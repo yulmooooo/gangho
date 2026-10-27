@@ -175,6 +175,32 @@
     </div>
   </div>
 
+  <!-- 암시장 궤짝 개봉 결과 전용 UI 모달 -->
+  <div id="gacha-result-modal" style="display: none;" class="fixed inset-0 bg-black/95 items-center justify-center p-4 z-50">
+    <div id="gacha-result-card" class="hanji-card border-2 w-full max-w-sm p-5 rounded-3xl shadow-2xl text-center space-y-3.5">
+      <div class="space-y-1">
+        <span id="gacha-res-tier-badge" class="text-[10px] font-bold tracking-widest uppercase px-2 py-0.5 rounded border"></span>
+        <h2 id="gacha-res-item-title" class="text-2xl font-brush"></h2>
+      </div>
+
+      <div class="w-14 h-14 mx-auto rounded-2xl bg-stone-950 border border-stone-700/80 p-2 flex items-center justify-center shadow-inner" id="gacha-res-icon"></div>
+
+      <div class="p-3 bg-stone-950/90 rounded-2xl border border-stone-800 space-y-2 text-left">
+        <p id="gacha-res-desc" class="text-xs text-stone-300 leading-relaxed font-medium"></p>
+        <div id="gacha-res-details" class="pt-2 border-t border-stone-800 flex flex-wrap gap-1.5 text-xs font-bold"></div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-2 pt-1">
+        <button id="btn-gacha-again" onclick="buyGachaBox()" class="py-3 bg-gradient-to-r from-amber-600 to-amber-500 hover:brightness-110 text-stone-950 font-brush text-sm rounded-xl transition cursor-pointer shadow">
+          한 번 더 개봉 (80냥)
+        </button>
+        <button onclick="closeGachaResultModal()" class="py-3 bg-stone-800 hover:bg-stone-700 text-stone-300 font-brush text-sm rounded-xl cursor-pointer">
+          확인 및 보관
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- 최종 엔딩 전당 모달 -->
   <div id="ending-modal" style="display: none;" class="fixed inset-0 bg-black/95 items-center justify-center p-4 z-50">
     <div id="ending-card" class="hanji-card border-2 w-full max-w-sm p-6 rounded-3xl shadow-2xl text-center space-y-4">
@@ -493,7 +519,7 @@
             </div>
           </div>
         </div>
-        <p class="text-[10px] text-stone-300 leading-tight font-medium">초대박(2%) 시 1,000냥 상당 전설 신화 무공 출현!</p>
+        <p class="text-[10px] text-stone-300 leading-tight font-medium">초대박(2%) 시 전설 비급 '천마신공' 원본 출현!</p>
         <button id="btn-gacha-buy" onclick="buyGachaBox()" class="w-full py-2.5 font-brush text-sm rounded-xl shadow cursor-pointer transition">
           궤짝 개봉 (80냥)
         </button>
@@ -551,6 +577,11 @@
         "자하신공": `<svg viewBox="0 0 16 16" class="w-full h-full pixel-art" fill="none"><rect x="3" y="2" width="10" height="12" rx="1" fill="#581c87"/><rect x="4" y="3" width="8" height="10" fill="#7e22ce"/><rect x="5" y="4" width="6" height="8" fill="#a855f7"/><rect x="6" y="6" width="4" height="1" fill="#fef08a"/><rect x="6" y="8" width="3" height="1" fill="#fef08a"/><rect x="2" y="2" width="2" height="12" fill="#3b0764"/></svg>`,
         "한철중검": `<svg viewBox="0 0 16 16" class="w-full h-full pixel-art" fill="none"><rect x="8" y="2" width="5" height="9" transform="rotate(45 8 2)" fill="#334155"/><rect x="9" y="3" width="2" height="8" transform="rotate(45 9 3)" fill="#64748b"/><rect x="3" y="9" width="5" height="2" transform="rotate(45 3 9)" fill="#0f172a"/><rect x="2" y="13" width="2" height="2" fill="#0284c7"/></svg>`,
         "구음진경": `<svg viewBox="0 0 16 16" class="w-full h-full pixel-art" fill="none"><rect x="3" y="2" width="10" height="12" rx="1" fill="#991b1b"/><rect x="4" y="3" width="8" height="10" fill="#dc2626"/><circle cx="8" cy="8" r="3" fill="#fef08a"/><path d="M8,5 A3,3 0 0,0 8,11 A1.5,1.5 0 0,0 8,8 A1.5,1.5 0 0,1 8,5" fill="#000"/><rect x="2" y="2" width="2" height="12" fill="#450a0a"/></svg>`,
+        "천마신공": `<svg viewBox="0 0 16 16" class="w-full h-full pixel-art" fill="none"><rect x="2" y="2" width="12" height="12" rx="1" fill="#450a0a"/><circle cx="8" cy="8" r="4" fill="#eab308"/><path d="M8,4 L10,8 L6,8 Z" fill="#000"/><rect x="3" y="3" width="2" height="10" fill="#b91c1c"/></svg>`,
+        "청홍검": `<svg viewBox="0 0 16 16" class="w-full h-full pixel-art" fill="none"><polygon points="13,1 15,3 6,12 4,10" fill="#a855f7"/><polygon points="12,2 14,4 5,13 3,11" fill="#38bdf8"/><circle cx="2" cy="14" r="1.5" fill="#eab308"/></svg>`,
+        "백년하수오": `<svg viewBox="0 0 16 16" class="w-full h-full pixel-art" fill="none"><circle cx="8" cy="9" r="4" fill="#047857"/><rect x="7" y="3" width="2" height="4" fill="#10b981"/><circle cx="8" cy="2" r="1" fill="#34d399"/></svg>`,
+        "연단환": `<svg viewBox="0 0 16 16" class="w-full h-full pixel-art" fill="none"><circle cx="8" cy="8" r="5" fill="#d97706"/><circle cx="7" cy="7" r="1.5" fill="#fef08a"/></svg>`,
+        "dust": `<svg viewBox="0 0 16 16" class="w-full h-full pixel-art" fill="none"><circle cx="5" cy="10" r="1.5" fill="#78716c"/><circle cx="11" cy="9" r="2" fill="#57534e"/><circle cx="8" cy="6" r="1" fill="#a8a29e"/></svg>`,
         "chest": `<svg viewBox="0 0 16 16" class="w-full h-full pixel-art" fill="none"><rect x="2" y="4" width="12" height="10" rx="1" fill="#78350f"/><rect x="2" y="4" width="12" height="4" fill="#a16207"/><rect x="2" y="8" width="12" height="1" fill="#1c1917"/><rect x="7" y="7" width="2" height="3" fill="#f59e0b"/><circle cx="8" cy="8.5" r="0.5" fill="#000"/></svg>`
       },
       enemies: {
@@ -592,7 +623,6 @@
 
     let yearGains = { qi: 0, ext: 0, agi: 0, fame: 0 };
 
-    // 밸런스 조정: 현경(950), 생사경(1500)
     const ranks = [
       { name: "삼류 무사 (三流)", minStat: 0, salary: 5, needsBreakthrough: false },
       { name: "이류 무사 (二流)", minStat: 50, salary: 15, needsBreakthrough: false },
@@ -729,7 +759,7 @@
 
     function openBreakthroughModal() {
       if (char.hasBreakthroughThisYear) {
-        alert("사경 폐관 돌파는 한 해에 한 번만 시도할 수 있습니다.");
+        showCustomAlert("사경 폐관 돌파는 한 해에 한 번만 시도할 수 있습니다.");
         return;
       }
 
@@ -757,7 +787,6 @@
       document.getElementById("breakthrough-modal").style.display = "none";
     }
 
-    // 밸런스 조정: 사경 돌파 보너스 수치 안정화 (총 +50)
     function executeBreakthrough() {
       const prob = parseInt(document.getElementById("breakthrough-modal").dataset.prob || "30", 10);
       const nextRank = ranks[char.rankIdx + 1];
@@ -851,7 +880,6 @@
       document.getElementById("breakthrough-result-modal").style.display = "none";
     }
 
-    // 밸런스 조정: 우화등선 천겁 시련 기준을 무력 2200으로 상향
     async function executeAscensionTrial() {
       if (char.hasAscended) return;
 
@@ -862,8 +890,6 @@
       const successProb = Math.min(80, 45 + Math.floor((myPower - 2200) / 15));
       const roll = Math.random() * 100;
 
-      alert("하늘이 갈라지며 아홉 갈래의 구천현뢰(九天玄雷)가 정수리로 쏟아져 내립니다!");
-
       if (roll < successProb) {
         char.hasAscended = true;
         char.title = "천상선인(天上仙人)";
@@ -873,7 +899,7 @@
         const lostQi = 45;
         char.qi = Math.max(10, char.qi - lostQi);
         addLog(char.age, `✕ [천겁 실패] 구천현뢰의 위력에 밀려 승천에 실패했습니다. (내공 -${lostQi})`, "text-red-400 font-bold");
-        alert(`구천현뢰의 압도적인 뇌기에 튕겨져 나왔습니다! 심각한 내상을 입었습니다. (내공 -${lostQi}년)`);
+        showGachaOrNoticeResult("ASCENSION_FAIL", lostQi);
         updateUI();
       }
     }
@@ -1115,7 +1141,6 @@
       }
     }
 
-    // 밸런스 조정: 비무 스탯 보상 과다 축적 완화
     function openDuelSelectModal() {
       const myPower = getCombatPower();
       const container = document.getElementById("duel-candidates");
@@ -1409,11 +1434,11 @@
 
     function buyShopItem(name, price, statBonus) {
       if (char.money < price) {
-        alert("은자가 부족합니다!");
+        showCustomAlert("은자가 부족합니다!");
         return;
       }
       if (char.ownedItems.includes(name)) {
-        alert("이미 습득한 고유 비급/장비입니다!");
+        showCustomAlert("이미 습득한 고유 비급/장비입니다!");
         return;
       }
 
@@ -1430,10 +1455,11 @@
       renderMarketUI();
     }
 
+    // === 암시장 궤짝 개봉 (자체 UI 팝업 연동) ===
     function buyGachaBox() {
       const COST = 80;
       if (char.money < COST) {
-        alert("은자 80냥이 부족합니다!");
+        showCustomAlert("은자 80냥이 부족합니다!");
         return;
       }
 
@@ -1441,24 +1467,54 @@
       const roll = Math.random() * 100;
       const gachaCard = document.getElementById("gacha-card");
 
+      let gachaResult = {};
+
       if (roll < 25) {
+        // 꽝
         addLog(char.age, `[암시장 궤짝] 80냥 상자는 흙먼지만 가득했습니다 (꽝)`, "text-stone-500 font-medium");
-        alert("먼지만 흩날리는 빈 상자였습니다... (꽝)");
+        gachaResult = {
+          tier: "FAIL",
+          title: "빈 상자 (꽝)",
+          desc: "조심스럽게 궤짝의 빗장을 열었으나, 흩날리는 흙먼지 외에는 아무것도 남아있지 않았습니다.",
+          iconKey: "dust",
+          details: [{ label: "손실", val: "-80냥", color: "text-stone-400" }]
+        };
       } else if (roll < 70) {
+        // 소박
         const refund = Math.floor(Math.random() * 40) + 30;
         char.money += refund;
         char.ext += 2;
         yearGains.ext += 2;
         addLog(char.age, `[암시장 궤짝] 연단환(외공+2)과 은자 ${refund}냥 회수`, "text-stone-200");
-        alert(`소박! 연단환(외공 +2)과 은자 ${refund}냥을 건졌습니다.`);
+        gachaResult = {
+          tier: "SMALL",
+          title: "연단환(練丹丸) & 노잣돈",
+          desc: "궤짝 구석에서 거친 기운의 알약 하나와 이전 주인이 흘린 노잣돈 주머니를 발견했습니다.",
+          iconKey: "연단환",
+          details: [
+            { label: "외공", val: "+2", color: "text-red-400" },
+            { label: "은자 회수", val: `+${refund}냥`, color: "text-yellow-400" }
+          ]
+        };
       } else if (roll < 92) {
+        // 중박
         char.qi += 10;
         char.agi += 6;
         yearGains.qi += 10;
         yearGains.agi += 6;
         addLog(char.age, `★ [암시장 중박] 희귀 영약 '백년하수오' (내공 +10, 신법 +6)`, "text-cyan-400 font-bold");
-        alert("중박! 희귀 영약 '백년하수오' 획득!");
+        gachaResult = {
+          tier: "MEDIUM",
+          title: "희귀 영약 '백년하수오'",
+          desc: "짙은 약향을 내뿜는 백 년 묵은 하수오를 섭취하여 단전의 혈맥을 맑게 넓혔습니다.",
+          iconKey: "백년하수오",
+          details: [
+            { label: "내공", val: "+10년", color: "text-amber-300" },
+            { label: "신법", val: "+6", color: "text-cyan-400" }
+          ]
+        };
       } else if (roll < 98) {
+        // 대박
         char.ext += 25;
         char.qi += 15;
         char.fame += 20;
@@ -1466,8 +1522,19 @@
         yearGains.qi += 15;
         yearGains.fame += 20;
         addLog(char.age, `★★ [암시장 대박] 명검 '청홍검' 발굴 (외공 +25, 내공 +15, 명성 +20)`, "text-purple-400 font-bold");
-        alert("★★ 대박! 명검 '청홍검'을 발굴했습니다!");
+        gachaResult = {
+          tier: "LARGE",
+          title: "고대 명검 '청홍검(靑紅劍)'",
+          desc: "붉고 푸른 안광을 뿜어내는 예기를 쥔 순간 전신에 전율이 흐르며 강호에 위명이 퍼집니다.",
+          iconKey: "청홍검",
+          details: [
+            { label: "외공", val: "+25", color: "text-red-400" },
+            { label: "내공", val: "+15년", color: "text-amber-300" },
+            { label: "명성", val: "+20", color: "text-emerald-400" }
+          ]
+        };
       } else {
+        // 초대박 (2%)
         char.qi += 60;
         char.ext += 35;
         char.agi += 30;
@@ -1479,12 +1546,118 @@
         gachaCard.classList.add("flash-gold");
         setTimeout(() => gachaCard.classList.remove("flash-gold"), 1200);
         addLog(char.age, `★★★ [초대박] 전설 비급 '천마신공' 원본 획득! 천하가 경악합니다!`, "text-amber-400 font-brush text-sm");
-        alert("★★★ 초대박 (2%)!! 전설의 '천마신공' 원본을 얻었습니다!!");
+        gachaResult = {
+          tier: "MYTHIC",
+          title: "전설 비급 '천마신공(天魔神功)'",
+          desc: "피와 번개의 기운이 서린 신화 속의 비급 원본입니다! 깨우치는 순간 전신의 혈맥이 폭발적으로 확장되었습니다.",
+          iconKey: "천마신공",
+          details: [
+            { label: "내공", val: "+60년", color: "text-amber-300" },
+            { label: "외공", val: "+35", color: "text-red-400" },
+            { label: "신법", val: "+30", color: "text-cyan-400" },
+            { label: "명성", val: "+50", color: "text-emerald-400" }
+          ]
+        };
       }
 
       checkRankUp();
       updateUI();
       renderMarketUI();
+      showGachaResultModal(gachaResult);
+    }
+
+    // 궤짝 결과 모달 화면 렌더링
+    function showGachaResultModal(res) {
+      const modal = document.getElementById("gacha-result-modal");
+      const card = document.getElementById("gacha-result-card");
+      const badge = document.getElementById("gacha-res-tier-badge");
+      const title = document.getElementById("gacha-res-item-title");
+      const icon = document.getElementById("gacha-res-icon");
+      const desc = document.getElementById("gacha-res-desc");
+      const details = document.getElementById("gacha-res-details");
+      const btnAgain = document.getElementById("btn-gacha-again");
+
+      card.classList.remove("flash-gold", "border-amber-400", "border-purple-500", "border-emerald-500", "border-stone-700");
+
+      title.innerText = res.title;
+      desc.innerText = res.desc;
+      icon.innerHTML = PIXEL_ASSETS.items[res.iconKey] || PIXEL_ASSETS.items.dust;
+
+      if (res.tier === "MYTHIC") {
+        card.classList.add("flash-gold", "border-amber-400");
+        badge.className = "text-[10px] font-bold tracking-widest uppercase px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-400";
+        badge.innerText = "MYTHIC 2% 초대박";
+        title.className = "text-2xl font-brush text-yellow-300";
+      } else if (res.tier === "LARGE") {
+        card.classList.add("border-purple-500");
+        badge.className = "text-[10px] font-bold tracking-widest uppercase px-2 py-0.5 rounded bg-purple-950 text-purple-300 border border-purple-500";
+        badge.innerText = "RARE 대박";
+        title.className = "text-2xl font-brush text-purple-300";
+      } else if (res.tier === "MEDIUM") {
+        card.classList.add("border-emerald-500");
+        badge.className = "text-[10px] font-bold tracking-widest uppercase px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-500";
+        badge.innerText = "UNCOMMON 중박";
+        title.className = "text-2xl font-brush text-emerald-300";
+      } else if (res.tier === "SMALL") {
+        card.classList.add("border-stone-600");
+        badge.className = "text-[10px] font-bold tracking-widest uppercase px-2 py-0.5 rounded bg-stone-800 text-stone-300 border border-stone-600";
+        badge.innerText = "COMMON 소박";
+        title.className = "text-2xl font-brush text-stone-200";
+      } else {
+        card.classList.add("border-stone-800");
+        badge.className = "text-[10px] font-bold tracking-widest uppercase px-2 py-0.5 rounded bg-stone-950 text-stone-500 border border-stone-800";
+        badge.innerText = "EMPTY 꽝";
+        title.className = "text-2xl font-brush text-stone-400";
+      }
+
+      details.innerHTML = "";
+      res.details.forEach(d => {
+        const span = document.createElement("span");
+        span.className = `px-2 py-1 rounded-lg bg-stone-900 border border-stone-800 ${d.color}`;
+        span.innerHTML = `${d.label} <strong>${d.val}</strong>`;
+        details.appendChild(span);
+      });
+
+      // 돈이 모자라면 '한 번 더 개봉' 비활성화
+      if (char.money < 80) {
+        btnAgain.disabled = true;
+        btnAgain.className = "py-3 bg-stone-900 border border-stone-800 text-stone-600 font-brush text-sm rounded-xl cursor-not-allowed";
+        btnAgain.innerText = "은자 부족 (80냥 필요)";
+      } else {
+        btnAgain.disabled = false;
+        btnAgain.className = "py-3 bg-gradient-to-r from-amber-600 to-amber-500 hover:brightness-110 text-stone-950 font-brush text-sm rounded-xl transition cursor-pointer shadow";
+        btnAgain.innerText = "한 번 더 개봉 (80냥)";
+      }
+
+      modal.style.display = "flex";
+    }
+
+    function closeGachaResultModal() {
+      document.getElementById("gacha-result-modal").style.display = "none";
+    }
+
+    // 승천 실패 알림 전용 UI 연동
+    function showGachaOrNoticeResult(type, lostQi) {
+      if (type === "ASCENSION_FAIL") {
+        showGachaResultModal({
+          tier: "FAIL",
+          title: "구천현뢰 격타 (천벌)",
+          desc: "구천현뢰의 무자비한 뇌기를 버텨내지 못하고 튕겨져 나왔습니다. 정수리에 심각한 내상을 입었습니다.",
+          iconKey: "dust",
+          details: [{ label: "내공 손실", val: `-${lostQi}년`, color: "text-rose-400" }]
+        });
+      }
+    }
+
+    // 간단한 인게임 알림
+    function showCustomAlert(msg) {
+      showGachaResultModal({
+        tier: "SMALL",
+        title: "강호 풍문",
+        desc: msg,
+        iconKey: "dust",
+        details: []
+      });
     }
 
     // === 다음 해 진행 ===
@@ -1700,7 +1873,6 @@
         btnBreakthrough.classList.add("hidden");
       }
 
-      // 밸런스 조정: 우화등선 버튼 노출 기준 상향 (생사경 + 무력 2200 이상)
       const btnAscension = document.getElementById("btn-ascension");
       if (char.rankIdx === 7 && getCombatPower() >= 2200 && !char.hasAscended) {
         btnAscension.classList.remove("hidden");
@@ -1711,7 +1883,9 @@
 
     window.addEventListener("keydown", function(e) {
       if (e.key === "Escape") {
-        if (document.getElementById("breakthrough-result-modal").style.display === "flex") {
+        if (document.getElementById("gacha-result-modal").style.display === "flex") {
+          closeGachaResultModal();
+        } else if (document.getElementById("breakthrough-result-modal").style.display === "flex") {
           closeBreakthroughResultModal();
         } else if (document.getElementById("tournament-modal").style.display === "flex") {
           if (!tournamentState.isFighting && tournamentState.stage === 0) {
