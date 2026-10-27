@@ -175,7 +175,7 @@
     </div>
   </div>
 
-  <!-- 암시장 궤짝 개봉 결과 전용 UI 모달 (상점보다 높은 z-[100] 부여) -->
+  <!-- 암시장 궤짝 개봉 결과 전용 UI 모달 -->
   <div id="gacha-result-modal" style="display: none;" class="fixed inset-0 bg-black/95 items-center justify-center p-4 z-[100]">
     <div id="gacha-result-card" class="hanji-card border-2 w-full max-w-sm p-5 rounded-3xl shadow-2xl text-center space-y-3.5">
       <div class="space-y-1">
@@ -202,8 +202,8 @@
   </div>
 
   <!-- 최종 엔딩 전당 모달 -->
-  <div id="ending-modal" style="display: none;" class="fixed inset-0 bg-black/95 items-center justify-center p-4 z-50">
-    <div id="ending-card" class="hanji-card border-2 w-full max-w-sm p-6 rounded-3xl shadow-2xl text-center space-y-4">
+  <div id="ending-modal" style="display: none;" class="fixed inset-0 bg-black/95 items-center justify-center p-3 z-50">
+    <div id="ending-card" class="hanji-card border-2 w-full max-w-sm p-5 rounded-3xl shadow-2xl text-center space-y-3 max-h-[94vh] overflow-y-auto">
       <div class="space-y-1">
         <span id="ending-badge" class="text-[10px] font-bold tracking-widest uppercase px-2.5 py-0.5 rounded border"></span>
         <h2 id="ending-title" class="text-2xl font-brush"></h2>
@@ -211,10 +211,10 @@
 
       <div class="w-16 h-16 mx-auto rounded-2xl bg-stone-950 border-2 border-amber-500/60 p-1.5 flex items-center justify-center shadow-inner relative overflow-hidden" id="ending-avatar-box"></div>
 
-      <div class="p-4 bg-stone-950/90 rounded-2xl border border-stone-800 space-y-3 text-left">
+      <div class="p-3.5 bg-stone-950/90 rounded-2xl border border-stone-800 space-y-2 text-left">
         <p id="ending-epilogue" class="text-xs leading-relaxed text-stone-300 font-medium"></p>
         
-        <div class="pt-2.5 border-t border-stone-800 grid grid-cols-2 gap-2 text-center text-xs">
+        <div class="pt-2 border-t border-stone-800 grid grid-cols-2 gap-1.5 text-center text-xs">
           <div class="bg-stone-900/80 p-1.5 rounded-xl border border-stone-800">
             <span class="text-stone-400 text-[10px] block">최종 경지</span>
             <strong id="end-stat-rank" class="text-amber-300 font-bold"></strong>
@@ -228,15 +228,91 @@
             <strong id="end-stat-age" class="text-stone-200 font-bold"></strong>
           </div>
           <div class="bg-stone-900/80 p-1.5 rounded-xl border border-stone-800">
-            <span class="text-stone-400 text-[10px] block">평생 모은 은자</span>
+            <span class="text-stone-400 text-[10px] block">보유 은자</span>
             <strong id="end-stat-money" class="text-yellow-400 font-bold"></strong>
           </div>
         </div>
       </div>
 
-      <button onclick="location.reload()" class="w-full py-3.5 bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 hover:brightness-110 text-stone-950 font-brush text-base rounded-xl transition shadow-xl cursor-pointer">
-        새로운 생으로 환생하다 (다시 시작) 🔄
-      </button>
+      <div class="space-y-1.5 pt-1">
+        <!-- 썸네일 카드 이미지 생성 및 공유 버튼 -->
+        <button onclick="generateShareCard()" class="w-full py-3 bg-gradient-to-r from-emerald-600 to-teal-500 hover:brightness-110 text-white font-brush text-sm rounded-xl transition shadow-lg cursor-pointer flex items-center justify-center gap-1.5">
+          <span>📸 내 기록 공유 카드 생성 (이미지/카톡)</span>
+        </button>
+
+        <button id="btn-submit-rank" onclick="submitToLeaderboard()" class="w-full py-2.5 bg-gradient-to-r from-amber-500 to-yellow-500 hover:brightness-110 text-stone-950 font-brush text-xs rounded-xl transition shadow cursor-pointer">
+          🏆 천하 서열록(랭킹)에 내 기록 헌액하기
+        </button>
+
+        <button onclick="openLeaderboardModal()" class="w-full py-2 bg-stone-900 border border-amber-600/50 hover:bg-stone-800 text-amber-300 font-brush text-xs rounded-xl cursor-pointer">
+          📜 천하 서열록 (실시간 Top 30) 열람
+        </button>
+
+        <button onclick="location.reload()" class="w-full py-2 bg-stone-800 hover:bg-stone-700 text-stone-300 font-brush text-xs rounded-xl cursor-pointer">
+          새로운 생으로 환생하다 (다시 시작) 🔄
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 공유 썸네일 카드 팝업 모달 (미리보기 및 공유/저장) -->
+  <div id="share-card-modal" style="display: none;" class="fixed inset-0 bg-black/95 items-center justify-center p-3 z-[120]">
+    <div class="hanji-card border-2 gold-border w-full max-w-sm p-4 rounded-3xl shadow-2xl space-y-3 text-center">
+      <div class="flex justify-between items-center pb-1 border-b border-stone-800">
+        <h3 class="text-base font-brush text-amber-300">강호 명예 족자 (공유 썸네일)</h3>
+        <button onclick="closeShareCardModal()" class="text-stone-400 hover:text-white font-bold text-lg p-1">✕</button>
+      </div>
+
+      <div class="w-full bg-stone-950 rounded-2xl p-2 border border-stone-800 shadow-inner flex justify-center">
+        <canvas id="share-canvas" width="600" height="780" class="w-full h-auto rounded-xl shadow-2xl max-h-[55vh] object-contain"></canvas>
+      </div>
+
+      <p class="text-[10px] text-stone-400 font-medium">
+        스마트폰에서는 [공유하기]를 누르면 카카오톡/인스타로 바로 보낼 수 있습니다.
+      </p>
+
+      <div class="grid grid-cols-2 gap-2 pt-1">
+        <button id="btn-native-share" onclick="handleNativeShare()" class="py-3 bg-gradient-to-r from-amber-600 to-amber-500 hover:brightness-110 text-stone-950 font-brush text-sm rounded-xl cursor-pointer shadow">
+          📲 카톡 / SNS 공유
+        </button>
+        <button onclick="downloadShareCard()" class="py-3 bg-stone-800 hover:bg-stone-700 text-stone-200 font-brush text-sm rounded-xl cursor-pointer border border-stone-700">
+          💾 이미지 저장
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 천하 서열록 (실시간 랭킹 Top 30 모달) -->
+  <div id="leaderboard-modal" style="display: none;" class="fixed inset-0 bg-black/95 items-center justify-center p-3 z-[110]">
+    <div class="hanji-card border-2 gold-border w-full max-w-sm p-4 rounded-3xl shadow-2xl space-y-3 max-h-[92vh] flex flex-col">
+      <div class="flex justify-between items-start pb-2 border-b border-stone-800">
+        <div>
+          <span class="text-[9px] font-bold text-amber-500 uppercase tracking-widest">HALL OF FAME TOP 30</span>
+          <h3 class="text-xl font-brush text-yellow-300">천하 서열록 (天下序列錄)</h3>
+        </div>
+        <button onclick="closeLeaderboardModal()" class="text-stone-400 hover:text-white font-bold p-1 text-lg">✕</button>
+      </div>
+
+      <div class="grid grid-cols-3 gap-1 p-1 bg-stone-950 rounded-xl border border-stone-800 text-center font-bold text-xs">
+        <button id="tab-daily" onclick="switchRankTab('daily')" class="py-1.5 rounded-lg bg-amber-600 text-stone-950 cursor-pointer transition">
+          오늘의 서열
+        </button>
+        <button id="tab-weekly" onclick="switchRankTab('weekly')" class="py-1.5 rounded-lg text-stone-400 hover:text-white cursor-pointer transition">
+          주간 서열
+        </button>
+        <button id="tab-monthly" onclick="switchRankTab('monthly')" class="py-1.5 rounded-lg text-stone-400 hover:text-white cursor-pointer transition">
+          월간 서열
+        </button>
+      </div>
+
+      <div class="text-[10px] text-stone-400 text-center flex justify-between px-1">
+        <span id="rank-period-info">오늘 기준 무력 순위 Top 30</span>
+        <button onclick="loadLeaderboard()" class="text-amber-400 hover:underline cursor-pointer">🔄 새로고침</button>
+      </div>
+
+      <div id="leaderboard-list" class="flex-1 overflow-y-auto space-y-1.5 pr-1 text-xs">
+        <div class="text-center py-10 text-stone-500 font-medium">서열을 불러오는 중...</div>
+      </div>
     </div>
   </div>
 
@@ -256,10 +332,15 @@
             <p id="char-sect" class="text-xs font-semibold text-stone-400 mt-0.5">화산파</p>
           </div>
         </div>
-        <div class="text-right">
-          <span id="char-age" class="text-2xl font-brush text-stone-100">16</span>
-          <span class="text-xs font-bold text-amber-500">세(歲)</span>
-          <div id="char-body-state" class="text-[9px] font-bold text-emerald-400 mt-0.5">기혈 왕성 (전성기)</div>
+        <div class="text-right flex flex-col items-end">
+          <button onclick="openLeaderboardModal()" class="px-2 py-0.5 mb-1 rounded bg-amber-950/80 border border-amber-500/50 text-[10px] font-bold text-amber-300 hover:bg-amber-900 cursor-pointer shadow">
+            🏆 강호 서열록
+          </button>
+          <div>
+            <span id="char-age" class="text-2xl font-brush text-stone-100">16</span>
+            <span class="text-xs font-bold text-amber-500">세(歲)</span>
+          </div>
+          <div id="char-body-state" class="text-[9px] font-bold text-emerald-400">기혈 왕성 (전성기)</div>
         </div>
       </div>
 
@@ -365,12 +446,10 @@
         </button>
       </div>
 
-      <!-- 현경/생사경 사경 폐관 돌파 버튼 -->
       <button id="btn-breakthrough" onclick="openBreakthroughModal()" class="w-full py-2.5 bg-gradient-to-r from-red-950 via-stone-900 to-red-950 border-2 border-red-600/70 text-red-300 breakthrough-pulse rounded-xl font-brush text-base flex items-center justify-center gap-1.5 cursor-pointer shadow hidden">
         <span>⚡ 생사 폐관 돌파 (경지 초월 시도)</span>
       </button>
 
-      <!-- 우화등선 천겁 시련 버튼 (생사경 + 무력 2200 이상) -->
       <button id="btn-ascension" onclick="executeAscensionTrial()" class="w-full py-3 bg-gradient-to-r from-sky-950 via-cyan-900 to-amber-950 border-2 border-cyan-400 text-cyan-200 immortal-card rounded-xl font-brush text-base flex items-center justify-center gap-1.5 cursor-pointer shadow-xl hidden">
         <span>⚡ 우화등선(羽化登仙): 구천현뢰 천겁 돌파</span>
       </button>
@@ -537,6 +616,14 @@
   </div>
 
   <script>
+    // ==========================================
+    // [설정] 본인의 Firebase Realtime Database URL
+    // ==========================================
+    const FIREBASE_DB_URL = "https://gangho-rank-default-rtdb.firebaseio.com/";
+
+    let currentRankTab = 'daily';
+    let hasSubmittedThisLife = false;
+
     const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
     const PIXEL_ASSETS = {
@@ -967,6 +1054,400 @@
       }
 
       modal.style.display = "flex";
+    }
+
+    // ==========================================
+    // 📸 공유 썸네일 카드 캔버스 생성 및 전송 로직
+    // ==========================================
+    function generateShareCard() {
+      const canvas = document.getElementById("share-canvas");
+      const ctx = canvas.getContext("2d");
+      const w = canvas.width;
+      const h = canvas.height;
+
+      // 1. 먹색 한지 배경
+      ctx.fillStyle = "#0c0d10";
+      ctx.fillRect(0, 0, w, h);
+
+      // 격자 패턴 질감
+      ctx.fillStyle = "rgba(217, 180, 110, 0.03)";
+      for (let x = 0; x < w; x += 15) {
+        for (let y = 0; y < h; y += 15) {
+          ctx.fillRect(x, y, 1, 1);
+        }
+      }
+
+      // 2. 동양풍 금빛 2중 테두리
+      ctx.strokeStyle = "rgba(217, 160, 60, 0.75)";
+      ctx.lineWidth = 4;
+      ctx.strokeRect(18, 18, w - 36, h - 36);
+
+      ctx.strokeStyle = "rgba(217, 160, 60, 0.25)";
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(26, 26, w - 52, h - 52);
+
+      // 모서리 장식
+      const corners = [[26, 26], [w - 26, 26], [26, h - 26], [w - 26, h - 26]];
+      ctx.fillStyle = "#d9a03c";
+      corners.forEach(([cx, cy]) => {
+        ctx.beginPath();
+        ctx.arc(cx, cy, 4, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // 3. 타이틀 영역
+      ctx.textAlign = "center";
+      ctx.fillStyle = "#f59e0b";
+      ctx.font = "bold 15px sans-serif";
+      ctx.fillText("✦ WUXIA LIFE SIMULATOR ✦", w / 2, 70);
+
+      ctx.fillStyle = "#fef08a";
+      ctx.font = "bold 34px 'Do Hyeon', 'Noto Serif KR', serif";
+      ctx.fillText("강호풍운록 (江湖風雲錄)", w / 2, 112);
+
+      ctx.fillStyle = "#a8a29e";
+      ctx.font = "bold 14px sans-serif";
+      ctx.fillText("── 천하에 아로새겨진 한 무인의 전설 ──", w / 2, 140);
+
+      // 4. 캐릭터 정보 박스
+      const boxY = 170;
+      ctx.fillStyle = "rgba(24, 25, 29, 0.85)";
+      ctx.strokeStyle = "rgba(180, 140, 80, 0.35)";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.roundRect(40, boxY, w - 80, 180, 16);
+      ctx.fill();
+      ctx.stroke();
+
+      // 아바타 그리기
+      const avSvg = getAvatarSvg(char.avatarId);
+      const avImg = new Image();
+      const svgBlob = new Blob([avSvg], { type: "image/svg+xml;charset=utf-8" });
+      const avUrl = URL.createObjectURL(svgBlob);
+
+      avImg.onload = function() {
+        ctx.drawImage(avImg, 65, boxY + 28, 120, 120);
+        URL.revokeObjectURL(avUrl);
+
+        // 텍스트 정보 (우측)
+        ctx.textAlign = "left";
+        ctx.fillStyle = "#fde047";
+        ctx.font = "bold 28px 'Do Hyeon', 'Noto Serif KR', serif";
+        ctx.fillText(char.name, 210, boxY + 65);
+
+        ctx.fillStyle = "#cbd5e1";
+        ctx.font = "bold 16px sans-serif";
+        ctx.fillText(`소속 : ${char.sect}`, 210, boxY + 98);
+
+        ctx.fillStyle = "#38bdf8";
+        ctx.font = "bold 15px sans-serif";
+        const endingRankName = char.hasAscended ? "신선 / 등선경 (神仙)" : ranks[char.rankIdx].name;
+        ctx.fillText(`경지 : ${endingRankName}`, 210, boxY + 128);
+
+        // 5. 스탯 박스 4분할
+        const statY = 375;
+        const stats = [
+          { label: "최종 무력", val: `${getCombatPower()}`, color: "#facc15" },
+          { label: "도달 연령", val: `${char.age} 세`, color: "#f3f4f6" },
+          { label: "내공 (內功)", val: `${char.qi} 년`, color: "#fbbf24" },
+          { label: "보유 은자", val: `${char.money} 냥`, color: "#34d399" }
+        ];
+
+        stats.forEach((st, i) => {
+          const col = i % 2;
+          const row = Math.floor(i / 2);
+          const bx = 40 + col * 265;
+          const by = statY + row * 105;
+
+          ctx.fillStyle = "rgba(18, 19, 22, 0.9)";
+          ctx.strokeStyle = "rgba(100, 100, 100, 0.35)";
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.roundRect(bx, by, 255, 90, 14);
+          ctx.fill();
+          ctx.stroke();
+
+          ctx.textAlign = "center";
+          ctx.fillStyle = "#94a3b8";
+          ctx.font = "bold 13px sans-serif";
+          ctx.fillText(st.label, bx + 127, by + 32);
+
+          ctx.fillStyle = st.color;
+          ctx.font = "bold 26px 'Do Hyeon', sans-serif";
+          ctx.fillText(st.val, bx + 127, by + 68);
+        });
+
+        // 6. 하단 에필로그 한 줄 요약
+        ctx.textAlign = "center";
+        ctx.fillStyle = "#e2e8f0";
+        ctx.font = "bold 16px 'Noto Serif KR', serif";
+        const endingTitle = document.getElementById("ending-title").innerText || "무림의 전설";
+        ctx.fillText(`★ [결말] ${endingTitle} ★`, w / 2, 630);
+
+        ctx.fillStyle = "#78716c";
+        ctx.font = "12px sans-serif";
+        ctx.fillText("지금 링크를 열어 당신의 무협 인생을 시뮬레이션해보세요!", w / 2, 690);
+
+        ctx.fillStyle = "#d97706";
+        ctx.font = "bold 13px sans-serif";
+        ctx.fillText("https://yulmooooo.github.io/gangho/", w / 2, 715);
+
+        document.getElementById("share-card-modal").style.display = "flex";
+      };
+
+      avImg.src = avUrl;
+    }
+
+    function closeShareCardModal() {
+      document.getElementById("share-card-modal").style.display = "none";
+    }
+
+    // 모바일 카카오톡/SNS 공유
+    async function handleNativeShare() {
+      const canvas = document.getElementById("share-canvas");
+      const title = `[강호풍운록] ${char.name}의 최종 기록!`;
+      const text = `${char.name}이(가) ${char.age}세에 최종 무력 ${getCombatPower()}에 도달했습니다! 당신도 천하제일에 도전해보세요.`;
+      const url = window.location.href;
+
+      canvas.toBlob(async (blob) => {
+        const file = new File([blob], "gangho-record.png", { type: "image/png" });
+
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          try {
+            await navigator.share({
+              files: [file],
+              title: title,
+              text: text,
+              url: url
+            });
+          } catch (e) {
+            if (e.name !== "AbortError") downloadShareCard();
+          }
+        } else if (navigator.share) {
+          try {
+            await navigator.share({ title: title, text: text, url: url });
+          } catch (e) {
+            downloadShareCard();
+          }
+        } else {
+          downloadShareCard();
+        }
+      });
+    }
+
+    // 이미지 파일 직접 다운로드
+    function downloadShareCard() {
+      const canvas = document.getElementById("share-canvas");
+      const a = document.createElement("a");
+      a.download = `강호풍운록_${char.name}_기록.png`;
+      a.href = canvas.toDataURL("image/png");
+      a.click();
+    }
+
+    // ==========================================
+    // 실시간 랭킹 시스템 (Firebase REST API 연동)
+    // ==========================================
+    function getWeekNumber(date) {
+      const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+      const dayNum = d.getUTCDay() || 7;
+      d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+      const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+      return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+    }
+
+    function getPeriodKeys() {
+      const now = new Date();
+      const yyyy = now.getFullYear();
+      const mm = String(now.getMonth() + 1).padStart(2, '0');
+      const dd = String(now.getDate()).padStart(2, '0');
+      const week = getWeekNumber(now);
+
+      return {
+        daily: `${yyyy}-${mm}-${dd}`,
+        weekly: `${yyyy}-W${week}`,
+        monthly: `${yyyy}-${mm}`
+      };
+    }
+
+    async function submitToLeaderboard() {
+      if (hasSubmittedThisLife) {
+        showCustomAlert("이미 이번 생의 기록을 천하 서열록에 등록하셨습니다.");
+        return;
+      }
+
+      if (!FIREBASE_DB_URL || FIREBASE_DB_URL.includes("내프로젝트")) {
+        showCustomAlert("Firebase Database URL이 아직 연결되지 않았습니다.");
+        return;
+      }
+
+      const submitBtn = document.getElementById("btn-submit-rank");
+      submitBtn.disabled = true;
+      submitBtn.innerText = "서열록에 헌액하는 중...";
+
+      const totalPower = getCombatPower();
+      const period = getPeriodKeys();
+      const record = {
+        name: char.name,
+        sect: char.sect,
+        power: totalPower,
+        rankName: ranks[char.rankIdx].name.split(" ")[0],
+        age: char.age,
+        avatarId: char.avatarId,
+        dailyKey: period.daily,
+        weeklyKey: period.weekly,
+        monthlyKey: period.monthly,
+        createdAt: Date.now()
+      };
+
+      try {
+        const url = `${FIREBASE_DB_URL.replace(/\/$/, '')}/rankings.json`;
+        const res = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(record)
+        });
+
+        if (res.ok) {
+          hasSubmittedThisLife = true;
+          submitBtn.innerText = "✓ 천하 서열록 등록 완료";
+          submitBtn.className = "w-full py-2.5 bg-stone-800 text-stone-500 font-brush text-xs rounded-xl cursor-not-allowed";
+          openLeaderboardModal();
+        } else {
+          throw new Error("HTTP " + res.status);
+        }
+      } catch (err) {
+        console.error("랭킹 등록 실패:", err);
+        showCustomAlert("서열록 등록에 실패했습니다. Firebase 데이터베이스 규칙을 확인해 주세요.");
+        submitBtn.disabled = false;
+        submitBtn.innerText = "🏆 천하 서열록(랭킹)에 내 기록 헌액하기";
+      }
+    }
+
+    function switchRankTab(type) {
+      currentRankTab = type;
+      const tabs = ['daily', 'weekly', 'monthly'];
+      tabs.forEach(t => {
+        const btn = document.getElementById(`tab-${t}`);
+        if (t === type) {
+          btn.className = "py-1.5 rounded-lg bg-amber-600 text-stone-950 cursor-pointer transition font-extrabold";
+        } else {
+          btn.className = "py-1.5 rounded-lg text-stone-400 hover:text-white cursor-pointer transition";
+        }
+      });
+
+      const infoMap = {
+        daily: "오늘 달성한 무력 순위 Top 30",
+        weekly: "이번 주 달성한 무력 순위 Top 30",
+        monthly: "이번 달 달성한 무력 순위 Top 30"
+      };
+      document.getElementById("rank-period-info").innerText = infoMap[type];
+      loadLeaderboard();
+    }
+
+    function openLeaderboardModal() {
+      document.getElementById("leaderboard-modal").style.display = "flex";
+      switchRankTab(currentRankTab);
+    }
+
+    function closeLeaderboardModal() {
+      document.getElementById("leaderboard-modal").style.display = "none";
+    }
+
+    async function loadLeaderboard() {
+      const listElem = document.getElementById("leaderboard-list");
+      listElem.innerHTML = `<div class="text-center py-10 text-stone-400 animate-pulse font-medium">강호의 기록들을 대조하는 중...</div>`;
+
+      if (!FIREBASE_DB_URL || FIREBASE_DB_URL.includes("내프로젝트")) {
+        listElem.innerHTML = `
+          <div class="text-center py-10 text-stone-400 space-y-2">
+            <p class="text-yellow-400 font-bold">Firebase DB URL 미설정</p>
+            <p class="text-[11px] text-stone-400">코드 상단의 FIREBASE_DB_URL 칸에<br>무료 Realtime Database 주소를 입력해 주세요.</p>
+          </div>
+        `;
+        return;
+      }
+
+      try {
+        const url = `${FIREBASE_DB_URL.replace(/\/$/, '')}/rankings.json?orderBy="power"&limitToLast=100`;
+        const res = await fetch(url);
+        if (!res.ok) throw new Error("서버 응답 오류 " + res.status);
+        const data = await res.json();
+
+        if (!data) {
+          listElem.innerHTML = `<div class="text-center py-10 text-stone-500">아직 서열록에 등록된 고수가 없습니다.</div>`;
+          return;
+        }
+
+        const nowPeriods = getPeriodKeys();
+        const currentTargetKey = nowPeriods[currentRankTab];
+        const filterKey = `${currentRankTab}Key`;
+
+        let list = Object.values(data).filter(item => item[filterKey] === currentTargetKey);
+        list.sort((a, b) => (b.power || 0) - (a.power || 0));
+        list = list.slice(0, 30);
+
+        if (list.length === 0) {
+          listElem.innerHTML = `<div class="text-center py-10 text-stone-500 font-medium">해당 기간에 헌액된 고수가 아직 없습니다.<br>첫 번째 전설이 되어보세요!</div>`;
+          return;
+        }
+
+        listElem.innerHTML = "";
+        list.forEach((entry, idx) => {
+          const rankNum = idx + 1;
+          const row = document.createElement("div");
+
+          let rankBadgeClass = "bg-stone-900 text-stone-400 border border-stone-800";
+          let borderHighlight = "border-stone-800/80 bg-stone-950/70";
+
+          if (rankNum === 1) {
+            rankBadgeClass = "bg-yellow-500 text-stone-950 font-black shadow-[0_0_8px_rgba(234,179,8,0.7)]";
+            borderHighlight = "border-amber-500/80 bg-stone-900/90";
+          } else if (rankNum === 2) {
+            rankBadgeClass = "bg-stone-300 text-stone-950 font-black";
+            borderHighlight = "border-stone-500 bg-stone-900/80";
+          } else if (rankNum === 3) {
+            rankBadgeClass = "bg-amber-700 text-white font-black";
+            borderHighlight = "border-amber-800 bg-stone-900/80";
+          }
+
+          row.className = `p-2 rounded-xl border flex items-center justify-between gap-2 ${borderHighlight}`;
+          row.innerHTML = `
+            <div class="flex items-center gap-2.5 min-w-0">
+              <span class="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-brush shrink-0 ${rankBadgeClass}">
+                ${rankNum}
+              </span>
+              <div class="w-8 h-8 rounded-lg bg-stone-950 border border-stone-800 flex items-center justify-center p-0.5 shrink-0 overflow-hidden">
+                ${getAvatarSvg(entry.avatarId || "huashan")}
+              </div>
+              <div class="min-w-0">
+                <div class="font-bold text-stone-100 truncate flex items-center gap-1.5">
+                  <span>${entry.name}</span>
+                  <span class="text-[9px] px-1 py-0.2 rounded bg-stone-900 text-amber-300 border border-stone-800 shrink-0 font-normal">
+                    ${entry.sect}
+                  </span>
+                </div>
+                <div class="text-[10px] text-stone-400 mt-0.5">
+                  <span>${entry.rankName}</span> · <span>${entry.age}세 은퇴</span>
+                </div>
+              </div>
+            </div>
+            <div class="text-right shrink-0">
+              <span class="text-[9px] text-stone-500 block font-bold">무력</span>
+              <strong class="text-amber-300 text-sm font-extrabold">${entry.power}</strong>
+            </div>
+          `;
+          listElem.appendChild(row);
+        });
+
+      } catch (err) {
+        console.error("랭킹 조회 실패:", err);
+        listElem.innerHTML = `
+          <div class="text-center py-8 text-rose-400 space-y-1">
+            <p class="font-bold">서열록을 불러오지 못했습니다.</p>
+            <p class="text-[10px] text-stone-500">네트워크 또는 Firebase 보안 규칙을 확인해 주세요.</p>
+          </div>
+        `;
+      }
     }
 
     function handleDuelClick() {
@@ -1455,7 +1936,7 @@
       renderMarketUI();
     }
 
-    // === 암시장 궤짝 개봉 (자체 UI 팝업 연동) ===
+    // === 암시장 궤짝 개봉 ===
     function buyGachaBox() {
       const COST = 80;
       if (char.money < COST) {
@@ -1575,8 +2056,6 @@
 
       title.innerText = res.title;
       desc.innerText = res.desc;
-      
-      // 아이콘 안전 로드 (없을 경우 기본 상자 아이콘으로 fallback)
       icon.innerHTML = (PIXEL_ASSETS.items && PIXEL_ASSETS.items[res.iconKey]) ? PIXEL_ASSETS.items[res.iconKey] : PIXEL_ASSETS.items.chest;
 
       if (res.tier === "MYTHIC") {
@@ -1760,13 +2239,13 @@
       const bodyStateElem = document.getElementById("char-body-state");
       if (char.age < 36) {
         bodyStateElem.innerText = "기혈 왕성 (전성기)";
-        bodyStateElem.className = "text-[9px] font-bold text-emerald-400 mt-0.5";
+        bodyStateElem.className = "text-[9px] font-bold text-emerald-400";
       } else if (char.age < 46) {
         bodyStateElem.innerText = "기혈 정체 (수련 둔화)";
-        bodyStateElem.className = "text-[9px] font-bold text-yellow-400 mt-0.5";
+        bodyStateElem.className = "text-[9px] font-bold text-yellow-400";
       } else {
         bodyStateElem.innerText = "기혈 쇠퇴 (노화 진행)";
-        bodyStateElem.className = "text-[9px] font-bold text-rose-400 mt-0.5";
+        bodyStateElem.className = "text-[9px] font-bold text-rose-400";
       }
 
       const titleTag = document.getElementById("char-title-tag");
@@ -1876,7 +2355,11 @@
 
     window.addEventListener("keydown", function(e) {
       if (e.key === "Escape") {
-        if (document.getElementById("gacha-result-modal").style.display === "flex") {
+        if (document.getElementById("share-card-modal").style.display === "flex") {
+          closeShareCardModal();
+        } else if (document.getElementById("leaderboard-modal").style.display === "flex") {
+          closeLeaderboardModal();
+        } else if (document.getElementById("gacha-result-modal").style.display === "flex") {
           closeGachaResultModal();
         } else if (document.getElementById("breakthrough-result-modal").style.display === "flex") {
           closeBreakthroughResultModal();
