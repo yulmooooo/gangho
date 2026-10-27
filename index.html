@@ -175,8 +175,8 @@
     </div>
   </div>
 
-  <!-- 암시장 궤짝 개봉 결과 전용 UI 모달 (상점보다 높은 z-[70] 부여) -->
-  <div id="gacha-result-modal" style="display: none;" class="fixed inset-0 bg-black/95 items-center justify-center p-4 z-[70]">
+  <!-- 암시장 궤짝 개봉 결과 전용 UI 모달 (상점보다 높은 z-[100] 부여) -->
+  <div id="gacha-result-modal" style="display: none;" class="fixed inset-0 bg-black/95 items-center justify-center p-4 z-[100]">
     <div id="gacha-result-card" class="hanji-card border-2 w-full max-w-sm p-5 rounded-3xl shadow-2xl text-center space-y-3.5">
       <div class="space-y-1">
         <span id="gacha-res-tier-badge" class="text-[10px] font-bold tracking-widest uppercase px-2 py-0.5 rounded border"></span>
@@ -495,8 +495,8 @@
     </div>
   </div>
 
-  <!-- 상점 & 암시장 모달 -->
-  <div id="market-modal" style="display: none;" class="fixed inset-0 bg-black/90 items-center justify-center p-3 z-50">
+  <!-- 상점 & 암시장 모달 (z-40) -->
+  <div id="market-modal" style="display: none;" class="fixed inset-0 bg-black/90 items-center justify-center p-3 z-40">
     <div class="hanji-card border-2 gold-border w-full max-w-sm p-4 rounded-3xl shadow-2xl space-y-3.5 max-h-[90vh] overflow-y-auto">
       <div class="flex justify-between items-center pb-2 border-b border-stone-800">
         <div>
@@ -1575,7 +1575,9 @@
 
       title.innerText = res.title;
       desc.innerText = res.desc;
-      icon.innerHTML = PIXEL_ASSETS.items[res.iconKey] || PIXEL_ASSETS.items.dust;
+      
+      // 아이콘 안전 로드 (없을 경우 기본 상자 아이콘으로 fallback)
+      icon.innerHTML = (PIXEL_ASSETS.items && PIXEL_ASSETS.items[res.iconKey]) ? PIXEL_ASSETS.items[res.iconKey] : PIXEL_ASSETS.items.chest;
 
       if (res.tier === "MYTHIC") {
         card.classList.add("flash-gold", "border-amber-400");
@@ -1646,7 +1648,7 @@
         tier: "SMALL",
         title: "강호 풍문",
         desc: msg,
-        iconKey: "dust",
+        iconKey: "chest",
         details: []
       });
     }
