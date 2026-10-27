@@ -175,8 +175,8 @@
     </div>
   </div>
 
-  <!-- 암시장 궤짝 개봉 결과 전용 UI 모달 -->
-  <div id="gacha-result-modal" style="display: none;" class="fixed inset-0 bg-black/95 items-center justify-center p-4 z-50">
+  <!-- 암시장 궤짝 개봉 결과 전용 UI 모달 (상점보다 높은 z-[70] 부여) -->
+  <div id="gacha-result-modal" style="display: none;" class="fixed inset-0 bg-black/95 items-center justify-center p-4 z-[70]">
     <div id="gacha-result-card" class="hanji-card border-2 w-full max-w-sm p-5 rounded-3xl shadow-2xl text-center space-y-3.5">
       <div class="space-y-1">
         <span id="gacha-res-tier-badge" class="text-[10px] font-bold tracking-widest uppercase px-2 py-0.5 rounded border"></span>
@@ -195,7 +195,7 @@
           한 번 더 개봉 (80냥)
         </button>
         <button onclick="closeGachaResultModal()" class="py-3 bg-stone-800 hover:bg-stone-700 text-stone-300 font-brush text-sm rounded-xl cursor-pointer">
-          확인 및 보관
+          확인 및 닫기
         </button>
       </div>
     </div>
@@ -1470,7 +1470,6 @@
       let gachaResult = {};
 
       if (roll < 25) {
-        // 꽝
         addLog(char.age, `[암시장 궤짝] 80냥 상자는 흙먼지만 가득했습니다 (꽝)`, "text-stone-500 font-medium");
         gachaResult = {
           tier: "FAIL",
@@ -1480,7 +1479,6 @@
           details: [{ label: "손실", val: "-80냥", color: "text-stone-400" }]
         };
       } else if (roll < 70) {
-        // 소박
         const refund = Math.floor(Math.random() * 40) + 30;
         char.money += refund;
         char.ext += 2;
@@ -1497,7 +1495,6 @@
           ]
         };
       } else if (roll < 92) {
-        // 중박
         char.qi += 10;
         char.agi += 6;
         yearGains.qi += 10;
@@ -1514,7 +1511,6 @@
           ]
         };
       } else if (roll < 98) {
-        // 대박
         char.ext += 25;
         char.qi += 15;
         char.fame += 20;
@@ -1534,7 +1530,6 @@
           ]
         };
       } else {
-        // 초대박 (2%)
         char.qi += 60;
         char.ext += 35;
         char.agi += 30;
@@ -1566,7 +1561,6 @@
       showGachaResultModal(gachaResult);
     }
 
-    // 궤짝 결과 모달 화면 렌더링
     function showGachaResultModal(res) {
       const modal = document.getElementById("gacha-result-modal");
       const card = document.getElementById("gacha-result-card");
@@ -1618,7 +1612,6 @@
         details.appendChild(span);
       });
 
-      // 돈이 모자라면 '한 번 더 개봉' 비활성화
       if (char.money < 80) {
         btnAgain.disabled = true;
         btnAgain.className = "py-3 bg-stone-900 border border-stone-800 text-stone-600 font-brush text-sm rounded-xl cursor-not-allowed";
@@ -1636,7 +1629,6 @@
       document.getElementById("gacha-result-modal").style.display = "none";
     }
 
-    // 승천 실패 알림 전용 UI 연동
     function showGachaOrNoticeResult(type, lostQi) {
       if (type === "ASCENSION_FAIL") {
         showGachaResultModal({
@@ -1649,7 +1641,6 @@
       }
     }
 
-    // 간단한 인게임 알림
     function showCustomAlert(msg) {
       showGachaResultModal({
         tier: "SMALL",
