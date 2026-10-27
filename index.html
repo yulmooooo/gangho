@@ -1,0 +1,1739 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>강호풍운록 - 삼류에서 천하제일인까지</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Do+Hyeon&family=Noto+Serif+KR:wght@600;800;900&family=Pretendard:wght@500;700;800&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Pretendard', sans-serif;
+      background-color: #08090b;
+      background-image: 
+        radial-gradient(circle at 50% 20%, rgba(30, 26, 20, 0.4) 0%, transparent 60%),
+        radial-gradient(rgba(217, 180, 110, 0.04) 1px, transparent 0);
+      background-size: 100% 100%, 20px 20px;
+      color: #f3f0e6;
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    .font-brush {
+      font-family: 'Do Hyeon', 'Noto Serif KR', serif;
+    }
+
+    .hanji-card {
+      background: linear-gradient(160deg, #18191d 0%, #121316 100%);
+      border: 1px solid rgba(190, 150, 90, 0.22);
+      box-shadow: inset 0 0 16px rgba(0, 0, 0, 0.6), 0 8px 24px rgba(0, 0, 0, 0.5);
+    }
+
+    .gold-border {
+      border-color: rgba(217, 160, 60, 0.45);
+    }
+
+    .pixel-art {
+      image-rendering: pixelated;
+    }
+
+    ::-webkit-scrollbar {
+      width: 4px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #3a3429;
+      border-radius: 4px;
+    }
+
+    @keyframes goldFlash {
+      0% { box-shadow: 0 0 0 rgba(234, 179, 8, 0); }
+      50% { box-shadow: 0 0 45px rgba(234, 179, 8, 0.95); }
+      100% { box-shadow: 0 0 0 rgba(234, 179, 8, 0); }
+    }
+    .flash-gold {
+      animation: goldFlash 1.4s ease-out;
+    }
+    @keyframes redPulse {
+      0%, 100% { border-color: rgba(239, 68, 68, 0.4); }
+      50% { border-color: rgba(239, 68, 68, 1); }
+    }
+    .breakthrough-pulse {
+      animation: redPulse 1.5s infinite;
+    }
+    @keyframes immortalAura {
+      0%, 100% { box-shadow: 0 0 25px rgba(56, 189, 248, 0.4), inset 0 0 20px rgba(250, 204, 21, 0.3); }
+      50% { box-shadow: 0 0 50px rgba(56, 189, 248, 0.8), inset 0 0 35px rgba(250, 204, 21, 0.6); }
+    }
+    .immortal-card {
+      animation: immortalAura 2.5s infinite;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex justify-center items-start sm:py-6 sm:px-4">
+
+  <!-- 시작 설정 모달 -->
+  <div id="start-modal" style="display: flex;" class="fixed inset-0 bg-black/90 items-center justify-center p-3 z-50">
+    <div class="hanji-card border-2 gold-border w-full max-w-sm p-5 rounded-3xl shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto">
+      <div class="text-center space-y-0.5">
+        <span class="text-[10px] font-bold tracking-widest text-amber-500 uppercase">Wuxia Life Sim</span>
+        <h1 class="text-2xl font-brush text-amber-300 tracking-wide">강호풍운록 (江湖風雲錄)</h1>
+        <p class="text-[11px] text-stone-400 font-medium">삼류무사에서 생사경의 전설까지</p>
+      </div>
+
+      <div class="space-y-3 text-xs font-bold">
+        <div>
+          <label class="block text-stone-300 mb-1">무협명 (이름)</label>
+          <input id="input-name" type="text" value="풍천혁" placeholder="이름을 입력하십시오" class="w-full bg-stone-900 border border-stone-700 rounded-xl px-3 py-2 text-white font-bold focus:outline-none focus:border-amber-500">
+        </div>
+
+        <div>
+          <label class="block text-stone-300 mb-1">소속 문파 (직접 입력)</label>
+          <input id="input-sect" type="text" value="화산파 (華山派)" placeholder="문파명을 입력하십시오" class="w-full bg-stone-900 border border-stone-700 rounded-xl px-3 py-2 text-white font-bold focus:outline-none focus:border-amber-500">
+        </div>
+
+        <div class="p-3 bg-stone-950/90 rounded-2xl border border-stone-800 space-y-2">
+          <div class="flex justify-between items-center">
+            <span class="text-stone-300 text-xs">타고난 기골 (초기 자질)</span>
+            <button onclick="rollInitialStats()" class="px-2.5 py-1 bg-stone-800 hover:bg-stone-700 text-amber-400 border border-amber-600/50 rounded-lg text-[10px] font-bold cursor-pointer transition flex items-center gap-1">
+              <span>🎲 주사위 재굴림</span>
+            </button>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2 text-center text-xs">
+            <div class="bg-stone-900/80 p-1.5 rounded-xl border border-stone-800">
+              <span class="text-stone-400 text-[10px] block">내공 (內功)</span>
+              <strong id="start-stat-qi" class="text-amber-300 font-extrabold text-sm">12</strong><span class="text-[10px] text-stone-400"> 년</span>
+            </div>
+            <div class="bg-stone-900/80 p-1.5 rounded-xl border border-stone-800">
+              <span class="text-stone-400 text-[10px] block">외공 (外功)</span>
+              <strong id="start-stat-ext" class="text-red-400 font-extrabold text-sm">15</strong>
+            </div>
+            <div class="bg-stone-900/80 p-1.5 rounded-xl border border-stone-800">
+              <span class="text-stone-400 text-[10px] block">신법 (身法)</span>
+              <strong id="start-stat-agi" class="text-cyan-400 font-extrabold text-sm">14</strong>
+            </div>
+            <div class="bg-stone-900/80 p-1.5 rounded-xl border border-stone-800">
+              <span class="text-stone-400 text-[10px] block">초기 자금</span>
+              <strong id="start-stat-money" class="text-yellow-400 font-extrabold text-sm">25</strong><span class="text-[10px] text-stone-400"> 냥</span>
+            </div>
+          </div>
+          <div class="text-[10px] text-stone-500 text-center">총 무력 합계: <span id="start-stat-total" class="text-stone-300 font-bold">41</span></div>
+        </div>
+
+        <div>
+          <label class="block text-stone-300 mb-1.5">외형 도트 선택</label>
+          <div id="avatar-grid" class="grid grid-cols-6 gap-1.5 p-2 bg-stone-950/80 rounded-2xl border border-stone-800"></div>
+        </div>
+      </div>
+
+      <button id="btn-start" onclick="startGame()" class="w-full py-3.5 bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 hover:brightness-110 text-stone-950 font-brush text-base rounded-xl transition duration-150 shadow-xl cursor-pointer">
+        강호에 발을 들이다
+      </button>
+    </div>
+  </div>
+
+  <!-- 자동 승급 경지 돌파 알림 모달 -->
+  <div id="rankup-modal" style="display: none;" class="fixed inset-0 bg-black/95 items-center justify-center p-4 z-50">
+    <div class="hanji-card border-2 border-amber-400 w-full max-w-sm p-6 rounded-3xl shadow-2xl text-center space-y-4 flash-gold">
+      <div class="space-y-1">
+        <span class="text-[11px] font-bold tracking-widest text-amber-500 uppercase">BREAKTHROUGH REALM</span>
+        <h2 class="text-3xl font-brush text-yellow-300">★ 경지 돌파 ★</h2>
+        <p class="text-xs text-stone-300 font-medium">단전의 벽을 깨부수고 새로운 경지에 올랐습니다!</p>
+      </div>
+
+      <div class="p-4 bg-stone-950/90 rounded-2xl border border-amber-500/40 space-y-2">
+        <div class="text-xs text-stone-400 font-bold">등극한 경지</div>
+        <div id="rankup-new-title" class="text-2xl font-brush text-amber-300 tracking-wide">일류 고수 (一流)</div>
+        <div class="text-xs text-emerald-400 font-bold pt-1 border-t border-stone-800">
+          연간 문파 녹봉: +<span id="rankup-new-salary">30</span>냥으로 상승
+        </div>
+      </div>
+
+      <button onclick="closeRankUpModal()" class="w-full py-3.5 bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 hover:brightness-110 text-stone-950 font-brush text-base rounded-xl transition shadow-lg cursor-pointer">
+        천하에 위명을 떨치다 (확인)
+      </button>
+    </div>
+  </div>
+
+  <!-- 폐관 돌파 결과 모달 -->
+  <div id="breakthrough-result-modal" style="display: none;" class="fixed inset-0 bg-black/95 items-center justify-center p-4 z-50">
+    <div id="breakthrough-result-card" class="hanji-card border-2 w-full max-w-sm p-6 rounded-3xl shadow-2xl text-center space-y-4">
+      <div class="space-y-1">
+        <span id="bt-result-tag" class="text-[10px] font-bold tracking-widest uppercase px-2 py-0.5 rounded border"></span>
+        <h2 id="bt-result-title" class="text-2xl font-brush"></h2>
+      </div>
+
+      <div id="bt-result-box" class="p-4 bg-stone-950/90 rounded-2xl border space-y-2 text-left">
+        <p id="bt-result-desc" class="text-xs leading-relaxed"></p>
+        <div id="bt-result-details" class="pt-2 border-t border-stone-800 text-xs font-bold space-y-1"></div>
+      </div>
+
+      <button onclick="closeBreakthroughResultModal()" class="w-full py-3.5 bg-gradient-to-r from-stone-800 to-stone-700 hover:brightness-110 text-white font-brush text-base rounded-xl transition shadow-lg cursor-pointer">
+        폐관에서 걸어나오다 (확인)
+      </button>
+    </div>
+  </div>
+
+  <!-- 최종 엔딩 전당 모달 -->
+  <div id="ending-modal" style="display: none;" class="fixed inset-0 bg-black/95 items-center justify-center p-4 z-50">
+    <div id="ending-card" class="hanji-card border-2 w-full max-w-sm p-6 rounded-3xl shadow-2xl text-center space-y-4">
+      <div class="space-y-1">
+        <span id="ending-badge" class="text-[10px] font-bold tracking-widest uppercase px-2.5 py-0.5 rounded border"></span>
+        <h2 id="ending-title" class="text-2xl font-brush"></h2>
+      </div>
+
+      <div class="w-16 h-16 mx-auto rounded-2xl bg-stone-950 border-2 border-amber-500/60 p-1.5 flex items-center justify-center shadow-inner relative overflow-hidden" id="ending-avatar-box"></div>
+
+      <div class="p-4 bg-stone-950/90 rounded-2xl border border-stone-800 space-y-3 text-left">
+        <p id="ending-epilogue" class="text-xs leading-relaxed text-stone-300 font-medium"></p>
+        
+        <div class="pt-2.5 border-t border-stone-800 grid grid-cols-2 gap-2 text-center text-xs">
+          <div class="bg-stone-900/80 p-1.5 rounded-xl border border-stone-800">
+            <span class="text-stone-400 text-[10px] block">최종 경지</span>
+            <strong id="end-stat-rank" class="text-amber-300 font-bold"></strong>
+          </div>
+          <div class="bg-stone-900/80 p-1.5 rounded-xl border border-stone-800">
+            <span class="text-stone-400 text-[10px] block">최종 무력</span>
+            <strong id="end-stat-power" class="text-cyan-400 font-bold"></strong>
+          </div>
+          <div class="bg-stone-900/80 p-1.5 rounded-xl border border-stone-800">
+            <span class="text-stone-400 text-[10px] block">도달 연령</span>
+            <strong id="end-stat-age" class="text-stone-200 font-bold"></strong>
+          </div>
+          <div class="bg-stone-900/80 p-1.5 rounded-xl border border-stone-800">
+            <span class="text-stone-400 text-[10px] block">평생 모은 은자</span>
+            <strong id="end-stat-money" class="text-yellow-400 font-bold"></strong>
+          </div>
+        </div>
+      </div>
+
+      <button onclick="location.reload()" class="w-full py-3.5 bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 hover:brightness-110 text-stone-950 font-brush text-base rounded-xl transition shadow-xl cursor-pointer">
+        새로운 생으로 환생하다 (다시 시작) 🔄
+      </button>
+    </div>
+  </div>
+
+  <!-- 메인 모바일 쉘 -->
+  <main class="w-full max-w-[460px] min-h-screen sm:min-h-0 flex flex-col space-y-3.5 p-3.5 sm:p-0 pb-8">
+    
+    <!-- 캐릭터 상태 패널 -->
+    <section class="hanji-card rounded-2xl p-4 gold-border border">
+      <div class="flex items-center justify-between pb-3 border-b border-stone-800">
+        <div class="flex items-center gap-3">
+          <div id="char-avatar-box" class="w-12 h-12 rounded-xl bg-stone-950 border-2 border-amber-500/60 flex items-center justify-center p-1 shadow-inner relative overflow-hidden"></div>
+          <div>
+            <div class="flex items-center gap-1.5">
+              <span id="char-title-tag" class="text-[9px] font-bold px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 hidden"></span>
+              <h2 id="char-name" class="text-xl font-brush text-amber-300 tracking-wide">풍천혁</h2>
+            </div>
+            <p id="char-sect" class="text-xs font-semibold text-stone-400 mt-0.5">화산파</p>
+          </div>
+        </div>
+        <div class="text-right">
+          <span id="char-age" class="text-2xl font-brush text-stone-100">16</span>
+          <span class="text-xs font-bold text-amber-500">세(歲)</span>
+          <div id="char-body-state" class="text-[9px] font-bold text-emerald-400 mt-0.5">기혈 왕성 (전성기)</div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-2 mt-3 text-center">
+        <div class="bg-stone-950/70 p-2.5 rounded-xl border border-stone-800/80">
+          <div class="text-[10px] font-bold text-stone-400 tracking-wider">현재 경지</div>
+          <div id="char-rank" class="text-sm font-brush text-amber-400 mt-0.5 truncate">삼류 무사 (三流)</div>
+          <div class="text-[11px] text-stone-300 font-bold mt-0.5">
+            무력: <strong id="char-total-power" class="text-amber-300 font-extrabold">37</strong>
+            <span id="delta-power" class="text-emerald-400 font-bold ml-0.5 text-[10px] hidden"></span>
+          </div>
+        </div>
+
+        <div class="bg-stone-950/70 p-2.5 rounded-xl border border-stone-800/80">
+          <div class="text-[10px] font-bold text-stone-400 tracking-wider">보유 자산</div>
+          <div class="text-base font-brush text-yellow-400 mt-0.5"><span id="char-money">20</span> 냥</div>
+          <div class="text-[10px] text-emerald-400 font-bold mt-0.5">녹봉: +<span id="char-salary">5</span>냥/년</div>
+        </div>
+      </div>
+
+      <!-- 다중 오버플로우 스탯 프로그레스 -->
+      <div class="mt-3.5 space-y-2 text-xs font-bold">
+        <div>
+          <div class="flex justify-between items-center mb-1">
+            <span class="text-stone-300">내공 (內功)</span>
+            <div class="flex items-center gap-1.5">
+              <span id="tier-qi" class="text-[9px] font-bold px-1 rounded bg-stone-800 border border-stone-700 text-stone-300">1단</span>
+              <span id="delta-qi" class="text-emerald-400 font-black text-[11px] hidden"></span>
+              <span id="stat-qi" class="text-amber-300 font-extrabold">10 년</span>
+            </div>
+          </div>
+          <div class="w-full bg-stone-950 h-2 rounded-full overflow-hidden border border-stone-800 relative">
+            <div id="bar-qi-bg" class="absolute inset-0 bg-transparent"></div>
+            <div id="bar-qi-fill" class="h-full transition-all duration-300 relative z-10" style="width: 10%"></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="flex justify-between items-center mb-1">
+            <span class="text-stone-300">외공 (外功)</span>
+            <div class="flex items-center gap-1.5">
+              <span id="tier-ext" class="text-[9px] font-bold px-1 rounded bg-stone-800 border border-stone-700 text-stone-300">1단</span>
+              <span id="delta-ext" class="text-emerald-400 font-black text-[11px] hidden"></span>
+              <span id="stat-ext" class="text-red-400 font-extrabold">15</span>
+            </div>
+          </div>
+          <div class="w-full bg-stone-950 h-2 rounded-full overflow-hidden border border-stone-800 relative">
+            <div id="bar-ext-bg" class="absolute inset-0 bg-transparent"></div>
+            <div id="bar-ext-fill" class="h-full transition-all duration-300 relative z-10" style="width: 15%"></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="flex justify-between items-center mb-1">
+            <span class="text-stone-300">신법 (身法)</span>
+            <div class="flex items-center gap-1.5">
+              <span id="tier-agi" class="text-[9px] font-bold px-1 rounded bg-stone-800 border border-stone-700 text-stone-300">1단</span>
+              <span id="delta-agi" class="text-emerald-400 font-black text-[11px] hidden"></span>
+              <span id="stat-agi" class="text-cyan-400 font-extrabold">12</span>
+            </div>
+          </div>
+          <div class="w-full bg-stone-950 h-2 rounded-full overflow-hidden border border-stone-800 relative">
+            <div id="bar-agi-bg" class="absolute inset-0 bg-transparent"></div>
+            <div id="bar-agi-fill" class="h-full transition-all duration-300 relative z-10" style="width: 12%"></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="flex justify-between items-center mb-1">
+            <span class="text-stone-300">강호 명성 (名聲)</span>
+            <div class="flex items-center gap-1.5">
+              <span id="tier-fame" class="text-[9px] font-bold px-1 rounded bg-stone-800 border border-stone-700 text-stone-300">1단</span>
+              <span id="delta-fame" class="text-emerald-400 font-black text-[11px] hidden"></span>
+              <span id="stat-fame" class="text-emerald-400 font-extrabold">0</span>
+            </div>
+          </div>
+          <div class="w-full bg-stone-950 h-2 rounded-full overflow-hidden border border-stone-800 relative">
+            <div id="bar-fame-bg" class="absolute inset-0 bg-transparent"></div>
+            <div id="bar-fame-fill" class="h-full transition-all duration-300 relative z-10" style="width: 0%"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 메이저 대회 배너 -->
+    <div id="major-banner" class="hidden p-3 rounded-2xl bg-gradient-to-r from-amber-950 via-stone-900 to-red-950 border-2 border-amber-500/80 shadow-lg text-center space-y-1">
+      <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 uppercase">Major Festival</span>
+      <h4 class="text-base font-brush text-yellow-300">★ 10년 주기 천하비무대회 개최의 해 ★</h4>
+      <p class="text-[11px] text-stone-300">토너먼트 우승 시 천하제일의 칭호와 거금이 주어집니다!</p>
+    </div>
+
+    <!-- 행동 버튼 컨트롤 패널 -->
+    <section class="hanji-card rounded-2xl p-3 gold-border border space-y-2">
+      <div class="grid grid-cols-2 gap-2 font-bold">
+        <button id="btn-train" onclick="doTrain()" class="py-2.5 px-2 bg-stone-900 hover:bg-stone-800 text-stone-100 border border-stone-700/80 rounded-xl transition flex flex-col items-center justify-center cursor-pointer shadow">
+          <span class="text-amber-400 font-brush text-base">🥋 무공 수련</span>
+          <span id="train-status" class="text-[10px] text-stone-400 font-medium">(연 1회)</span>
+        </button>
+
+        <button id="btn-duel" onclick="handleDuelClick()" class="py-2.5 px-2 bg-stone-900 hover:bg-stone-800 text-stone-100 border border-stone-700/80 rounded-xl transition flex flex-col items-center justify-center cursor-pointer shadow">
+          <span id="duel-label" class="text-rose-400 font-brush text-base">⚔️ 강호 비무</span>
+          <span id="duel-status" class="text-[10px] text-stone-400 font-medium">(은자 파밍)</span>
+        </button>
+      </div>
+
+      <!-- 현경/생사경 사경 폐관 돌파 버튼 -->
+      <button id="btn-breakthrough" onclick="openBreakthroughModal()" class="w-full py-2.5 bg-gradient-to-r from-red-950 via-stone-900 to-red-950 border-2 border-red-600/70 text-red-300 breakthrough-pulse rounded-xl font-brush text-base flex items-center justify-center gap-1.5 cursor-pointer shadow hidden">
+        <span>⚡ 생사 폐관 돌파 (경지 초월 시도)</span>
+      </button>
+
+      <!-- 우화등선 천겁 시련 버튼 (생사경 + 무력 2200 이상) -->
+      <button id="btn-ascension" onclick="executeAscensionTrial()" class="w-full py-3 bg-gradient-to-r from-sky-950 via-cyan-900 to-amber-950 border-2 border-cyan-400 text-cyan-200 immortal-card rounded-xl font-brush text-base flex items-center justify-center gap-1.5 cursor-pointer shadow-xl hidden">
+        <span>⚡ 우화등선(羽化登仙): 구천현뢰 천겁 돌파</span>
+      </button>
+
+      <button id="btn-market" onclick="openMarketModal()" class="w-full py-2.5 bg-stone-900 hover:bg-stone-800 text-amber-300 border border-amber-600/40 rounded-xl font-brush text-base flex items-center justify-center gap-1.5 cursor-pointer shadow">
+        <span>🏮 강호 전포 & 암시장 궤짝</span>
+      </button>
+
+      <button id="btn-next-year" onclick="nextYear()" class="w-full py-3.5 bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 hover:brightness-110 text-stone-950 font-brush text-lg rounded-xl transition shadow-xl cursor-pointer">
+        다음 해로 진행 (녹봉 수령) ➔
+      </button>
+    </section>
+
+    <!-- 강호록 타임라인 피드 -->
+    <section class="hanji-card rounded-2xl p-4 gold-border border flex-1 flex flex-col h-[380px]">
+      <div class="flex items-center justify-between pb-2 border-b border-stone-800 mb-2">
+        <h3 class="text-base font-brush text-amber-300 tracking-wide">강호록 (江湖錄)</h3>
+        <span class="text-[11px] font-bold text-stone-500">연도별 행적</span>
+      </div>
+
+      <div id="log-list" class="flex-1 overflow-y-auto space-y-2 pr-1 text-xs"></div>
+    </section>
+
+  </main>
+
+  <!-- 사경 폐관 확인 모달 -->
+  <div id="breakthrough-modal" style="display: none;" class="fixed inset-0 bg-black/95 items-center justify-center p-3 z-50">
+    <div class="hanji-card border-2 border-red-500/80 w-full max-w-sm p-5 rounded-3xl shadow-2xl space-y-4 text-center">
+      <div class="space-y-1">
+        <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-red-950 border border-red-600 text-red-400">LIFE OR DEATH CAVE</span>
+        <h3 class="text-2xl font-brush text-red-400" id="breakthrough-target-title">현경(玄境) 사경 폐관</h3>
+        <p class="text-xs font-bold text-stone-300">인간의 껍질을 벗고 무신의 반열을 노립니다.</p>
+      </div>
+
+      <div class="p-3 bg-stone-950/80 rounded-2xl border border-stone-800 text-left space-y-2 text-xs">
+        <div class="flex justify-between">
+          <span class="text-stone-400">현재 무력 / 돌파 기준:</span>
+          <strong id="breakthrough-power-req" class="text-amber-300"></strong>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-stone-400">돌파 성공 확률:</span>
+          <strong id="breakthrough-prob-text" class="text-cyan-400"></strong>
+        </div>
+        <p class="text-[11px] text-stone-400 border-t border-stone-800 pt-1.5 leading-relaxed">
+          ★ <strong>성공 시:</strong> 단전 확장, 올스탯 상승 및 다음 경지 즉시 등극.<br>
+          ✕ <strong>실패 시:</strong> 주화입마 발생 위험 (내공 파열로 스탯 영구 감소).
+        </p>
+      </div>
+
+      <div class="grid grid-cols-2 gap-2 pt-1">
+        <button id="btn-do-breakthrough" onclick="executeBreakthrough()" class="py-3 bg-gradient-to-r from-red-600 to-rose-600 hover:brightness-110 text-white font-brush text-sm rounded-xl cursor-pointer shadow">
+          단전을 열고 폐관 돌입
+        </button>
+        <button onclick="closeBreakthroughModal()" class="py-3 bg-stone-800 text-stone-300 font-brush text-sm rounded-xl cursor-pointer">
+          마음을 가다듬고 물러남
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 천하비무대회 모달 -->
+  <div id="tournament-modal" style="display: none;" class="fixed inset-0 bg-black/95 items-center justify-center p-3 z-50">
+    <div class="hanji-card border-2 gold-border w-full max-w-sm p-5 rounded-3xl shadow-2xl space-y-4 text-center relative">
+      <button id="btn-tour-close" onclick="closeTournamentModal()" class="absolute top-4 right-4 text-stone-400 hover:text-white font-bold text-lg p-1 transition cursor-pointer">
+        ✕
+      </button>
+
+      <div class="space-y-1">
+        <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40">TEN-YEAR MAJOR FESTIVAL</span>
+        <h3 class="text-2xl font-brush text-yellow-300">천하제일 비무대회</h3>
+        <p id="tour-round-title" class="text-xs font-bold text-stone-300"></p>
+      </div>
+
+      <div class="p-3 bg-stone-950/80 rounded-2xl border border-stone-800 text-left space-y-2 text-xs">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <div id="tour-my-avatar" class="w-7 h-7 rounded bg-stone-900 border border-stone-700 flex items-center justify-center"></div>
+            <strong class="text-white text-xs" id="tour-my-info"></strong>
+          </div>
+          <div class="flex items-center gap-2">
+            <strong class="text-rose-400 text-xs" id="tour-opp-info"></strong>
+            <div id="tour-opp-avatar" class="w-7 h-7 rounded bg-stone-900 border border-stone-700 flex items-center justify-center"></div>
+          </div>
+        </div>
+        <p id="tour-opp-desc" class="text-[11px] text-stone-400 border-t border-stone-800/80 pt-1"></p>
+      </div>
+
+      <div id="tour-log-box" class="h-44 bg-stone-950 p-3 rounded-xl border border-stone-800 overflow-y-auto text-left text-xs space-y-2 font-medium leading-relaxed font-mono"></div>
+
+      <button id="btn-tour-action" onclick="onTourActionButtonClick()" class="w-full py-3 bg-gradient-to-r from-amber-600 to-amber-500 hover:brightness-110 text-stone-950 font-brush text-base rounded-xl transition cursor-pointer shadow-lg">
+        비무 개시
+      </button>
+    </div>
+  </div>
+
+  <!-- 일반 비무 상대 선택 모달 -->
+  <div id="duel-select-modal" style="display: none;" class="fixed inset-0 bg-black/90 items-center justify-center p-3 z-50">
+    <div class="hanji-card border-2 gold-border w-full max-w-sm p-4 rounded-3xl shadow-2xl space-y-3 max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-start pb-2 border-b border-stone-800">
+        <div>
+          <h3 class="text-lg font-brush text-amber-300">비무 상대 지목</h3>
+          <p class="text-[10px] text-stone-400 font-medium">난이도에 따라 상금과 보상이 다릅니다.</p>
+        </div>
+        <button onclick="closeDuelSelectModal()" class="text-stone-400 hover:text-white font-bold p-1">✕</button>
+      </div>
+
+      <div id="duel-candidates" class="space-y-2"></div>
+    </div>
+  </div>
+
+  <!-- 일반 비무 연출 모달 -->
+  <div id="duel-battle-modal" style="display: none;" class="fixed inset-0 bg-black/95 items-center justify-center p-4 z-50">
+    <div class="hanji-card border-2 gold-border w-full max-w-sm p-5 rounded-3xl shadow-2xl space-y-3.5 text-center">
+      <div class="text-[10px] font-bold text-amber-500 uppercase tracking-wider" id="battle-sub">비무 결전</div>
+      <h3 class="text-2xl font-brush text-stone-100" id="battle-title">대결 시작</h3>
+      
+      <div id="battle-log-box" class="h-44 bg-stone-950/90 p-3.5 rounded-2xl border border-stone-800 overflow-y-auto text-left text-xs space-y-2 font-medium leading-relaxed"></div>
+
+      <button id="btn-battle-confirm" style="display: none;" class="w-full py-3 bg-gradient-to-r from-amber-600 to-amber-500 text-stone-950 font-brush text-base rounded-xl transition cursor-pointer">
+        비무를 매듭짓다
+      </button>
+    </div>
+  </div>
+
+  <!-- 상점 & 암시장 모달 -->
+  <div id="market-modal" style="display: none;" class="fixed inset-0 bg-black/90 items-center justify-center p-3 z-50">
+    <div class="hanji-card border-2 gold-border w-full max-w-sm p-4 rounded-3xl shadow-2xl space-y-3.5 max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center pb-2 border-b border-stone-800">
+        <div>
+          <h3 class="text-lg font-brush text-amber-300">강호 전포 & 암시장</h3>
+          <p class="text-[10px] text-stone-400 font-medium">고유 비급은 1회만 습득 가능합니다.</p>
+        </div>
+        <div class="text-right">
+          <span class="text-[10px] text-stone-400">보유:</span>
+          <span id="market-my-money" class="text-sm font-brush text-yellow-400 ml-1">20</span><span class="text-[10px] text-stone-400"> 냥</span>
+        </div>
+      </div>
+
+      <div id="gacha-card" class="p-3.5 rounded-2xl transition border space-y-2">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded bg-stone-950 border border-purple-500/40 flex items-center justify-center" id="icon-gacha-box"></div>
+            <div>
+              <strong id="gacha-title" class="font-brush text-sm block">봉인된 비밀 궤짝</strong>
+              <span id="gacha-badge" class="text-[9px] font-bold px-1.5 py-0.2 rounded border">도파민 가챠</span>
+            </div>
+          </div>
+        </div>
+        <p class="text-[10px] text-stone-300 leading-tight font-medium">초대박(2%) 시 1,000냥 상당 전설 신화 무공 출현!</p>
+        <button id="btn-gacha-buy" onclick="buyGachaBox()" class="w-full py-2.5 font-brush text-sm rounded-xl shadow cursor-pointer transition">
+          궤짝 개봉 (80냥)
+        </button>
+      </div>
+
+      <div class="space-y-1.5">
+        <div class="text-xs font-brush text-stone-400">정가 장비 및 비급 (고유 1회)</div>
+        <div id="shop-items-container" class="space-y-1.5"></div>
+      </div>
+
+      <div class="pt-2 border-t border-stone-800">
+        <button onclick="closeMarketModal()" class="w-full py-2 bg-stone-900 text-stone-300 font-bold text-xs rounded-xl cursor-pointer">닫기</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+    const PIXEL_ASSETS = {
+      avatars: [
+        {
+          id: "huashan",
+          name: "청의검객",
+          svg: `<svg viewBox="0 0 16 16" class="w-full h-full pixel-art" fill="none"><rect x="5" y="1" width="6" height="3" fill="#1e293b"/><rect x="4" y="4" width="8" height="5" fill="#fcd34d"/><rect x="6" y="5" width="1" height="1" fill="#000"/><rect x="9" y="5" width="1" height="1" fill="#000"/><rect x="7" y="7" width="2" height="1" fill="#e11d48"/><rect x="4" y="9" width="8" height="5" fill="#0284c7"/><rect x="6" y="9" width="4" height="5" fill="#f8fafc"/><rect x="12" y="7" width="1" height="6" fill="#94a3b8"/><rect x="12" y="13" width="1" height="1" fill="#f59e0b"/></svg>`
+        },
+        {
+          id: "shaolin",
+          name: "황포승려",
+          svg: `<svg viewBox="0 0 16 16" class="w-full h-full pixel-art" fill="none"><circle cx="8" cy="6" r="4" fill="#fcd34d"/><rect x="6" y="5" width="1" height="1" fill="#000"/><rect x="9" y="5" width="1" height="1" fill="#000"/><rect x="7" y="3" width="2" height="1" fill="#b45309"/><rect x="4" y="9" width="8" height="5" fill="#d97706"/><rect x="7" y="9" width="2" height="5" fill="#dc2626"/><rect x="3" y="8" width="1" height="6" fill="#78350f"/></svg>`
+        },
+        {
+          id: "tang",
+          name: "자색자객",
+          svg: `<svg viewBox="0 0 16 16" class="w-full h-full pixel-art" fill="none"><rect x="4" y="2" width="8" height="4" fill="#581c87"/><rect x="4" y="6" width="8" height="3" fill="#fcd34d"/><rect x="5" y="6" width="1" height="1" fill="#a855f7"/><rect x="10" y="6" width="1" height="1" fill="#a855f7"/><rect x="4" y="8" width="8" height="6" fill="#3b0764"/><rect x="12" y="8" width="2" height="2" fill="#10b981"/></svg>`
+        },
+        {
+          id: "ronin",
+          name: "삿갓낭인",
+          svg: `<svg viewBox="0 0 16 16" class="w-full h-full pixel-art" fill="none"><polygon points="8,1 1,7 15,7" fill="#78350f"/><polygon points="8,2 3,7 13,7" fill="#a16207"/><rect x="5" y="7" width="6" height="3" fill="#fcd34d"/><rect x="6" y="8" width="1" height="1" fill="#000"/><rect x="9" y="8" width="1" height="1" fill="#000"/><rect x="4" y="10" width="8" height="5" fill="#44403c"/><rect x="2" y="10" width="2" height="5" fill="#cbd5e1"/></svg>`
+        },
+        {
+          id: "taoist",
+          name: "백발도사",
+          svg: `<svg viewBox="0 0 16 16" class="w-full h-full pixel-art" fill="none"><rect x="4" y="1" width="8" height="4" fill="#f8fafc"/><rect x="5" y="4" width="6" height="4" fill="#fcd34d"/><rect x="6" y="5" width="1" height="1" fill="#000"/><rect x="9" y="5" width="1" height="1" fill="#000"/><rect x="6" y="7" width="4" height="2" fill="#e2e8f0"/><rect x="4" y="8" width="8" height="6" fill="#1e1b4b"/><rect x="7" y="9" width="2" height="4" fill="#38bdf8"/></svg>`
+        },
+        {
+          id: "maiden",
+          name: "홍의여검",
+          svg: `<svg viewBox="0 0 16 16" class="w-full h-full pixel-art" fill="none"><rect x="3" y="2" width="10" height="4" fill="#09090b"/><rect x="4" y="5" width="8" height="4" fill="#fef08a"/><rect x="5" y="6" width="1" height="1" fill="#e11d48"/><rect x="10" y="6" width="1" height="1" fill="#e11d48"/><rect x="7" y="8" width="2" height="1" fill="#f43f5e"/><rect x="4" y="9" width="8" height="5" fill="#be123c"/><rect x="6" y="9" width="4" height="5" fill="#fda4af"/></svg>`
+        }
+      ],
+      items: {
+        "청강검": `<svg viewBox="0 0 16 16" class="w-full h-full pixel-art" fill="none"><polygon points="12,1 15,4 7,12 4,9" fill="#94a3b8"/><polygon points="13,2 14,3 7,10 6,9" fill="#f8fafc"/><rect x="3" y="10" width="3" height="1" transform="rotate(-45 3 10)" fill="#78350f"/><circle cx="2" cy="14" r="1.5" fill="#f59e0b"/></svg>`,
+        "자하신공": `<svg viewBox="0 0 16 16" class="w-full h-full pixel-art" fill="none"><rect x="3" y="2" width="10" height="12" rx="1" fill="#581c87"/><rect x="4" y="3" width="8" height="10" fill="#7e22ce"/><rect x="5" y="4" width="6" height="8" fill="#a855f7"/><rect x="6" y="6" width="4" height="1" fill="#fef08a"/><rect x="6" y="8" width="3" height="1" fill="#fef08a"/><rect x="2" y="2" width="2" height="12" fill="#3b0764"/></svg>`,
+        "한철중검": `<svg viewBox="0 0 16 16" class="w-full h-full pixel-art" fill="none"><rect x="8" y="2" width="5" height="9" transform="rotate(45 8 2)" fill="#334155"/><rect x="9" y="3" width="2" height="8" transform="rotate(45 9 3)" fill="#64748b"/><rect x="3" y="9" width="5" height="2" transform="rotate(45 3 9)" fill="#0f172a"/><rect x="2" y="13" width="2" height="2" fill="#0284c7"/></svg>`,
+        "구음진경": `<svg viewBox="0 0 16 16" class="w-full h-full pixel-art" fill="none"><rect x="3" y="2" width="10" height="12" rx="1" fill="#991b1b"/><rect x="4" y="3" width="8" height="10" fill="#dc2626"/><circle cx="8" cy="8" r="3" fill="#fef08a"/><path d="M8,5 A3,3 0 0,0 8,11 A1.5,1.5 0 0,0 8,8 A1.5,1.5 0 0,1 8,5" fill="#000"/><rect x="2" y="2" width="2" height="12" fill="#450a0a"/></svg>`,
+        "chest": `<svg viewBox="0 0 16 16" class="w-full h-full pixel-art" fill="none"><rect x="2" y="4" width="12" height="10" rx="1" fill="#78350f"/><rect x="2" y="4" width="12" height="4" fill="#a16207"/><rect x="2" y="8" width="12" height="1" fill="#1c1917"/><rect x="7" y="7" width="2" height="3" fill="#f59e0b"/><circle cx="8" cy="8.5" r="0.5" fill="#000"/></svg>`
+      },
+      enemies: {
+        "쉬움": `<svg viewBox="0 0 16 16" class="w-full h-full pixel-art" fill="none"><rect x="4" y="2" width="8" height="3" fill="#059669"/><rect x="5" y="5" width="6" height="4" fill="#fcd34d"/><rect x="6" y="6" width="1" height="1" fill="#000"/><rect x="9" y="6" width="1" height="1" fill="#000"/><rect x="6" y="8" width="4" height="1" fill="#000"/><rect x="4" y="9" width="8" height="5" fill="#047857"/></svg>`,
+        "호각": `<svg viewBox="0 0 16 16" class="w-full h-full pixel-art" fill="none"><rect x="5" y="1" width="6" height="3" fill="#0369a1"/><rect x="5" y="4" width="6" height="5" fill="#fcd34d"/><rect x="6" y="5" width="1" height="1" fill="#000"/><rect x="9" y="5" width="1" height="1" fill="#000"/><rect x="4" y="9" width="8" height="5" fill="#0284c7"/><rect x="12" y="7" width="1" height="7" fill="#cbd5e1"/></svg>`,
+        "도전": `<svg viewBox="0 0 16 16" class="w-full h-full pixel-art" fill="none"><rect x="4" y="2" width="8" height="4" fill="#450a0a"/><rect x="5" y="5" width="6" height="4" fill="#fcd34d"/><rect x="6" y="6" width="1" height="1" fill="#ef4444"/><rect x="9" y="6" width="1" height="1" fill="#ef4444"/><rect x="6" y="5" width="1" height="3" fill="#b91c1c"/><rect x="4" y="9" width="8" height="5" fill="#18181b"/></svg>`,
+        "무작위": `<svg viewBox="0 0 16 16" class="w-full h-full pixel-art" fill="none"><rect x="4" y="2" width="8" height="7" fill="#1e1b4b"/><rect x="6" y="5" width="1" height="1" fill="#a855f7"/><rect x="9" y="5" width="1" height="1" fill="#a855f7"/><rect x="4" y="9" width="8" height="5" fill="#0f172a"/><text x="8" y="13" font-size="6" font-family="monospace" fill="#c084fc" text-anchor="middle" font-weight="bold">?</text></svg>`,
+        "boss": `<svg viewBox="0 0 16 16" class="w-full h-full pixel-art" fill="none"><polygon points="8,1 4,4 12,4" fill="#eab308"/><rect x="4" y="4" width="8" height="5" fill="#fcd34d"/><rect x="6" y="5" width="1" height="1" fill="#eab308"/><rect x="9" y="5" width="1" height="1" fill="#eab308"/><rect x="4" y="9" width="8" height="5" fill="#ca8a04"/><circle cx="8" cy="8" r="6" stroke="#facc15" stroke-width="0.5" fill="none"/></svg>`
+      }
+    };
+
+    let selectedAvatarId = "huashan";
+
+    let rolledStats = {
+      qi: 12,
+      ext: 15,
+      agi: 14,
+      money: 25
+    };
+
+    let char = {
+      name: "풍천혁",
+      title: "",
+      sect: "화산파",
+      avatarId: "huashan",
+      age: 16,
+      rankIdx: 0,
+      money: 25,
+      qi: 12,
+      ext: 15,
+      agi: 14,
+      fame: 0,
+      hasTrainedThisYear: false,
+      hasDueledThisYear: false,
+      hasBreakthroughThisYear: false,
+      hasAscended: false,
+      ownedItems: []
+    };
+
+    let yearGains = { qi: 0, ext: 0, agi: 0, fame: 0 };
+
+    // 밸런스 조정: 현경(950), 생사경(1500)
+    const ranks = [
+      { name: "삼류 무사 (三流)", minStat: 0, salary: 5, needsBreakthrough: false },
+      { name: "이류 무사 (二流)", minStat: 50, salary: 15, needsBreakthrough: false },
+      { name: "일류 고수 (一流)", minStat: 140, salary: 30, needsBreakthrough: false },
+      { name: "절정 고수 (絶頂)", minStat: 260, salary: 60, needsBreakthrough: false },
+      { name: "초절정 고수 (超絶頂)", minStat: 420, salary: 120, needsBreakthrough: false },
+      { name: "화경 / 검선 (化境)", minStat: 600, salary: 250, needsBreakthrough: false },
+      { name: "현경 / 무신 (玄境)", minStat: 950, salary: 500, needsBreakthrough: true },
+      { name: "생사경 / 자연경 (生死境)", minStat: 1500, salary: 1000, needsBreakthrough: true }
+    ];
+
+    const shopItems = [
+      { id: 1, name: "청강검 (靑鋼劍)", price: 50, desc: "외공 +8", iconKey: "청강검", bonus: { ext: 8 } },
+      { id: 2, name: "자하신공 비급", price: 150, desc: "내공 +20, 신법 +5", iconKey: "자하신공", bonus: { qi: 20, agi: 5 } },
+      { id: 3, name: "한철중검 (寒鐵重劍)", price: 400, desc: "외공 +40, 내공 +15", iconKey: "한철중검", bonus: { ext: 40, qi: 15 } },
+      { id: 4, name: "구음진경 (九陰眞經)", price: 1000, desc: "내공 +60, 외공 +30, 신법 +25", iconKey: "구음진경", bonus: { qi: 60, ext: 30, agi: 25 } }
+    ];
+
+    let tournamentState = {
+      stage: 0,
+      opponents: [],
+      buttonMode: 'FIGHT',
+      isFighting: false
+    };
+
+    function isMajorYear(age) {
+      return [20, 30, 40, 50].includes(age);
+    }
+
+    function getCombatPower() {
+      return char.qi + char.ext + char.agi;
+    }
+
+    function getCurrentSalary() {
+      return ranks[char.rankIdx].salary;
+    }
+
+    function getAvatarSvg(avatarId) {
+      const found = PIXEL_ASSETS.avatars.find(a => a.id === avatarId);
+      return found ? found.svg : PIXEL_ASSETS.avatars[0].svg;
+    }
+
+    function rollInitialStats() {
+      rolledStats.qi = Math.floor(Math.random() * 11) + 8;
+      rolledStats.ext = Math.floor(Math.random() * 13) + 10;
+      rolledStats.agi = Math.floor(Math.random() * 11) + 10;
+      rolledStats.money = Math.floor(Math.random() * 26) + 15;
+
+      document.getElementById("start-stat-qi").innerText = rolledStats.qi;
+      document.getElementById("start-stat-ext").innerText = rolledStats.ext;
+      document.getElementById("start-stat-agi").innerText = rolledStats.agi;
+      document.getElementById("start-stat-money").innerText = rolledStats.money;
+      document.getElementById("start-stat-total").innerText = rolledStats.qi + rolledStats.ext + rolledStats.agi;
+    }
+
+    function renderAvatarSelector() {
+      const container = document.getElementById("avatar-grid");
+      container.innerHTML = "";
+
+      PIXEL_ASSETS.avatars.forEach(av => {
+        const isSelected = selectedAvatarId === av.id;
+        const div = document.createElement("div");
+        div.className = `p-1.5 rounded-xl flex flex-col items-center justify-center cursor-pointer border transition ${isSelected ? 'border-amber-400 bg-amber-950/60 shadow-md' : 'border-stone-800 bg-stone-900/60 hover:opacity-100 opacity-60'}`;
+        div.innerHTML = `
+          <div class="w-8 h-8">${av.svg}</div>
+          <span class="text-[9px] mt-1 text-stone-300 font-medium truncate w-full text-center">${av.name}</span>
+        `;
+        div.onclick = () => {
+          selectedAvatarId = av.id;
+          renderAvatarSelector();
+        };
+        container.appendChild(div);
+      });
+    }
+
+    function startGame() {
+      const nameInput = document.getElementById("input-name").value.trim();
+      const sectInput = document.getElementById("input-sect").value.trim();
+
+      char.name = nameInput || "풍천혁";
+      char.sect = sectInput || "무명 낭인";
+      char.avatarId = selectedAvatarId;
+
+      char.qi = rolledStats.qi;
+      char.ext = rolledStats.ext;
+      char.agi = rolledStats.agi;
+      char.money = rolledStats.money;
+
+      document.getElementById("start-modal").style.display = "none";
+      updateUI();
+      addLog(char.age, `${char.sect}의 문하생으로 강호에 입문했습니다. (초기 자금 ${char.money}냥 수령)`, "text-amber-300 font-bold");
+    }
+
+    function doTrain() {
+      if (char.hasTrainedThisYear) return;
+
+      let dQi = Math.floor(Math.random() * 4) + 2;
+      let dExt = Math.floor(Math.random() * 4) + 2;
+      let dAgi = Math.floor(Math.random() * 3) + 1;
+
+      if (char.age >= 36 && char.age < 46) {
+        dExt = Math.max(1, Math.floor(dExt * 0.5));
+        dAgi = Math.max(1, Math.floor(dAgi * 0.5));
+      } else if (char.age >= 46) {
+        dExt = Math.random() < 0.4 ? 1 : 0;
+        dAgi = Math.random() < 0.3 ? 1 : 0;
+        dQi = Math.max(1, dQi - 1);
+      }
+
+      char.qi += dQi;
+      char.ext += dExt;
+      char.agi += dAgi;
+
+      yearGains.qi += dQi;
+      yearGains.ext += dExt;
+      yearGains.agi += dAgi;
+
+      char.hasTrainedThisYear = true;
+
+      addLog(char.age, `[무공 수련] 심신 수련 완료 (내공 +${dQi}, 외공 +${dExt}, 신법 +${dAgi})`, "text-stone-200");
+      checkRankUp();
+      updateUI();
+    }
+
+    function showRankUpPopup(rank) {
+      document.getElementById("rankup-new-title").innerText = rank.name;
+      document.getElementById("rankup-new-salary").innerText = rank.salary;
+      document.getElementById("rankup-modal").style.display = "flex";
+    }
+
+    function closeRankUpModal() {
+      document.getElementById("rankup-modal").style.display = "none";
+    }
+
+    function openBreakthroughModal() {
+      if (char.hasBreakthroughThisYear) {
+        alert("사경 폐관 돌파는 한 해에 한 번만 시도할 수 있습니다.");
+        return;
+      }
+
+      const nextRank = ranks[char.rankIdx + 1];
+      if (!nextRank || !nextRank.needsBreakthrough) return;
+
+      document.getElementById("breakthrough-target-title").innerText = `${nextRank.name} 사경 폐관`;
+      document.getElementById("breakthrough-power-req").innerText = `${getCombatPower()} / 필요 ${nextRank.minStat}`;
+
+      let prob = 30;
+      if (getCombatPower() >= nextRank.minStat) {
+        prob += Math.min(30, Math.floor((getCombatPower() - nextRank.minStat) / 20));
+      } else {
+        prob = Math.max(10, prob - Math.floor((nextRank.minStat - getCombatPower()) / 25));
+      }
+
+      document.getElementById("breakthrough-prob-text").innerText = `약 ${prob}%`;
+      document.getElementById("breakthrough-modal").dataset.prob = prob;
+      document.getElementById("btn-do-breakthrough").disabled = false;
+
+      document.getElementById("breakthrough-modal").style.display = "flex";
+    }
+
+    function closeBreakthroughModal() {
+      document.getElementById("breakthrough-modal").style.display = "none";
+    }
+
+    // 밸런스 조정: 사경 돌파 보너스 수치 안정화 (총 +50)
+    function executeBreakthrough() {
+      const prob = parseInt(document.getElementById("breakthrough-modal").dataset.prob || "30", 10);
+      const nextRank = ranks[char.rankIdx + 1];
+      const btn = document.getElementById("btn-do-breakthrough");
+
+      btn.disabled = true;
+      char.hasBreakthroughThisYear = true;
+
+      closeBreakthroughModal();
+      const roll = Math.random() * 100;
+
+      if (roll < prob) {
+        char.rankIdx += 1;
+        char.qi += 20;
+        char.ext += 15;
+        char.agi += 15;
+        yearGains.qi += 20; yearGains.ext += 15; yearGains.agi += 15;
+
+        addLog(char.age, `★★★ [사경 돌파 대성공] 환골탈태! '${nextRank.name}' 등극!`, "text-yellow-300 font-brush text-sm");
+        showBreakthroughResultPopup("SUCCESS", nextRank, 20, 15, 15);
+      } else if (roll < prob + 45) {
+        char.qi += 5;
+        yearGains.qi += 5;
+
+        addLog(char.age, `[사경 돌파 실패] 아직 때가 이르지 못해 경지의 벽에 막혔습니다. (내공 +5)`, "text-stone-400");
+        showBreakthroughResultPopup("FAIL", nextRank, 5, 0, 0);
+      } else {
+        const lostQi = Math.min(25, Math.floor(char.qi * 0.15));
+        char.qi = Math.max(10, char.qi - lostQi);
+
+        addLog(char.age, `✕ [주화입마] 사경 돌파 중 기운이 역류하여 심각한 내상을 입었습니다. (내공 -${lostQi})`, "text-red-400 font-bold");
+        showBreakthroughResultPopup("DEVIATION", nextRank, -lostQi, 0, 0);
+      }
+
+      checkRankUp();
+      updateUI();
+    }
+
+    function showBreakthroughResultPopup(type, rank, dQi, dExt, dAgi) {
+      const modal = document.getElementById("breakthrough-result-modal");
+      const card = document.getElementById("breakthrough-result-card");
+      const tag = document.getElementById("bt-result-tag");
+      const title = document.getElementById("bt-result-title");
+      const desc = document.getElementById("bt-result-desc");
+      const details = document.getElementById("bt-result-details");
+
+      card.classList.remove("flash-gold", "breakthrough-pulse", "border-amber-400", "border-cyan-500", "border-rose-600");
+
+      if (type === "SUCCESS") {
+        card.classList.add("flash-gold", "border-amber-400");
+        tag.className = "text-[10px] font-bold tracking-widest uppercase px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40";
+        tag.innerText = "BREAKTHROUGH SUCCESS";
+        title.className = "text-2xl font-brush text-yellow-300";
+        title.innerText = "★ 환골탈태! 돌파 대성공 ★";
+        desc.className = "text-xs text-stone-200 leading-relaxed";
+        desc.innerText = `벼락같은 오도의 섬광이 단전을 관통했습니다. 굳게 닫혀 있던 천지인의 혈맥이 뚫리며 마침내 '${rank.name}'의 반열에 올랐습니다!`;
+        details.innerHTML = `
+          <div class="text-amber-300">내공 +${dQi}년 | 외공 +${dExt} | 신법 +${dAgi} 상승</div>
+          <div class="text-emerald-400">연간 문파 녹봉이 ${rank.salary}냥으로 상승했습니다.</div>
+        `;
+      } else if (type === "FAIL") {
+        card.classList.add("border-stone-600");
+        tag.className = "text-[10px] font-bold tracking-widest uppercase px-2 py-0.5 rounded bg-stone-800 text-stone-400 border border-stone-700";
+        tag.innerText = "REACHED THE WALL";
+        title.className = "text-2xl font-brush text-stone-300";
+        title.innerText = "경지의 벽에 가로막히다";
+        desc.className = "text-xs text-stone-400 leading-relaxed";
+        desc.innerText = "경지의 문턱까지 기운을 끌어올렸으나, 마지막 한 조각의 깨달음이 부족해 단전의 벽을 넘지 못했습니다. 큰 내상 없이 자리를 털고 일어납니다.";
+        details.innerHTML = `
+          <div class="text-cyan-400">기초 내공을 소폭 보충했습니다. (내공 +${dQi}년)</div>
+          <div class="text-stone-500 font-normal">스탯 손실 없이 다음 해에 재도전할 수 있습니다.</div>
+        `;
+      } else if (type === "DEVIATION") {
+        card.classList.add("breakthrough-pulse", "border-rose-600");
+        tag.className = "text-[10px] font-bold tracking-widest uppercase px-2 py-0.5 rounded bg-rose-950 text-rose-400 border border-rose-600";
+        tag.innerText = "QI DEVIATION DISASTER";
+        title.className = "text-2xl font-brush text-rose-500";
+        title.innerText = "✕ 주화입마(走火入魔) 발생 ✕";
+        desc.className = "text-xs text-rose-200 leading-relaxed";
+        desc.innerText = "무리하게 혈맥을 넓히던 중 통제되지 못한 폭주하는 내력이 역류하여 단전을 강타했습니다! 핏줄이 터지고 영구적인 내상을 입었습니다.";
+        details.innerHTML = `
+          <div class="text-rose-400">내공 손실: ${dQi}년 영구 소실</div>
+          <div class="text-stone-400 font-normal">호흡을 가다듬고 원기를 회복해야 합니다.</div>
+        `;
+      }
+
+      modal.style.display = "flex";
+    }
+
+    function closeBreakthroughResultModal() {
+      document.getElementById("breakthrough-result-modal").style.display = "none";
+    }
+
+    // 밸런스 조정: 우화등선 천겁 시련 기준을 무력 2200으로 상향
+    async function executeAscensionTrial() {
+      if (char.hasAscended) return;
+
+      const confirmed = confirm("하늘의 벼락(구천현뢰)을 맞이하여 인간의 껍질을 벗고 신선으로 승천을 시도하시겠습니까?\n실패 시 큰 내상을 입을 수 있습니다.");
+      if (!confirmed) return;
+
+      const myPower = getCombatPower();
+      const successProb = Math.min(80, 45 + Math.floor((myPower - 2200) / 15));
+      const roll = Math.random() * 100;
+
+      alert("하늘이 갈라지며 아홉 갈래의 구천현뢰(九天玄雷)가 정수리로 쏟아져 내립니다!");
+
+      if (roll < successProb) {
+        char.hasAscended = true;
+        char.title = "천상선인(天上仙人)";
+        addLog(char.age, `★★★★★ [우화등선] 천겁을 뚫고 신선의 반열에 올랐습니다!`, "text-cyan-300 font-brush text-base");
+        showFinalEnding("ASCENSION");
+      } else {
+        const lostQi = 45;
+        char.qi = Math.max(10, char.qi - lostQi);
+        addLog(char.age, `✕ [천겁 실패] 구천현뢰의 위력에 밀려 승천에 실패했습니다. (내공 -${lostQi})`, "text-red-400 font-bold");
+        alert(`구천현뢰의 압도적인 뇌기에 튕겨져 나왔습니다! 심각한 내상을 입었습니다. (내공 -${lostQi}년)`);
+        updateUI();
+      }
+    }
+
+    function showFinalEnding(forcedEnding = null) {
+      const modal = document.getElementById("ending-modal");
+      const card = document.getElementById("ending-card");
+      const badge = document.getElementById("ending-badge");
+      const title = document.getElementById("ending-title");
+      const epilogue = document.getElementById("ending-epilogue");
+      const rankStatElem = document.getElementById("end-stat-rank");
+
+      document.getElementById("ending-avatar-box").innerHTML = getAvatarSvg(char.avatarId);
+      document.getElementById("end-stat-power").innerText = getCombatPower();
+      document.getElementById("end-stat-age").innerText = `${char.age}세`;
+      document.getElementById("end-stat-money").innerText = `${char.money}냥`;
+
+      card.classList.remove("immortal-card", "flash-gold", "border-cyan-400", "border-yellow-400", "border-amber-600", "border-stone-600");
+
+      if (forcedEnding === "ASCENSION" || char.hasAscended) {
+        rankStatElem.innerText = "신선 / 등선경 (神仙)";
+        rankStatElem.className = "text-cyan-300 font-extrabold";
+
+        card.classList.add("immortal-card", "border-cyan-400");
+        badge.className = "text-[10px] font-bold tracking-widest uppercase px-2.5 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-400";
+        badge.innerText = "MYTHIC ENDING (신화)";
+        title.className = "text-2xl font-brush text-cyan-300";
+        title.innerText = "우화등선(羽化登仙) - 신선 승천";
+        epilogue.innerText = `${char.sect}의 평범한 문하생으로 시작하여, 인간의 한계를 초월하고 아홉 줄기 구천현뢰를 뚫어냈습니다. 강호의 먼지를 털어내고 육신을 벗어던진 그의 영혼은 천상으로 승천하여 영원불멸의 '검선(劍仙)'으로 신화가 되었습니다.`;
+      } else {
+        rankStatElem.innerText = ranks[char.rankIdx].name;
+        rankStatElem.className = "text-amber-300 font-bold";
+
+        const totalPower = getCombatPower();
+
+        if (totalPower >= 1500) {
+          card.classList.add("flash-gold", "border-yellow-400");
+          badge.className = "text-[10px] font-bold tracking-widest uppercase px-2.5 py-0.5 rounded bg-yellow-950 text-yellow-300 border border-yellow-400";
+          badge.innerText = "LEGENDARY ENDING (전설)";
+          title.className = "text-2xl font-brush text-yellow-300";
+          title.innerText = "천하무적(天下無敵) - 무림지존";
+          epilogue.innerText = `환갑을 맞이할 때까지 당대 강호에서 그를 마주하여 물러서지 않은 고수가 없었습니다. 천하제일의 패도를 완성한 절대자로 군림한 뒤, 스스로 검을 거두고 명산에 은거하니 그 이름 석 자는 강호 역사상 가장 눈부신 전설로 남았습니다.`;
+        } else if (totalPower >= 950) {
+          card.classList.add("border-amber-500");
+          badge.className = "text-[10px] font-bold tracking-widest uppercase px-2.5 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-500";
+          badge.innerText = "MASTER ENDING (명인)";
+          title.className = "text-2xl font-brush text-amber-300";
+          title.innerText = "일대종사(一代宗師) - 태산북두";
+          epilogue.innerText = `무림의 험난한 풍파를 이겨내고 한 문파를 대표하는 큰 어른이자 태산북두(泰山北斗)로 우뚝 섰습니다. 환갑에 이르러 강호의 전선에서 물러난 뒤, 수많은 제자들을 길러내며 그가 남긴 무학은 천하에 길이 이어지게 되었습니다.`;
+        } else if (totalPower >= 500) {
+          card.classList.add("border-stone-500");
+          badge.className = "text-[10px] font-bold tracking-widest uppercase px-2.5 py-0.5 rounded bg-stone-900 text-stone-300 border border-stone-600";
+          badge.innerText = "NORMAL ENDING (풍운)";
+          title.className = "text-2xl font-brush text-stone-200";
+          title.innerText = "풍운협객(風雲俠客) - 주막의 옛이야기";
+          epilogue.innerText = `수많은 비무와 사선을 넘나들며 치열하게 강호를 풍미했습니다. 나이가 들어 손의 검은 무뎌졌으나, 단골 주막에서 술 한 잔을 기울이며 청춘 시절 천하를 주름잡던 무용담을 안주 삼아 평온하고 낭만 있는 여생을 보냈습니다.`;
+        } else {
+          card.classList.add("border-stone-800");
+          badge.className = "text-[10px] font-bold tracking-widest uppercase px-2.5 py-0.5 rounded bg-stone-950 text-stone-500 border border-stone-800";
+          badge.innerText = "COMMON ENDING (서민)";
+          title.className = "text-2xl font-brush text-stone-400";
+          title.innerText = "평범한 촌부(村夫) - 칼을 쟁기로 바꾸다";
+          epilogue.innerText = `강호의 비정함과 삼류의 높은 벽을 실감하며 칼을 내려놓았습니다. 큰 명성을 떨치진 못했으나 모진 암투에서 목숨을 건져 고향으로 돌아가 밭을 일구며 소박하고 평화로운 삶을 매듭지었습니다.`;
+        }
+      }
+
+      modal.style.display = "flex";
+    }
+
+    function handleDuelClick() {
+      if (char.hasDueledThisYear) return;
+
+      if (isMajorYear(char.age)) {
+        startMajorTournament();
+      } else {
+        openDuelSelectModal();
+      }
+    }
+
+    function closeTournamentModal() {
+      if (tournamentState.isFighting) return;
+      document.getElementById("tournament-modal").style.display = "none";
+    }
+
+    function startMajorTournament() {
+      const basePower = getCombatPower();
+      tournamentState.stage = 0;
+      tournamentState.buttonMode = 'FIGHT';
+      tournamentState.isFighting = false;
+      tournamentState.opponents = [
+        { round: "본선 8강", name: "종남파 수제자 배도운", power: Math.max(20, Math.round(basePower * 0.90)), desc: "검로가 바르고 탄탄한 청년 고수", icon: PIXEL_ASSETS.enemies["호각"] },
+        { round: "준결승 4강", name: "사파의 혈랑도 단목량", power: Math.max(30, Math.round(basePower * 1.08)), desc: "수많은 비무로 피를 묻힌 실전파 칼잡이", icon: PIXEL_ASSETS.enemies["도전"] },
+        { round: "천하 결승", name: "전대 챔피언 천검존자", power: Math.max(45, Math.round(basePower * 1.25)), desc: "대회 2연패를 노리는 당대 천하제일 후보", icon: PIXEL_ASSETS.enemies["boss"] }
+      ];
+
+      document.getElementById("tour-log-box").innerHTML = "";
+      setupTournamentStageUI();
+      document.getElementById("btn-tour-close").style.display = "block";
+      document.getElementById("tournament-modal").style.display = "flex";
+    }
+
+    function setupTournamentStageUI() {
+      const stage = tournamentState.stage;
+      const opp = tournamentState.opponents[stage];
+      document.getElementById("tour-round-title").innerText = `★ ${opp.round} 격돌 ★`;
+      document.getElementById("tour-my-info").innerText = `${char.name} (${getCombatPower()})`;
+      document.getElementById("tour-opp-info").innerText = `${opp.name} (${opp.power})`;
+      document.getElementById("tour-opp-desc").innerText = opp.desc;
+
+      document.getElementById("tour-my-avatar").innerHTML = getAvatarSvg(char.avatarId);
+      document.getElementById("tour-opp-avatar").innerHTML = opp.icon;
+
+      tournamentState.buttonMode = 'FIGHT';
+      tournamentState.isFighting = false;
+
+      if (stage === 0) {
+        document.getElementById("btn-tour-close").style.display = "block";
+      } else {
+        document.getElementById("btn-tour-close").style.display = "none";
+      }
+
+      const actBtn = document.getElementById("btn-tour-action");
+      actBtn.disabled = false;
+      actBtn.innerText = `${opp.round} 맞대결 개시`;
+      actBtn.className = "w-full py-3 bg-gradient-to-r from-amber-600 to-amber-500 hover:brightness-110 text-stone-950 font-brush text-base rounded-xl transition cursor-pointer shadow-lg";
+    }
+
+    function onTourActionButtonClick() {
+      if (tournamentState.buttonMode === 'FIGHT') {
+        runTournamentMatch();
+      } else if (tournamentState.buttonMode === 'NEXT') {
+        setupTournamentStageUI();
+      } else if (tournamentState.buttonMode === 'CLOSE') {
+        tournamentState.isFighting = false;
+        document.getElementById("tournament-modal").style.display = "none";
+      }
+    }
+
+    async function runTournamentMatch() {
+      tournamentState.isFighting = true;
+      char.hasDueledThisYear = true;
+      document.getElementById("btn-tour-close").style.display = "none";
+
+      const actBtn = document.getElementById("btn-tour-action");
+      actBtn.disabled = true;
+      actBtn.className = "w-full py-3 bg-stone-800 text-stone-500 font-brush text-base rounded-xl cursor-not-allowed";
+
+      const opp = tournamentState.opponents[tournamentState.stage];
+      const myPower = getCombatPower();
+      const logBox = document.getElementById("tour-log-box");
+
+      const log = (msg, color = "text-stone-300") => {
+        const d = document.createElement("div");
+        d.className = `${color} leading-relaxed`;
+        d.innerHTML = msg;
+        logBox.appendChild(d);
+        logBox.scrollTop = logBox.scrollHeight;
+      };
+
+      log(`▶ ── ${opp.round}: ${char.name}(${myPower}) vs ${opp.name}(${opp.power}) ──`, "text-amber-400 font-bold pb-1 border-b border-stone-800");
+
+      const rounds = [
+        { round: "1합", msgWin: "날카로운 신법으로 상대의 빈틈을 파고들어 선제 강타!", msgLose: "상대의 묵직한 패도에 밀려 호흡이 흐트러졌습니다." },
+        { round: "2합", msgWin: "검 끝에 실린 내기로 상대의 맹렬한 공세를 꺾었습니다!", msgLose: "상대의 거친 내공 격돌에 중심을 잃고 밀려났습니다." },
+        { round: "3합", msgWin: "천하를 뒤흔드는 비기 오의를 작렬시켜 상대 무기를 격파!", msgLose: "상대의 기습적인 연환 필살기에 허를 찔리고 말았습니다." }
+      ];
+
+      let myWins = 0;
+      let oppWins = 0;
+
+      for (let i = 0; i < rounds.length; i++) {
+        await sleep(650);
+        const r = rounds[i];
+        const winProb = myPower / (myPower + opp.power);
+        const isRoundWin = Math.random() < winProb;
+
+        if (isRoundWin) {
+          myWins++;
+          log(`<strong>[${r.round}]</strong> <span class="text-cyan-300 font-bold">${r.msgWin}</span>`);
+        } else {
+          oppWins++;
+          log(`<strong>[${r.round}]</strong> <span class="text-rose-400 font-bold">${r.msgLose}</span>`);
+        }
+      }
+
+      await sleep(600);
+      const isFinalWin = myWins > oppWins;
+
+      if (isFinalWin) {
+        log(`\n★ [승리] ${char.name}의 초식이 승리를 거두며 ${opp.name}을(를) 격파했습니다!`, "text-yellow-400 font-brush text-sm pt-2 border-t border-stone-800");
+
+        if (tournamentState.stage === 2) {
+          await sleep(500);
+          char.money += 250;
+          char.fame += 70;
+          char.qi += 6; char.ext += 6; char.agi += 6;
+          yearGains.fame += 70; yearGains.qi += 6; yearGains.ext += 6; yearGains.agi += 6;
+          char.title = "천하제일(天下第一)";
+
+          addLog(char.age, `★★★ [천하비무제 제패] 우승! 칭호 '천하제일', 은자 250냥, 올스탯 +6 획득!`, "text-yellow-300 font-brush text-sm");
+          log(`\n🏆 [천하제일 우승] 관중들의 환호 속에 우승 상금 250냥 획득!`, "text-yellow-400 font-brush text-sm");
+
+          checkRankUp();
+          updateUI();
+
+          tournamentState.buttonMode = 'CLOSE';
+          tournamentState.isFighting = false;
+          actBtn.disabled = false;
+          actBtn.innerText = "영광을 안고 대회를 마무리하다";
+          actBtn.className = "w-full py-3 bg-gradient-to-r from-yellow-500 to-amber-500 hover:brightness-110 text-stone-950 font-brush text-base rounded-xl cursor-pointer shadow-lg";
+        } else {
+          tournamentState.stage++;
+          tournamentState.buttonMode = 'NEXT';
+          tournamentState.isFighting = false;
+          actBtn.disabled = false;
+          actBtn.innerText = `다음 라운드 진출 (${tournamentState.opponents[tournamentState.stage].round})`;
+          actBtn.className = "w-full py-3 bg-gradient-to-r from-cyan-600 to-blue-500 hover:brightness-110 text-white font-brush text-base rounded-xl cursor-pointer shadow-lg";
+        }
+
+      } else {
+        log(`\n✕ [패배] ${opp.name}의 벽을 넘지 못하고 패배하여 탈락했습니다.`, "text-rose-400 font-bold pt-2 border-t border-stone-800");
+        
+        let prize = tournamentState.stage === 0 ? 30 : 60;
+        char.money += prize;
+        char.fame += 10;
+        yearGains.fame += 10;
+
+        addLog(char.age, `[천하비무제] ${opp.round}에서 석패하여 탈락했습니다. (상금 ${prize}냥 수령)`, "text-stone-400 font-bold");
+
+        checkRankUp();
+        updateUI();
+
+        await sleep(400);
+        tournamentState.buttonMode = 'CLOSE';
+        tournamentState.isFighting = false;
+        actBtn.disabled = false;
+        actBtn.innerText = `아쉬움을 삼키며 퇴장 (${prize}냥 수령)`;
+        actBtn.className = "w-full py-3 bg-stone-800 hover:bg-stone-700 text-stone-200 font-brush text-base rounded-xl cursor-pointer shadow";
+      }
+    }
+
+    // 밸런스 조정: 비무 스탯 보상 과다 축적 완화
+    function openDuelSelectModal() {
+      const myPower = getCombatPower();
+      const container = document.getElementById("duel-candidates");
+      container.innerHTML = "";
+
+      const options = [
+        {
+          tag: "쉬움",
+          tagColor: "text-emerald-400 border-emerald-500/40 bg-emerald-950/40",
+          name: "하급 무뢰배 / 초보 비무자",
+          desc: "손쉬운 적수. 안정적인 푼돈벌이.",
+          ratio: 0.72,
+          isBlind: false,
+          icon: PIXEL_ASSETS.enemies["쉬움"],
+          winPrize: 10,
+          losePrize: 2,
+          rewardDesc: "10냥, 명성 +2",
+          onWin: () => { 
+            char.money += 10; char.fame += 2;
+            yearGains.fame += 2;
+          },
+          onLose: () => { char.money += 2; }
+        },
+        {
+          tag: "호각",
+          tagColor: "text-blue-400 border-blue-500/40 bg-blue-950/40",
+          name: "동문 사형 / 표국의 표사",
+          desc: "치열한 승부. 쏠쏠한 상금.",
+          ratio: 1.0,
+          isBlind: false,
+          icon: PIXEL_ASSETS.enemies["호각"],
+          winPrize: 25,
+          losePrize: 5,
+          rewardDesc: "25냥, 명성 +5, 외공 +1",
+          onWin: () => { 
+            char.money += 25; char.fame += 5; char.ext += 1;
+            yearGains.fame += 5; yearGains.ext += 1;
+          },
+          onLose: () => { char.money += 5; }
+        },
+        {
+          tag: "도전",
+          tagColor: "text-rose-400 border-rose-500/40 bg-rose-950/40",
+          name: "인근 문파 수제자 / 흑도 고수",
+          desc: "한 수 위의 강자. 큰 판돈.",
+          ratio: 1.25,
+          isBlind: false,
+          icon: PIXEL_ASSETS.enemies["도전"],
+          winPrize: 50,
+          losePrize: 10,
+          rewardDesc: "50냥, 명성 +12, 외공 +2, 신법 +1",
+          onWin: () => { 
+            char.money += 50; char.fame += 12; char.ext += 2; char.agi += 1;
+            yearGains.fame += 12; yearGains.ext += 2; yearGains.agi += 1;
+          },
+          onLose: () => { char.money += 10; char.qi += 1; yearGains.qi += 1; }
+        },
+        {
+          tag: "무작위",
+          tagColor: "text-purple-400 border-purple-500/30 bg-purple-950/40",
+          name: "방랑하는 의문의 복면인",
+          desc: "건달일 수도, 은거 기인일 수도 있는 미지의 상대.",
+          ratio: (0.6 + Math.random() * 1.0),
+          isBlind: true,
+          icon: PIXEL_ASSETS.enemies["무작위"],
+          winPrize: Math.floor(Math.random() * 70) + 20,
+          losePrize: 5,
+          rewardDesc: "알 수 없음 (???냥, 기연 또는 낭패)",
+          onWin: function() {
+            char.money += this.winPrize;
+            char.fame += 10;
+            char.qi += 3;
+            yearGains.fame += 10;
+            yearGains.qi += 3;
+          },
+          onLose: () => { char.money += 5; }
+        }
+      ];
+
+      options.forEach(opt => {
+        const oppPower = Math.max(15, Math.round(myPower * opt.ratio));
+        const card = document.createElement("div");
+        card.className = "p-3 rounded-2xl bg-stone-950/80 border border-stone-800 hover:border-amber-500/60 transition cursor-pointer flex items-center justify-between gap-2.5";
+        
+        const powerText = opt.isBlind ? `<strong class="text-purple-400 font-extrabold tracking-widest">???</strong>` : `<strong class="text-amber-400">${oppPower}</strong>`;
+        const rewardText = opt.isBlind 
+          ? `<span class="text-purple-300 font-bold">승리 상금: ???냥</span> <span class="text-stone-500">(미지의 보상)</span>` 
+          : `승리 상금: ${opt.winPrize}냥 (${opt.rewardDesc})`;
+
+        card.innerHTML = `
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-stone-900 border border-stone-700/80 p-1 flex items-center justify-center shrink-0">
+              ${opt.icon}
+            </div>
+            <div>
+              <div class="flex items-center gap-1.5">
+                <span class="text-[9px] font-bold px-1.5 py-0.2 rounded border ${opt.tagColor}">${opt.tag}</span>
+                <span class="font-bold text-xs text-stone-100">${opt.name}</span>
+              </div>
+              <p class="text-[10px] text-stone-400 mt-0.5">${opt.desc}</p>
+              <div class="text-[10px] text-yellow-400 font-bold mt-0.5">${rewardText}</div>
+            </div>
+          </div>
+          <div class="text-right shrink-0">
+            <span class="text-xs text-stone-400 font-bold block">무력</span>
+            ${powerText}
+          </div>
+        `;
+        card.onclick = () => {
+          document.getElementById("duel-select-modal").style.display = "none";
+          char.hasDueledThisYear = true;
+          startBattleSequence(opt, oppPower);
+        };
+        container.appendChild(card);
+      });
+
+      document.getElementById("duel-select-modal").style.display = "flex";
+    }
+
+    function closeDuelSelectModal() {
+      document.getElementById("duel-select-modal").style.display = "none";
+    }
+
+    async function startBattleSequence(opponent, oppPower) {
+      const myPower = getCombatPower();
+      const modal = document.getElementById("duel-battle-modal");
+      const title = document.getElementById("battle-title");
+      const logBox = document.getElementById("battle-log-box");
+      const confirmBtn = document.getElementById("btn-battle-confirm");
+
+      title.innerText = `${opponent.name} 일전`;
+      logBox.innerHTML = "";
+      confirmBtn.style.display = "none";
+      modal.style.display = "flex";
+
+      const appendBattleLine = (text, color = "text-stone-300") => {
+        const p = document.createElement("div");
+        p.className = `${color} leading-relaxed`;
+        p.innerHTML = text;
+        logBox.appendChild(p);
+        logBox.scrollTop = logBox.scrollHeight;
+      };
+
+      appendBattleLine(`▶ 대치: ${char.name}(무력 ${myPower}) vs ${opponent.name}(무력 ${oppPower})`, "text-stone-400 pb-1 border-b border-stone-800 font-bold");
+
+      let myWins = 0;
+      let oppWins = 0;
+      const rounds = [
+        { round: "1합", msgWin: "신법으로 상대의 빈틈을 파고들어 강타!", msgLose: "상대의 묵직한 초식에 밀렸습니다." },
+        { round: "2합", msgWin: "검 끝에 실린 내기로 상대 기세를 꺾었습니다!", msgLose: "거친 패도에 검이 튕겨나갈 뻔했습니다." },
+        { round: "3합", msgWin: "비기를 작렬시켜 상대의 무기를 격파!", msgLose: "기습적인 연환격에 허를 찔렸습니다." }
+      ];
+
+      for (let i = 0; i < rounds.length; i++) {
+        await sleep(650);
+        const r = rounds[i];
+        const winProb = myPower / (myPower + oppPower);
+        const isRoundWin = Math.random() < winProb;
+
+        if (isRoundWin) {
+          myWins++;
+          appendBattleLine(`<strong>[${r.round}]</strong> <span class="text-cyan-300 font-bold">${r.msgWin}</span>`);
+        } else {
+          oppWins++;
+          appendBattleLine(`<strong>[${r.round}]</strong> <span class="text-rose-400 font-bold">${r.msgLose}</span>`);
+        }
+      }
+
+      await sleep(600);
+      const isFinalWin = myWins > oppWins;
+
+      if (isFinalWin) {
+        appendBattleLine(`\n★ [승리] 상금 ${opponent.winPrize}냥을 거머쥐었습니다!`, "text-yellow-400 font-brush text-sm pt-2 border-t border-stone-800");
+        opponent.onWin();
+        addLog(char.age, `[비무 승리] ${opponent.name} 격파 (+${opponent.winPrize}냥)`, "text-amber-300 font-bold");
+      } else {
+        appendBattleLine(`\n✕ [패배] 아쉽게 패배하여 위로금 ${opponent.losePrize}냥을 받았습니다.`, "text-stone-400 font-bold pt-2 border-t border-stone-800");
+        opponent.onLose();
+        addLog(char.age, `[비무 패배] ${opponent.name}에게 석패 (+${opponent.losePrize}냥)`, "text-stone-400");
+      }
+
+      checkRankUp();
+      updateUI();
+
+      confirmBtn.style.display = "block";
+      confirmBtn.onclick = () => {
+        modal.style.display = "none";
+      };
+    }
+
+    // === 상점 & 암시장 ===
+    function openMarketModal() {
+      document.getElementById("icon-gacha-box").innerHTML = PIXEL_ASSETS.items.chest;
+      renderMarketUI();
+      document.getElementById("market-modal").style.display = "flex";
+    }
+
+    function closeMarketModal() {
+      document.getElementById("market-modal").style.display = "none";
+    }
+
+    function renderMarketUI() {
+      document.getElementById("market-my-money").innerText = char.money;
+
+      const gachaCard = document.getElementById("gacha-card");
+      const gachaBadge = document.getElementById("gacha-badge");
+      const gachaTitle = document.getElementById("gacha-title");
+      const btnGacha = document.getElementById("btn-gacha-buy");
+
+      if (char.money >= 80) {
+        gachaCard.className = "p-3.5 rounded-2xl bg-gradient-to-b from-stone-900 via-purple-950/40 to-stone-900 border-2 border-amber-500/80 shadow-lg space-y-2";
+        gachaBadge.className = "text-[9px] font-bold px-1.5 py-0.2 rounded bg-amber-500/20 border border-amber-400 text-amber-300";
+        gachaTitle.className = "font-brush text-sm text-amber-200";
+        btnGacha.disabled = false;
+        btnGacha.className = "w-full py-2.5 bg-gradient-to-r from-amber-600 to-amber-500 hover:brightness-110 text-stone-950 font-brush text-sm rounded-xl shadow-lg cursor-pointer transition";
+      } else {
+        gachaCard.className = "p-3.5 rounded-2xl bg-stone-950 border border-stone-800 opacity-60 space-y-2";
+        gachaBadge.className = "text-[9px] font-bold px-1.5 py-0.2 rounded bg-stone-900 border border-stone-800 text-stone-500";
+        gachaTitle.className = "font-brush text-sm text-stone-400";
+        btnGacha.disabled = true;
+        btnGacha.className = "w-full py-2.5 bg-stone-800 text-stone-500 font-brush text-sm rounded-xl cursor-not-allowed";
+      }
+
+      const container = document.getElementById("shop-items-container");
+      container.innerHTML = "";
+
+      shopItems.forEach(item => {
+        const isOwned = char.ownedItems.includes(item.name);
+        const canBuy = !isOwned && char.money >= item.price;
+        const row = document.createElement("div");
+
+        if (isOwned) {
+          row.className = "p-2.5 rounded-xl bg-stone-950 border border-stone-800/60 opacity-40 flex justify-between items-center";
+          row.innerHTML = `
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-lg bg-stone-950 border border-stone-800 p-1 flex items-center justify-center shrink-0">
+                ${PIXEL_ASSETS.items[item.iconKey] || ''}
+              </div>
+              <div>
+                <div class="text-xs font-bold text-stone-500 flex items-center gap-1.5">
+                  <span class="line-through">${item.name}</span>
+                  <span class="text-[9px] bg-stone-800 text-stone-400 px-1 py-0.2 rounded font-bold">습득 완료</span>
+                </div>
+                <div class="text-[10px] font-medium text-stone-600">${item.desc}</div>
+              </div>
+            </div>
+            <button disabled class="px-3 py-1.5 bg-stone-900 text-stone-600 font-bold text-xs rounded-lg cursor-not-allowed">
+              보유 중
+            </button>
+          `;
+        } else if (canBuy) {
+          row.className = "p-2.5 rounded-xl bg-stone-900/90 border-2 border-amber-500/80 shadow-md flex justify-between items-center transition";
+          row.innerHTML = `
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-lg bg-stone-950 border border-stone-700/80 p-1 flex items-center justify-center shrink-0">
+                ${PIXEL_ASSETS.items[item.iconKey] || ''}
+              </div>
+              <div>
+                <div class="text-xs font-bold text-amber-300 flex items-center gap-1.5">
+                  <span>${item.name}</span>
+                  <span class="text-[9px] bg-amber-500/20 text-amber-300 border border-amber-500/40 px-1 py-0.2 rounded font-bold">구매 가능</span>
+                </div>
+                <div class="text-[10px] font-semibold text-stone-300">${item.desc}</div>
+              </div>
+            </div>
+            <button onclick="buyShopItem('${item.name}', ${item.price}, ${JSON.stringify(item.bonus).replace(/"/g, '&quot;')})" 
+              class="px-3 py-1.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:brightness-110 text-stone-950 font-brush text-xs rounded-lg shadow cursor-pointer transition">
+              ${item.price}냥
+            </button>
+          `;
+        } else {
+          row.className = "p-2.5 rounded-xl bg-stone-950/70 border border-stone-800/80 opacity-55 flex justify-between items-center";
+          row.innerHTML = `
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-lg bg-stone-950 border border-stone-800 p-1 flex items-center justify-center shrink-0 opacity-50">
+                ${PIXEL_ASSETS.items[item.iconKey] || ''}
+              </div>
+              <div>
+                <div class="text-xs font-bold text-stone-400">${item.name}</div>
+                <div class="text-[10px] font-medium text-stone-500">${item.desc}</div>
+              </div>
+            </div>
+            <button disabled class="px-3 py-1.5 bg-stone-800 text-stone-500 font-bold text-xs rounded-lg border border-stone-700/50 cursor-not-allowed">
+              ${item.price}냥
+            </button>
+          `;
+        }
+        container.appendChild(row);
+      });
+    }
+
+    function buyShopItem(name, price, statBonus) {
+      if (char.money < price) {
+        alert("은자가 부족합니다!");
+        return;
+      }
+      if (char.ownedItems.includes(name)) {
+        alert("이미 습득한 고유 비급/장비입니다!");
+        return;
+      }
+
+      char.money -= price;
+      char.ownedItems.push(name);
+
+      if (statBonus.qi) { char.qi += statBonus.qi; yearGains.qi += statBonus.qi; }
+      if (statBonus.ext) { char.ext += statBonus.ext; yearGains.ext += statBonus.ext; }
+      if (statBonus.agi) { char.agi += statBonus.agi; yearGains.agi += statBonus.agi; }
+
+      addLog(char.age, `[전포 구매] ${price}냥으로 고유 비급 '${name}'을(를) 체득했습니다!`, "text-amber-400 font-bold");
+      checkRankUp();
+      updateUI();
+      renderMarketUI();
+    }
+
+    function buyGachaBox() {
+      const COST = 80;
+      if (char.money < COST) {
+        alert("은자 80냥이 부족합니다!");
+        return;
+      }
+
+      char.money -= COST;
+      const roll = Math.random() * 100;
+      const gachaCard = document.getElementById("gacha-card");
+
+      if (roll < 25) {
+        addLog(char.age, `[암시장 궤짝] 80냥 상자는 흙먼지만 가득했습니다 (꽝)`, "text-stone-500 font-medium");
+        alert("먼지만 흩날리는 빈 상자였습니다... (꽝)");
+      } else if (roll < 70) {
+        const refund = Math.floor(Math.random() * 40) + 30;
+        char.money += refund;
+        char.ext += 2;
+        yearGains.ext += 2;
+        addLog(char.age, `[암시장 궤짝] 연단환(외공+2)과 은자 ${refund}냥 회수`, "text-stone-200");
+        alert(`소박! 연단환(외공 +2)과 은자 ${refund}냥을 건졌습니다.`);
+      } else if (roll < 92) {
+        char.qi += 10;
+        char.agi += 6;
+        yearGains.qi += 10;
+        yearGains.agi += 6;
+        addLog(char.age, `★ [암시장 중박] 희귀 영약 '백년하수오' (내공 +10, 신법 +6)`, "text-cyan-400 font-bold");
+        alert("중박! 희귀 영약 '백년하수오' 획득!");
+      } else if (roll < 98) {
+        char.ext += 25;
+        char.qi += 15;
+        char.fame += 20;
+        yearGains.ext += 25;
+        yearGains.qi += 15;
+        yearGains.fame += 20;
+        addLog(char.age, `★★ [암시장 대박] 명검 '청홍검' 발굴 (외공 +25, 내공 +15, 명성 +20)`, "text-purple-400 font-bold");
+        alert("★★ 대박! 명검 '청홍검'을 발굴했습니다!");
+      } else {
+        char.qi += 60;
+        char.ext += 35;
+        char.agi += 30;
+        char.fame += 50;
+        yearGains.qi += 60;
+        yearGains.ext += 35;
+        yearGains.agi += 30;
+        yearGains.fame += 50;
+        gachaCard.classList.add("flash-gold");
+        setTimeout(() => gachaCard.classList.remove("flash-gold"), 1200);
+        addLog(char.age, `★★★ [초대박] 전설 비급 '천마신공' 원본 획득! 천하가 경악합니다!`, "text-amber-400 font-brush text-sm");
+        alert("★★★ 초대박 (2%)!! 전설의 '천마신공' 원본을 얻었습니다!!");
+      }
+
+      checkRankUp();
+      updateUI();
+      renderMarketUI();
+    }
+
+    // === 다음 해 진행 ===
+    function nextYear() {
+      char.age += 1;
+      yearGains = { qi: 0, ext: 0, agi: 0, fame: 0 };
+
+      const salary = getCurrentSalary();
+      char.money += salary;
+      addLog(char.age, `새해가 밝았습니다. 문파 녹봉 ${salary}냥 지급`, "text-emerald-400 font-bold");
+
+      if (char.age >= 46 && char.age < 60) {
+        const decayExt = Math.floor(Math.random() * 3) + 1;
+        const decayAgi = Math.floor(Math.random() * 3) + 1;
+
+        char.ext = Math.max(10, char.ext - decayExt);
+        char.agi = Math.max(10, char.agi - decayAgi);
+
+        addLog(char.age, `[세월의 무상함] 나이가 들어 기혈이 쇠약해집니다. (외공 -${decayExt}, 신법 -${decayAgi})`, "text-stone-500 font-medium");
+      }
+
+      if (isMajorYear(char.age)) {
+        addLog(char.age, `★ [10년 주기] 강호 최대의 제전, '천하비무대회'가 개막했습니다!`, "text-yellow-300 font-brush text-sm");
+      }
+
+      char.hasTrainedThisYear = false;
+      char.hasDueledThisYear = false;
+      char.hasBreakthroughThisYear = false;
+
+      if (char.age >= 60) {
+        showFinalEnding();
+        const btnNext = document.getElementById("btn-next-year");
+        btnNext.disabled = true;
+        btnNext.innerText = "천하를 풍미하고 은퇴하다";
+        btnNext.className = "w-full py-3.5 bg-stone-800 text-stone-500 font-brush text-base rounded-xl cursor-not-allowed";
+        
+        document.getElementById("btn-train").disabled = true;
+        document.getElementById("btn-duel").disabled = true;
+        document.getElementById("btn-market").disabled = true;
+        document.getElementById("btn-breakthrough").disabled = true;
+        document.getElementById("btn-ascension").disabled = true;
+        updateUI();
+        return;
+      }
+
+      checkRankUp();
+      updateUI();
+    }
+
+    function checkRankUp() {
+      const totalPower = getCombatPower();
+      if (char.rankIdx < 5) {
+        const nextRank = ranks[char.rankIdx + 1];
+        if (totalPower >= nextRank.minStat) {
+          char.rankIdx += 1;
+          addLog(char.age, `★ [경지 돌파] '${nextRank.name}' 반열 등극! (녹봉 ${nextRank.salary}냥으로 상승)`, "text-amber-300 font-brush text-sm");
+          showRankUpPopup(nextRank);
+        }
+      }
+    }
+
+    function addLog(age, text, colorClass = "text-stone-300") {
+      const list = document.getElementById("log-list");
+      const item = document.createElement("div");
+      item.className = "p-2 rounded-xl bg-stone-950/70 border border-stone-800/80 flex items-start gap-2";
+      item.innerHTML = `
+        <span class="text-[10px] font-bold text-amber-400 bg-amber-950/60 border border-amber-800/50 px-1.5 py-0.5 rounded shrink-0">${age}세</span>
+        <span class="${colorClass} leading-snug">${text}</span>
+      `;
+      list.prepend(item);
+    }
+
+    function renderMultiTierBar(val, baseFillClass, tierId, bgId, fillId) {
+      const tierLevels = [
+        { fill: baseFillClass, bg: "bg-transparent", name: "1단" },
+        { fill: "bg-gradient-to-r from-amber-500 to-yellow-300 shadow-[0_0_8px_rgba(250,204,21,0.6)]", bg: baseFillClass, name: "2단" },
+        { fill: "bg-gradient-to-r from-purple-500 to-fuchsia-400 shadow-[0_0_8px_rgba(217,70,239,0.7)]", bg: "bg-amber-500", name: "3단" },
+        { fill: "bg-gradient-to-r from-red-600 via-rose-500 to-white shadow-[0_0_10px_rgba(244,63,94,0.9)]", bg: "bg-purple-600", name: "4단" }
+      ];
+
+      const tierIndex = Math.min(tierLevels.length - 1, Math.floor(val / 100));
+      const currentTier = tierLevels[tierIndex];
+      const remainder = val % 100;
+      const pct = (val > 0 && remainder === 0 && tierIndex > 0) ? 100 : remainder;
+
+      document.getElementById(tierId).innerText = currentTier.name;
+      
+      const bgElem = document.getElementById(bgId);
+      bgElem.className = `absolute inset-0 ${currentTier.bg}`;
+      
+      const fillElem = document.getElementById(fillId);
+      fillElem.className = `h-full transition-all duration-300 relative z-10 ${currentTier.fill}`;
+      fillElem.style.width = Math.max(3, pct) + "%";
+    }
+
+    function updateUI() {
+      document.getElementById("char-name").innerText = char.name;
+      document.getElementById("char-sect").innerText = char.sect;
+      document.getElementById("char-age").innerText = char.age;
+      document.getElementById("char-rank").innerText = ranks[char.rankIdx].name;
+      document.getElementById("char-total-power").innerText = getCombatPower();
+      document.getElementById("char-money").innerText = char.money;
+      document.getElementById("char-salary").innerText = getCurrentSalary();
+
+      document.getElementById("char-avatar-box").innerHTML = getAvatarSvg(char.avatarId);
+
+      const bodyStateElem = document.getElementById("char-body-state");
+      if (char.age < 36) {
+        bodyStateElem.innerText = "기혈 왕성 (전성기)";
+        bodyStateElem.className = "text-[9px] font-bold text-emerald-400 mt-0.5";
+      } else if (char.age < 46) {
+        bodyStateElem.innerText = "기혈 정체 (수련 둔화)";
+        bodyStateElem.className = "text-[9px] font-bold text-yellow-400 mt-0.5";
+      } else {
+        bodyStateElem.innerText = "기혈 쇠퇴 (노화 진행)";
+        bodyStateElem.className = "text-[9px] font-bold text-rose-400 mt-0.5";
+      }
+
+      const titleTag = document.getElementById("char-title-tag");
+      if (char.title) {
+        titleTag.innerText = char.title;
+        titleTag.classList.remove("hidden");
+      } else {
+        titleTag.classList.add("hidden");
+      }
+
+      const banner = document.getElementById("major-banner");
+      if (isMajorYear(char.age)) {
+        banner.classList.remove("hidden");
+      } else {
+        banner.classList.add("hidden");
+      }
+
+      document.getElementById("stat-qi").innerText = char.qi + " 년";
+      document.getElementById("stat-ext").innerText = char.ext;
+      document.getElementById("stat-agi").innerText = char.agi;
+      document.getElementById("stat-fame").innerText = char.fame;
+
+      const renderDelta = (elemId, val) => {
+        const elem = document.getElementById(elemId);
+        if (val > 0) {
+          elem.innerText = `(+${val})`;
+          elem.classList.remove("hidden");
+        } else {
+          elem.classList.add("hidden");
+        }
+      };
+
+      const totalGain = yearGains.qi + yearGains.ext + yearGains.agi;
+      renderDelta("delta-power", totalGain);
+      renderDelta("delta-qi", yearGains.qi);
+      renderDelta("delta-ext", yearGains.ext);
+      renderDelta("delta-agi", yearGains.agi);
+      renderDelta("delta-fame", yearGains.fame);
+
+      renderMultiTierBar(char.qi, "bg-gradient-to-r from-amber-600 to-amber-400", "tier-qi", "bar-qi-bg", "bar-qi-fill");
+      renderMultiTierBar(char.ext, "bg-gradient-to-r from-red-600 to-red-400", "tier-ext", "bar-ext-bg", "bar-ext-fill");
+      renderMultiTierBar(char.agi, "bg-gradient-to-r from-cyan-600 to-cyan-400", "tier-agi", "bar-agi-bg", "bar-agi-fill");
+      renderMultiTierBar(char.fame, "bg-gradient-to-r from-emerald-600 to-emerald-400", "tier-fame", "bar-fame-bg", "bar-fame-fill");
+
+      const btnTrain = document.getElementById("btn-train");
+      const trainStatus = document.getElementById("train-status");
+      if (char.hasTrainedThisYear) {
+        btnTrain.disabled = true;
+        btnTrain.className = "py-2.5 px-2 bg-stone-950 border border-stone-800 text-stone-600 rounded-xl flex flex-col items-center justify-center cursor-not-allowed";
+        trainStatus.innerText = "(완료)";
+      } else {
+        btnTrain.disabled = false;
+        btnTrain.className = "py-2.5 px-2 bg-stone-900 hover:bg-stone-800 text-stone-100 border border-stone-700/80 rounded-xl transition flex flex-col items-center justify-center cursor-pointer shadow";
+        trainStatus.innerText = "(연 1회)";
+      }
+
+      const btnDuel = document.getElementById("btn-duel");
+      const duelLabel = document.getElementById("duel-label");
+      const duelStatus = document.getElementById("duel-status");
+
+      if (char.hasDueledThisYear) {
+        btnDuel.disabled = true;
+        btnDuel.className = "py-2.5 px-2 bg-stone-950 border border-stone-800 text-stone-600 rounded-xl flex flex-col items-center justify-center cursor-not-allowed";
+        duelStatus.innerText = "(완료)";
+        duelLabel.innerText = isMajorYear(char.age) ? "👑 비무제 출전" : "⚔️ 강호 비무";
+      } else {
+        btnDuel.disabled = false;
+        if (isMajorYear(char.age)) {
+          btnDuel.className = "py-2.5 px-2 bg-gradient-to-r from-amber-600 via-yellow-500 to-amber-600 hover:brightness-110 text-stone-950 border border-yellow-400 rounded-xl transition flex flex-col items-center justify-center cursor-pointer shadow-lg animate-pulse";
+          duelLabel.innerText = "👑 천하비무제 출전";
+          duelLabel.className = "text-stone-950 font-brush text-base";
+          duelStatus.innerText = "(메이저 제전)";
+          duelStatus.className = "text-[10px] text-stone-900 font-bold";
+        } else {
+          btnDuel.className = "py-2.5 px-2 bg-stone-900 hover:bg-stone-800 text-stone-100 border border-stone-700/80 rounded-xl transition flex flex-col items-center justify-center cursor-pointer shadow";
+          duelLabel.innerText = "⚔️ 강호 비무";
+          duelLabel.className = "text-rose-400 font-brush text-base";
+          duelStatus.innerText = "(은자 파밍)";
+          duelStatus.className = "text-[10px] text-stone-400 font-medium";
+        }
+      }
+
+      const btnBreakthrough = document.getElementById("btn-breakthrough");
+      if (char.rankIdx >= 5 && char.rankIdx < ranks.length - 1) {
+        btnBreakthrough.classList.remove("hidden");
+        const nextRankName = ranks[char.rankIdx + 1].name.split(" ")[0];
+        btnBreakthrough.innerHTML = `<span>⚡ ${nextRankName} 사경 폐관 돌파</span>`;
+
+        if (char.hasBreakthroughThisYear) {
+          btnBreakthrough.disabled = true;
+          btnBreakthrough.className = "w-full py-2.5 bg-stone-950 border border-stone-800 text-stone-600 rounded-xl font-brush text-base cursor-not-allowed";
+        } else {
+          btnBreakthrough.disabled = false;
+          btnBreakthrough.className = "w-full py-2.5 bg-gradient-to-r from-red-950 via-stone-900 to-red-950 border-2 border-red-600/70 text-red-300 breakthrough-pulse rounded-xl font-brush text-base flex items-center justify-center gap-1.5 cursor-pointer shadow";
+        }
+      } else {
+        btnBreakthrough.classList.add("hidden");
+      }
+
+      // 밸런스 조정: 우화등선 버튼 노출 기준 상향 (생사경 + 무력 2200 이상)
+      const btnAscension = document.getElementById("btn-ascension");
+      if (char.rankIdx === 7 && getCombatPower() >= 2200 && !char.hasAscended) {
+        btnAscension.classList.remove("hidden");
+      } else {
+        btnAscension.classList.add("hidden");
+      }
+    }
+
+    window.addEventListener("keydown", function(e) {
+      if (e.key === "Escape") {
+        if (document.getElementById("breakthrough-result-modal").style.display === "flex") {
+          closeBreakthroughResultModal();
+        } else if (document.getElementById("tournament-modal").style.display === "flex") {
+          if (!tournamentState.isFighting && tournamentState.stage === 0) {
+            closeTournamentModal();
+          }
+        } else if (document.getElementById("duel-select-modal").style.display === "flex") {
+          closeDuelSelectModal();
+        } else if (document.getElementById("market-modal").style.display === "flex") {
+          closeMarketModal();
+        } else if (document.getElementById("breakthrough-modal").style.display === "flex") {
+          closeBreakthroughModal();
+        } else if (document.getElementById("rankup-modal").style.display === "flex") {
+          closeRankUpModal();
+        }
+      }
+    });
+
+    window.onload = function() {
+      rollInitialStats();
+      renderAvatarSelector();
+      updateUI();
+    };
+  </script>
+</body>
+</html>
