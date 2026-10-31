@@ -92,12 +92,12 @@
       <div class="space-y-3 text-xs font-bold">
         <div>
           <label class="block text-stone-300 mb-1">무협명 (이름)</label>
-          <input id="input-name" type="text" value="풍천혁" placeholder="이름을 입력하십시오" class="w-full bg-stone-900 border border-stone-700 rounded-xl px-3 py-2 text-white font-bold focus:outline-none focus:border-amber-500">
+          <input id="input-name" type="text" maxlength="12" value="풍천혁" placeholder="이름을 입력하십시오" class="w-full bg-stone-900 border border-stone-700 rounded-xl px-3 py-2 text-white font-bold focus:outline-none focus:border-amber-500">
         </div>
 
         <div>
           <label class="block text-stone-300 mb-1">소속 문파 (직접 입력)</label>
-          <input id="input-sect" type="text" value="화산파 (華山派)" placeholder="문파명을 입력하십시오" class="w-full bg-stone-900 border border-stone-700 rounded-xl px-3 py-2 text-white font-bold focus:outline-none focus:border-amber-500">
+          <input id="input-sect" type="text" maxlength="20" value="화산파 (華山派)" placeholder="문파명을 입력하십시오" class="w-full bg-stone-900 border border-stone-700 rounded-xl px-3 py-2 text-white font-bold focus:outline-none focus:border-amber-500">
         </div>
 
         <div class="p-3 bg-stone-950/90 rounded-2xl border border-stone-800 space-y-2">
@@ -202,7 +202,7 @@
         <button id="btn-gacha-again" onclick="buyGachaBox()" class="py-3 bg-gradient-to-r from-amber-600 to-amber-500 hover:brightness-110 text-stone-950 font-brush text-sm rounded-xl transition cursor-pointer shadow">
           한 번 더 개봉 (80냥)
         </button>
-        <button onclick="closeGachaResultModal()" class="py-3 bg-stone-800 hover:bg-stone-700 text-stone-300 font-brush text-sm rounded-xl cursor-pointer">
+        <button id="btn-gacha-close" onclick="closeGachaResultModal()" class="py-3 bg-stone-800 hover:bg-stone-700 text-stone-300 font-brush text-sm rounded-xl cursor-pointer">
           확인 및 닫기
         </button>
       </div>
@@ -517,6 +517,35 @@
     </div>
   </div>
 
+  <!-- 우화등선 확인 모달 -->
+  <div id="ascension-confirm-modal" style="display: none;" class="fixed inset-0 bg-black/95 items-center justify-center p-3 z-50">
+    <div class="hanji-card border-2 border-cyan-400 immortal-card w-full max-w-sm p-5 rounded-3xl shadow-2xl space-y-4 text-center">
+      <div class="space-y-1">
+        <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-cyan-950 border border-cyan-400 text-cyan-300">HEAVENLY TRIBULATION</span>
+        <h3 class="text-2xl font-brush text-cyan-300">구천현뢰 천겁</h3>
+        <p class="text-xs font-bold text-stone-300">하늘의 벼락을 맞이하여 인간의 껍질을 벗고<br>신선으로 승천을 시도하시겠습니까?</p>
+      </div>
+      <div class="p-3 bg-stone-950/80 rounded-2xl border border-stone-800 text-left space-y-2 text-xs">
+        <div class="flex justify-between">
+          <span class="text-stone-400">승천 성공 확률:</span>
+          <strong id="ascension-prob-text" class="text-cyan-400"></strong>
+        </div>
+        <p class="text-[11px] text-stone-400 border-t border-stone-800 pt-1.5 leading-relaxed">
+          ★ <strong>성공 시:</strong> 우화등선, 신화 엔딩.<br>
+          ✕ <strong>실패 시:</strong> 구천현뢰에 맞아 내공 -45년.
+        </p>
+      </div>
+      <div class="grid grid-cols-2 gap-2 pt-1">
+        <button onclick="confirmAscensionTrial()" class="py-3 bg-gradient-to-r from-cyan-600 to-sky-500 hover:brightness-110 text-white font-brush text-sm rounded-xl cursor-pointer shadow">
+          천겁을 맞이하다
+        </button>
+        <button onclick="closeAscensionConfirmModal()" class="py-3 bg-stone-800 text-stone-300 font-brush text-sm rounded-xl cursor-pointer">
+          아직 때가 아니다
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- 천하비무대회 모달 -->
   <div id="tournament-modal" style="display: none;" class="fixed inset-0 bg-black/95 items-center justify-center p-3 z-50">
     <div class="hanji-card border-2 gold-border w-full max-w-sm p-5 rounded-3xl shadow-2xl space-y-4 text-center relative">
@@ -632,6 +661,18 @@
     let hasSubmittedThisLife = false;
 
     const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+    // 랭킹 등 외부에서 온 글자를 화면에 넣을 때 HTML로 실행되지 않도록 변환
+    function escapeHtml(value) {
+      return String(value ?? "").replace(/[&<>"']/g, ch => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+      }[ch]));
+    }
+
+    // 이름·문파 입력값 정리: 꺾쇠 등 특수기호 제거 + 길이 제한
+    function cleanInputText(value, maxLen) {
+      return String(value || "").replace(/[<>"'`&\\]/g, "").trim().slice(0, maxLen);
+    }
 
     const PIXEL_ASSETS = {
       avatars: [
@@ -793,8 +834,8 @@
     }
 
     function startGame() {
-      const nameInput = document.getElementById("input-name").value.trim();
-      const sectInput = document.getElementById("input-sect").value.trim();
+      const nameInput = cleanInputText(document.getElementById("input-name").value, 12);
+      const sectInput = cleanInputText(document.getElementById("input-sect").value, 20);
 
       char.name = nameInput || "풍천혁";
       char.sect = sectInput || "무명 낭인";
@@ -974,14 +1015,25 @@
       document.getElementById("breakthrough-result-modal").style.display = "none";
     }
 
-    async function executeAscensionTrial() {
+    function getAscensionProb() {
+      return Math.min(80, 45 + Math.floor((getCombatPower() - 2200) / 15));
+    }
+
+    function executeAscensionTrial() {
+      if (char.hasAscended) return;
+      document.getElementById("ascension-prob-text").innerText = `약 ${getAscensionProb()}%`;
+      document.getElementById("ascension-confirm-modal").style.display = "flex";
+    }
+
+    function closeAscensionConfirmModal() {
+      document.getElementById("ascension-confirm-modal").style.display = "none";
+    }
+
+    function confirmAscensionTrial() {
+      closeAscensionConfirmModal();
       if (char.hasAscended) return;
 
-      const confirmed = confirm("하늘의 벼락(구천현뢰)을 맞이하여 인간의 껍질을 벗고 신선으로 승천을 시도하시겠습니까?\n실패 시 큰 내상을 입을 수 있습니다.");
-      if (!confirmed) return;
-
-      const myPower = getCombatPower();
-      const successProb = Math.min(80, 45 + Math.floor((myPower - 2200) / 15));
+      const successProb = getAscensionProb();
       const roll = Math.random() * 100;
 
       if (roll < successProb) {
@@ -1375,22 +1427,27 @@
       }
 
       try {
-        const url = `${FIREBASE_DB_URL.replace(/\/$/, '')}/rankings.json?orderBy="power"&limitToLast=100`;
-        const res = await fetch(url);
+        const nowPeriods = getPeriodKeys();
+        const currentTargetKey = nowPeriods[currentRankTab];
+        const filterKey = `${currentRankTab}Key`;
+        const baseUrl = `${FIREBASE_DB_URL.replace(/\/$/, '')}/rankings.json`;
+
+        // 해당 기간(오늘/이번 주/이번 달) 기록만 서버에서 바로 가져옵니다.
+        // Firebase 규칙에 .indexOn 이 없으면 400 오류가 나므로, 그때는 예전 방식으로 대체합니다.
+        let res = await fetch(`${baseUrl}?orderBy=${encodeURIComponent('"' + filterKey + '"')}&equalTo=${encodeURIComponent('"' + currentTargetKey + '"')}`);
+        if (res.status === 400) {
+          res = await fetch(`${baseUrl}?orderBy="power"&limitToLast=100`);
+        }
         if (!res.ok) throw new Error("서버 응답 오류 " + res.status);
         const data = await res.json();
 
         if (!data) {
-          listElem.innerHTML = `<div class="text-center py-10 text-stone-500">아직 서열록에 등록된 고수가 없습니다.</div>`;
+          listElem.innerHTML = `<div class="text-center py-10 text-stone-500 font-medium">해당 기간에 헌액된 고수가 아직 없습니다.<br>첫 번째 전설이 되어보세요!</div>`;
           return;
         }
 
-        const nowPeriods = getPeriodKeys();
-        const currentTargetKey = nowPeriods[currentRankTab];
-        const filterKey = `${currentRankTab}Key`;
-
-        let list = Object.values(data).filter(item => item[filterKey] === currentTargetKey);
-        list.sort((a, b) => (b.power || 0) - (a.power || 0));
+        let list = Object.values(data).filter(item => item && item[filterKey] === currentTargetKey);
+        list.sort((a, b) => (Number(b.power) || 0) - (Number(a.power) || 0));
         list = list.slice(0, 30);
 
         if (list.length === 0) {
@@ -1428,19 +1485,19 @@
               </div>
               <div class="min-w-0">
                 <div class="font-bold text-stone-100 truncate flex items-center gap-1.5">
-                  <span>${entry.name}</span>
+                  <span>${escapeHtml(entry.name)}</span>
                   <span class="text-[9px] px-1 py-0.2 rounded bg-stone-900 text-amber-300 border border-stone-800 shrink-0 font-normal">
-                    ${entry.sect}
+                    ${escapeHtml(entry.sect)}
                   </span>
                 </div>
                 <div class="text-[10px] text-stone-400 mt-0.5">
-                  <span>${entry.rankName}</span> · <span>${entry.age}세 은퇴</span>
+                  <span>${escapeHtml(entry.rankName)}</span> · <span>${Number(entry.age) || "?"}세 은퇴</span>
                 </div>
               </div>
             </div>
             <div class="text-right shrink-0">
               <span class="text-[9px] text-stone-500 block font-bold">무력</span>
-              <strong class="text-amber-300 text-sm font-extrabold">${entry.power}</strong>
+              <strong class="text-amber-300 text-sm font-extrabold">${Number(entry.power) || 0}</strong>
             </div>
           `;
           listElem.appendChild(row);
@@ -2100,6 +2157,12 @@
         details.appendChild(span);
       });
 
+      // 일반 알림/천겁 실패 안내에는 '한 번 더 개봉' 버튼을 숨김
+      btnAgain.style.display = res.isNotice ? "none" : "";
+      document.getElementById("btn-gacha-close").className = res.isNotice
+        ? "col-span-2 py-3 bg-stone-800 hover:bg-stone-700 text-stone-300 font-brush text-sm rounded-xl cursor-pointer"
+        : "py-3 bg-stone-800 hover:bg-stone-700 text-stone-300 font-brush text-sm rounded-xl cursor-pointer";
+
       if (char.money < 80) {
         btnAgain.disabled = true;
         btnAgain.className = "py-3 bg-stone-900 border border-stone-800 text-stone-600 font-brush text-sm rounded-xl cursor-not-allowed";
@@ -2124,7 +2187,8 @@
           title: "구천현뢰 격타 (천벌)",
           desc: "구천현뢰의 무자비한 뇌기를 버텨내지 못하고 튕겨져 나왔습니다. 정수리에 심각한 내상을 입었습니다.",
           iconKey: "dust",
-          details: [{ label: "내공 손실", val: `-${lostQi}년`, color: "text-rose-400" }]
+          details: [{ label: "내공 손실", val: `-${lostQi}년`, color: "text-rose-400" }],
+          isNotice: true
         });
       }
     }
@@ -2135,7 +2199,8 @@
         title: "강호 풍문",
         desc: msg,
         iconKey: "chest",
-        details: []
+        details: [],
+        isNotice: true
       });
     }
 
@@ -2378,6 +2443,8 @@
           closeDuelSelectModal();
         } else if (document.getElementById("market-modal").style.display === "flex") {
           closeMarketModal();
+        } else if (document.getElementById("ascension-confirm-modal").style.display === "flex") {
+          closeAscensionConfirmModal();
         } else if (document.getElementById("breakthrough-modal").style.display === "flex") {
           closeBreakthroughModal();
         } else if (document.getElementById("rankup-modal").style.display === "flex") {
