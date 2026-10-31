@@ -226,7 +226,7 @@
       <div class="w-16 h-16 mx-auto rounded-2xl bg-stone-950 border-2 border-amber-500/60 p-1.5 flex items-center justify-center shadow-inner relative overflow-hidden" id="ending-avatar-box"></div>
 
       <div class="p-3.5 bg-stone-950/90 rounded-2xl border border-stone-800 space-y-2 text-left">
-        <p id="ending-epilogue" class="text-xs leading-relaxed text-stone-300 font-medium"></p>
+        <p id="ending-epilogue" class="text-xs leading-relaxed text-stone-300 font-medium whitespace-pre-line"></p>
         
         <div class="pt-2 border-t border-stone-800 grid grid-cols-2 gap-1.5 text-center text-xs">
           <div class="bg-stone-900/80 p-1.5 rounded-xl border border-stone-800">
@@ -467,6 +467,23 @@
       </div>
     </section>
 
+    <!-- 내 문파 현황 (창건 후 표시) -->
+    <section id="sect-summary" class="hidden hanji-card rounded-2xl p-3.5 border border-amber-500/50 space-y-2">
+      <div class="flex items-center justify-between">
+        <div class="min-w-0">
+          <span class="text-[9px] font-bold tracking-widest text-amber-500 uppercase">My Sect</span>
+          <h3 id="sect-sum-name" class="text-lg font-brush text-amber-300 truncate"></h3>
+        </div>
+        <span id="sect-sum-level" class="shrink-0 text-[10px] font-bold px-2 py-0.5 rounded border bg-amber-950/60 text-amber-300 border-amber-600/60"></span>
+      </div>
+      <div class="grid grid-cols-3 gap-1.5 text-center text-[11px] font-bold">
+        <div class="bg-stone-950/70 p-1.5 rounded-xl border border-stone-800"><div class="text-[10px] text-stone-400">문파 수입</div><div class="text-yellow-400"><span id="sect-sum-income"></span>냥</div></div>
+        <div class="bg-stone-950/70 p-1.5 rounded-xl border border-stone-800"><div class="text-[10px] text-stone-400">제자</div><div class="text-stone-100"><span id="sect-sum-disciples"></span></div></div>
+        <div class="bg-stone-950/70 p-1.5 rounded-xl border border-stone-800"><div class="text-[10px] text-stone-400">문규</div><div id="sect-sum-ideal" class="text-stone-100"></div></div>
+      </div>
+      <p id="sect-sum-heir" class="text-[10px] text-stone-400 text-center"></p>
+    </section>
+
     <!-- 메이저 대회 배너 -->
     <div id="major-banner" class="hidden p-3 rounded-2xl bg-gradient-to-r from-amber-950 via-stone-900 to-red-950 border-2 border-amber-500/80 shadow-lg text-center space-y-1">
       <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 uppercase">Major Festival</span>
@@ -494,6 +511,11 @@
 
       <button id="btn-ascension" onclick="executeAscensionTrial()" class="w-full py-3 bg-gradient-to-r from-sky-950 via-cyan-900 to-amber-950 border-2 border-cyan-400 text-cyan-200 immortal-card rounded-xl font-brush text-base flex items-center justify-center gap-1.5 cursor-pointer shadow-xl hidden">
         <span>⚡ 우화등선(羽化登仙): 구천현뢰 천겁 돌파</span>
+      </button>
+
+      <button id="btn-sect" onclick="handleSectButton()" class="w-full py-2.5 bg-stone-900 hover:bg-stone-800 text-amber-200 border border-amber-600/40 rounded-xl font-brush text-base flex flex-col items-center justify-center cursor-pointer shadow">
+        <span id="sect-btn-label">🏯 문파 창건</span>
+        <span id="sect-btn-sub" class="text-[10px] text-stone-400 font-medium"></span>
       </button>
 
       <button id="btn-market" onclick="openMarketModal()" class="w-full py-2.5 bg-stone-900 hover:bg-stone-800 text-amber-300 border border-amber-600/40 rounded-xl font-brush text-base flex items-center justify-center gap-1.5 cursor-pointer shadow">
@@ -549,6 +571,50 @@
           마음을 가다듬고 물러남
         </button>
       </div>
+    </div>
+  </div>
+
+  <!-- 문파 창건 모달 -->
+  <div id="sect-found-modal" style="display: none;" class="fixed inset-0 bg-black/95 items-center justify-center p-3 z-50">
+    <div class="hanji-card border-2 gold-border w-full max-w-sm p-5 rounded-3xl shadow-2xl space-y-3.5 max-h-[92vh] overflow-y-auto">
+      <div class="text-center space-y-1">
+        <span class="text-[10px] font-bold tracking-widest uppercase px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40">FOUND YOUR SECT</span>
+        <h3 class="text-2xl font-brush text-amber-300">문파 창건 (開派立宗)</h3>
+        <p class="text-[11px] text-stone-400">현판을 걸고 제자를 받아 나만의 문파를 세웁니다. (창건 비용 <span id="sect-found-cost"></span>냥)</p>
+      </div>
+      <div class="text-xs font-bold space-y-1">
+        <label class="block text-stone-300">문파 이름</label>
+        <input id="sect-found-name" type="text" maxlength="12" class="w-full bg-stone-900 border border-stone-700 rounded-xl px-3 py-2 text-white font-bold focus:outline-none focus:border-amber-500">
+      </div>
+      <div class="space-y-1.5">
+        <div class="text-xs font-bold text-stone-300">문규 (門規) — 문파의 이념</div>
+        <div id="sect-ideal-list" class="space-y-1.5"></div>
+      </div>
+      <p class="text-[10px] text-stone-500 text-center">진영 전용 전각: <span id="sect-found-special" class="text-amber-300"></span></p>
+      <div class="grid grid-cols-2 gap-2">
+        <button onclick="confirmFoundSect()" class="py-3 bg-gradient-to-r from-amber-600 to-amber-500 hover:brightness-110 text-stone-950 font-brush text-sm rounded-xl cursor-pointer shadow">현판을 내걸다</button>
+        <button onclick="closeSectFoundModal()" class="py-3 bg-stone-800 text-stone-300 font-brush text-sm rounded-xl cursor-pointer">다음에 하자</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 문파 관리 모달 -->
+  <div id="sect-modal" style="display: none;" class="fixed inset-0 bg-black/90 items-center justify-center p-3 z-40">
+    <div class="hanji-card border-2 gold-border w-full max-w-sm p-4 rounded-3xl shadow-2xl space-y-3 max-h-[92vh] flex flex-col">
+      <div class="flex justify-between items-start pb-2 border-b border-stone-800">
+        <div class="min-w-0">
+          <span id="sect-modal-level" class="text-[9px] font-bold text-amber-500 uppercase tracking-widest"></span>
+          <h3 id="sect-modal-name" class="text-xl font-brush text-amber-300 truncate"></h3>
+          <p class="text-[10px] text-stone-400">보유 <span id="sect-modal-money" class="text-yellow-400 font-bold"></span>냥 · 연 수입 <span id="sect-modal-income" class="text-emerald-400 font-bold"></span>냥</p>
+        </div>
+        <button onclick="closeSectModal()" class="text-stone-400 hover:text-white font-bold p-1 text-lg">✕</button>
+      </div>
+      <div class="grid grid-cols-2 gap-1 p-1 bg-stone-950 rounded-xl border border-stone-800 text-center font-bold text-xs">
+        <button id="sect-tab-build" onclick="switchSectTab('build')" class="py-1.5 rounded-lg cursor-pointer transition">🏯 전각 증축</button>
+        <button id="sect-tab-disc" onclick="switchSectTab('disc')" class="py-1.5 rounded-lg cursor-pointer transition">🧑‍🎓 제자</button>
+      </div>
+      <div id="sect-level-bar" class="text-[10px] text-stone-400"></div>
+      <div id="sect-tab-body" class="flex-1 overflow-y-auto space-y-2 pr-1 text-xs"></div>
     </div>
   </div>
 
@@ -625,6 +691,11 @@
           </div>
         </div>
         <p id="tour-opp-desc" class="text-[11px] text-stone-400 border-t border-stone-800/80 pt-1"></p>
+      </div>
+
+      <div id="tour-entrant-row" class="hidden grid grid-cols-2 gap-1 p-1 bg-stone-950 rounded-xl border border-stone-800 text-center font-bold text-xs">
+        <button id="tour-entrant-me" onclick="setTourEntrant('me')" class="py-1.5 rounded-lg cursor-pointer transition">내가 직접 출전</button>
+        <button id="tour-entrant-heir" onclick="setTourEntrant('heir')" class="py-1.5 rounded-lg cursor-pointer transition">대제자 출전</button>
       </div>
 
       <div id="tour-log-box" class="h-36 bg-stone-950 p-3 rounded-xl border border-stone-800 overflow-y-auto text-left text-xs space-y-2 font-medium leading-relaxed font-mono"></div>
@@ -919,7 +990,8 @@
     }
 
     function getBreakthroughBonus() {
-      return getFaction().breakBonus + Math.min(10, Math.floor(char.align.demonic / 10));
+      const bloodPool = sect() && sect().special === "demonic" ? sect().buildings.special * 3 : 0;
+      return getFaction().breakBonus + Math.min(10, Math.floor(char.align.demonic / 10)) + bloodPool;
     }
 
     // ==========================================
@@ -1093,8 +1165,24 @@
       stage: 0,
       opponents: [],
       buttonMode: 'FIGHT',
-      isFighting: false
+      isFighting: false,
+      entrant: 'me'
     };
+
+    // 대회 출전자 (나 또는 대제자)
+    function getTourFighter() {
+      const heir = getHeir();
+      if (tournamentState.entrant === 'heir' && heir) {
+        return { isHeir: true, name: heir.name, power: heir.power, avatarSvg: PIXEL_ASSETS.avatars[heir.avatar].svg, ref: heir };
+      }
+      return { isHeir: false, name: char.name, power: getCombatPower(), avatarSvg: getAvatarSvg(char.avatarId) };
+    }
+
+    function setTourEntrant(who) {
+      if (tournamentState.isFighting || tournamentState.stage !== 0) return;
+      tournamentState.entrant = who;
+      setupTournamentStageUI();
+    }
 
     function isMajorYear(age) {
       return [20, 30, 40, 50].includes(age);
@@ -1210,6 +1298,9 @@
       }
 
       dAgi += getFaction().trainAgi;
+      const hallLv = buildingLv("hall");
+      dQi += hallLv;
+      dExt += hallLv;
 
       char.qi += dQi;
       char.ext += dExt;
@@ -1295,7 +1386,7 @@
         addLog(char.age, `[사경 돌파 실패] 아직 때가 이르지 못해 경지의 벽에 막혔습니다. (내공 +5)`, "text-stone-400");
         showBreakthroughResultPopup("FAIL", nextRank, 5, 0, 0);
       } else {
-        const lostQi = Math.min(25, Math.floor(char.qi * 0.15));
+        const lostQi = Math.round(Math.min(25, Math.floor(char.qi * 0.15)) * (1 - 0.25 * buildingLv("pharmacy")));
         char.qi = Math.max(10, char.qi - lostQi);
 
         addLog(char.age, `✕ [주화입마] 사경 돌파 중 기운이 역류하여 심각한 내상을 입었습니다. (내공 -${lostQi})`, "text-red-400 font-bold");
@@ -1510,7 +1601,7 @@
       if (origin !== info.path && info.path !== "neutral" && origin !== "neutral") {
         prefix = `${FACTIONS[origin].label}의 문하생으로 출발했으나, 그가 걸어온 길은 결국 ${PATH_ROAD[info.path]}였습니다. `;
       }
-      epilogue.innerText = prefix + info.text.replace(/\{name\}/g, char.name).replace(/\{sect\}/g, char.sect);
+      epilogue.innerText = prefix + info.text.replace(/\{name\}/g, char.name).replace(/\{sect\}/g, char.formerSect || char.sect) + getSectEpilogue();
 
       document.getElementById("end-path-line").innerText =
         `출신: ${FACTIONS[origin].label} → 최종: ${getFaction().label} 소속 · ${pathLabel}`;
@@ -1949,6 +2040,7 @@
       const basePower = getBenchmarkPower();
       setMinigameEnabled(minigameEnabled);
       tournamentState.stage = 0;
+      tournamentState.entrant = 'me';
       tournamentState.buttonMode = 'FIGHT';
       tournamentState.isFighting = false;
       tournamentState.opponents = [
@@ -1967,11 +2059,22 @@
       const stage = tournamentState.stage;
       const opp = tournamentState.opponents[stage];
       document.getElementById("tour-round-title").innerText = `★ ${opp.round} 격돌 ★`;
-      document.getElementById("tour-my-info").innerText = `${char.name} (${getCombatPower()})`;
+      const fighter = getTourFighter();
+      document.getElementById("tour-my-info").innerText = `${fighter.isHeir ? "[대제자] " : ""}${fighter.name} (${fighter.power})`;
+      const entrantRow = document.getElementById("tour-entrant-row");
+      if (getHeir() && stage === 0) {
+        entrantRow.classList.remove("hidden");
+        ["me", "heir"].forEach(w => {
+          document.getElementById(`tour-entrant-${w}`).className = `py-1.5 rounded-lg cursor-pointer transition ${tournamentState.entrant === w ? "bg-amber-600 text-stone-950 font-extrabold" : "text-stone-400 hover:text-white"}`;
+        });
+        document.getElementById("tour-entrant-heir").innerText = `대제자 ${getHeir().name} (${getHeir().power})`;
+      } else {
+        entrantRow.classList.add("hidden");
+      }
       document.getElementById("tour-opp-info").innerText = `${opp.name} (${opp.power})`;
       document.getElementById("tour-opp-desc").innerText = opp.desc;
 
-      document.getElementById("tour-my-avatar").innerHTML = getAvatarSvg(char.avatarId);
+      document.getElementById("tour-my-avatar").innerHTML = fighter.avatarSvg;
       document.getElementById("tour-opp-avatar").innerHTML = opp.icon;
 
       tournamentState.buttonMode = 'FIGHT';
@@ -2010,7 +2113,9 @@
       actBtn.className = "w-full py-3 bg-stone-800 text-stone-500 font-brush text-base rounded-xl cursor-not-allowed";
 
       const opp = tournamentState.opponents[tournamentState.stage];
-      const myPower = getCombatPower();
+      const fighter = getTourFighter();
+      const myPower = fighter.power;
+      document.getElementById("tour-entrant-row").classList.add("hidden");
       const logBox = document.getElementById("tour-log-box");
 
       const log = (msg, color = "text-stone-300") => {
@@ -2021,7 +2126,7 @@
         logBox.scrollTop = logBox.scrollHeight;
       };
 
-      log(`▶ ── ${opp.round}: ${escapeHtml(char.name)}(${myPower}) vs ${opp.name}(${opp.power}) ──`, "text-amber-400 font-bold pb-1 border-b border-stone-800");
+      log(`▶ ── ${opp.round}: ${escapeHtml(fighter.name)}(${myPower}) vs ${opp.name}(${opp.power}) ──`, "text-amber-400 font-bold pb-1 border-b border-stone-800");
 
       const rounds = [
         { round: "1합", msgWin: "날카로운 신법으로 상대의 빈틈을 파고들어 선제 강타!", msgLose: "상대의 묵직한 패도에 밀려 호흡이 흐트러졌습니다." },
@@ -2037,12 +2142,29 @@
       const isFinalWin = myWins > oppWins;
 
       if (isFinalWin) {
-        log(`\n★ [승리] ${escapeHtml(char.name)}의 초식이 승리를 거두며 ${opp.name}을(를) 격파했습니다!`, "text-yellow-400 font-brush text-sm pt-2 border-t border-stone-800");
+        log(`\n★ [승리] ${escapeHtml(fighter.name)}의 초식이 승리를 거두며 ${opp.name}을(를) 격파했습니다!`, "text-yellow-400 font-brush text-sm pt-2 border-t border-stone-800");
 
         if (tournamentState.stage === 2) {
           await sleep(500);
           const grandPrize = Math.round(250 * getPrizeMult());
           char.money += grandPrize;
+          if (fighter.isHeir) {
+            const h = fighter.ref;
+            h.power += 30; h.title = "천하제일(天下第一)"; h.wins++; h.loyalty = Math.min(100, h.loyalty + 20);
+            sect().tourWins++;
+            char.fame += 40; yearGains.fame += 40;
+            addLog(char.age, `★★★ [천하비무제 제패] 대제자 ${h.name}이(가) 우승! ${sect().name}의 이름이 천하에 울려 퍼집니다. (은자 ${grandPrize}냥, 명성 +40)`, "text-yellow-300 font-brush text-sm");
+            log(`\n🏆 [천하제일 우승] 대제자 ${escapeHtml(h.name)}의 우승! 상금 ${grandPrize}냥 획득!`, "text-yellow-400 font-brush text-sm");
+            checkSectLevelUp();
+            checkRankUp();
+            updateUI();
+            tournamentState.buttonMode = 'CLOSE';
+            tournamentState.isFighting = false;
+            actBtn.disabled = false;
+            actBtn.innerText = "제자의 영광과 함께 대회를 마무리하다";
+            actBtn.className = "w-full py-3 bg-gradient-to-r from-yellow-500 to-amber-500 hover:brightness-110 text-stone-950 font-brush text-base rounded-xl cursor-pointer shadow-lg";
+            return;
+          }
           char.fame += 70;
           char.qi += 6; char.ext += 6; char.agi += 6;
           yearGains.fame += 70; yearGains.qi += 6; yearGains.ext += 6; yearGains.agi += 6;
@@ -2940,12 +3062,583 @@
       if (isMajorYear(char.age)) return;
       if (Math.random() > 0.6) return;
 
-      // 최근에 본 사건은 피함
-      let pool = RANDOM_EVENTS.filter(e => !char.seenEvents.slice(-4).includes(e.id));
-      if (pool.length === 0) pool = RANDOM_EVENTS;
+      // 제자가 있으면 제자 사건도 섞임 (최근에 본 사건은 피함)
+      const all = [...RANDOM_EVENTS, ...DISCIPLE_EVENTS].filter(e => !e.cond || e.cond());
+      let pool = all.filter(e => !char.seenEvents.slice(-4).includes(e.id));
+      if (pool.length === 0) pool = all;
       const ev = pool[Math.floor(Math.random() * pool.length)];
       char.seenEvents.push(ev.id);
       openEventModal(ev.build());
+    }
+
+    // ==========================================
+    // [문파] 창건 · 전각 · 제자
+    // ==========================================
+    const SECT_FOUND_COST = 300;
+    const SECT_FOUND_MIN_RANK = 2; // 일류 고수 이상
+
+    const SECT_IDEALS = {
+      chivalry: { label: "협의(俠義)", path: "orthodox", desc: "약자를 돕고 의를 지킨다", perk: "매년 협의 +2 · 제자 충성 +5/년", incomeMult: 1.0, growMult: 1.0, talentBonus: 0 },
+      profit:   { label: "실리(實利)", path: "unorthodox", desc: "돈과 세력이 곧 힘이다", perk: "문파 수입 +30% · 매년 악명 +1", incomeMult: 1.3, growMult: 1.0, talentBonus: 0 },
+      might:    { label: "패도(霸道)", path: "demonic", desc: "오직 강자만이 살아남는다", perk: "제자 성장 +30% · 매년 마성 +2", incomeMult: 1.0, growMult: 1.3, talentBonus: 0 },
+      freedom:  { label: "자유(自由)", path: "neutral", desc: "규율보다 각자의 길을 존중한다", perk: "입문 지원자의 자질 상승 · 성향 변화 없음", incomeMult: 1.0, growMult: 1.0, talentBonus: 1 }
+    };
+
+    const BUILDINGS = {
+      hall:     { name: "연무장 (演武場)", icon: "🥋", costs: [200, 800, 2500], desc: lv => `수련 시 내공·외공 +${lv}` },
+      library:  { name: "장경각 (藏經閣)", icon: "📚", costs: [250, 900, 3000], desc: lv => `제자 성장 +${lv * 15}%${lv >= 3 ? " · 매년 내공 +2" : ""}` },
+      pharmacy: { name: "약당 (藥堂)", icon: "⚗️", costs: [200, 800, 2500], desc: lv => `매년 내공 +${lv * 2} · 주화입마 피해 -${lv * 25}%` },
+      palace:   { name: "대전 (大殿)", icon: "🏛️", costs: [300, 1000, 3500], desc: lv => `문파 수입 +${lv * 30}% · 매년 명성 +${lv * 2}` }
+    };
+
+    const SPECIAL_BUILDINGS = {
+      orthodox:   { name: "의원 (醫院)", icon: "🩺", costs: [250, 900, 2800], desc: lv => `매년 협의 +${lv} · 입문 지원자 자질 상승` },
+      unorthodox: { name: "도박장 (賭博場)", icon: "🎲", costs: [250, 900, 2800], desc: lv => `매년 은자 +${lv * 60} · 매년 악명 +1` },
+      demonic:    { name: "혈지 (血池)", icon: "🩸", costs: [250, 900, 2800], desc: lv => `폐관 돌파 +${lv * 3}%p · 매년 마성 +${lv}` },
+      neutral:    { name: "객잔 (客棧)", icon: "🏮", costs: [250, 900, 2800], desc: lv => `매년 은자 +${lv * 40} · 매년 신법 +1` }
+    };
+
+    const SECT_LEVELS = [
+      { name: "초라한 도장 (道場)", min: 0, base: 30, maxDisc: 2 },
+      { name: "중소 문파 (中小門派)", min: 5, base: 80, maxDisc: 3 },
+      { name: "명문 대파 (名門大派)", min: 10, base: 200, maxDisc: 4 },
+      { name: "천하대문파 (天下大門派)", min: 16, base: 450, maxDisc: 5 }
+    ];
+
+    const PERSONAS = {
+      "정직": { path: "orthodox", desc: "곧고 바르다" },
+      "온화": { path: "orthodox", desc: "다정하고 참을성이 있다" },
+      "야심": { path: "unorthodox", desc: "출세욕이 강하다" },
+      "냉혹": { path: "demonic", desc: "피를 보는 데 망설임이 없다" },
+      "호방": { path: "neutral", desc: "술과 자유를 사랑한다" }
+    };
+    const DISCIPLE_SURNAMES = ["백", "진", "한", "유", "설", "위", "연", "하", "천", "구", "모", "제갈", "독고", "남궁", "황보"];
+    const DISCIPLE_GIVEN = ["소운", "무진", "설화", "태호", "명", "하린", "준", "예린", "운학", "현", "도윤", "월", "비", "강", "청아", "서진", "율", "이경", "단", "초희"];
+
+    const sect = () => char.sectData;
+    const ri = (a, b) => Math.floor(Math.random() * (b - a + 1)) + a;
+
+    function sectLevelShort(idx) {
+      return SECT_LEVELS[idx].name.replace(/\s*\(.*\)/, "");
+    }
+
+    function getSectPoints() {
+      const s = sect(); if (!s) return 0;
+      const b = Object.values(s.buildings).reduce((x, y) => x + y, 0);
+      return b + s.disciples.length + Math.floor(char.fame / 80) + s.tourWins * 2;
+    }
+
+    function getSectLevelIdx() {
+      const pts = getSectPoints();
+      let idx = 0;
+      SECT_LEVELS.forEach((l, i) => { if (pts >= l.min) idx = i; });
+      return idx;
+    }
+
+    function getSectIncome() {
+      const s = sect(); if (!s) return 0;
+      const lvl = SECT_LEVELS[getSectLevelIdx()];
+      let income = lvl.base * SECT_IDEALS[s.ideal].incomeMult * (1 + 0.3 * s.buildings.palace);
+      if (s.special === "unorthodox") income += 60 * s.buildings.special;
+      if (s.special === "neutral") income += 40 * s.buildings.special;
+      income -= 10 * (getSectLevelIdx() + 1) * s.disciples.length; // 제자 봉록 (문파가 클수록 증가)
+      return Math.round(income);
+    }
+
+    function getHeir() {
+      const s = sect(); if (!s || !s.heirId) return null;
+      return s.disciples.find(d => d.id === s.heirId) || null;
+    }
+
+    function buildingLv(key) {
+      return sect() ? sect().buildings[key] || 0 : 0;
+    }
+
+    function makeApplicant() {
+      const s = sect();
+      const bonusChance = 0.12 * (SECT_IDEALS[s.ideal].talentBonus * 2 + (s.special === "orthodox" ? s.buildings.special : 0) + getSectLevelIdx());
+      const roll = () => Math.min(5, ri(1, 4) + (Math.random() < bonusChance ? 1 : 0));
+      const talent = roll(), wit = roll();
+      const personaKeys = Object.keys(PERSONAS);
+      const persona = personaKeys[Math.floor(Math.random() * personaKeys.length)];
+      const name = DISCIPLE_SURNAMES[ri(0, DISCIPLE_SURNAMES.length - 1)] + DISCIPLE_GIVEN[ri(0, DISCIPLE_GIVEN.length - 1)];
+      return {
+        id: "d" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+        name, persona, talent, wit,
+        power: 15 + talent * 6 + wit * 3 + ri(0, 10),
+        loyalty: 50 + ri(0, 20),
+        avatar: ri(0, PIXEL_ASSETS.avatars.length - 1),
+        wins: 0, title: ""
+      };
+    }
+
+    function discipleGrowth(d, teaching) {
+      const s = sect();
+      const libMult = 1 + 0.15 * s.buildings.library;
+      const growMult = SECT_IDEALS[s.ideal].growMult;
+      if (teaching) return Math.round(((d.talent + d.wit) * 1.2 + getCombatPower() * 0.015) * libMult * growMult);
+      return Math.round((d.talent + d.wit) * 0.4 * libMult * growMult);
+    }
+
+    function stars(n) { return "★".repeat(n) + "☆".repeat(5 - n); }
+
+    // ----- 창건 -----
+    let selectedIdeal = "chivalry";
+
+    function canFoundSect() {
+      return char.rankIdx >= SECT_FOUND_MIN_RANK && char.money >= SECT_FOUND_COST && char.age < 58;
+    }
+
+    function handleSectButton() {
+      if (sect()) return openSectModal();
+      if (!canFoundSect()) {
+        showCustomAlert(`문파 창건 조건: 일류 고수 이상의 경지와 은자 ${SECT_FOUND_COST}냥이 필요합니다.`);
+        return;
+      }
+      openSectFoundModal();
+    }
+
+    function openSectFoundModal() {
+      document.getElementById("sect-found-cost").innerText = SECT_FOUND_COST;
+      const nameInput = document.getElementById("sect-found-name");
+      if (!nameInput.value) nameInput.value = `${char.name.slice(0, 1)}운문`;
+      selectedIdeal = { orthodox: "chivalry", unorthodox: "profit", demonic: "might", neutral: "freedom" }[getPath()];
+      renderIdealList();
+      document.getElementById("sect-found-special").innerText = `${SPECIAL_BUILDINGS[char.faction].icon} ${SPECIAL_BUILDINGS[char.faction].name} (현재 ${getFaction().label} 소속)`;
+      document.getElementById("sect-found-modal").style.display = "flex";
+    }
+
+    function renderIdealList() {
+      const box = document.getElementById("sect-ideal-list");
+      box.innerHTML = "";
+      Object.entries(SECT_IDEALS).forEach(([key, it]) => {
+        const on = key === selectedIdeal;
+        const info = PATH_INFO[it.path];
+        const div = document.createElement("div");
+        div.className = `p-2 rounded-xl border cursor-pointer transition flex items-start gap-2 ${on ? "border-amber-400 bg-amber-950/40" : "border-stone-800 bg-stone-950/60 opacity-75 hover:opacity-100"}`;
+        div.innerHTML = `
+          <span class="shrink-0 w-6 h-6 rounded-lg border text-xs font-brush flex items-center justify-center ${info.chip}">${info.short}</span>
+          <span class="min-w-0"><span class="block text-xs font-bold text-stone-100">${it.label} <span class="text-[10px] text-stone-400 font-medium">${it.desc}</span></span>
+          <span class="block text-[10px] text-amber-300/90">${it.perk}</span></span>`;
+        div.onclick = () => { selectedIdeal = key; renderIdealList(); };
+        box.appendChild(div);
+      });
+    }
+
+    function closeSectFoundModal() {
+      document.getElementById("sect-found-modal").style.display = "none";
+    }
+
+    function confirmFoundSect() {
+      if (!canFoundSect() || sect()) return closeSectFoundModal();
+      const name = cleanInputText(document.getElementById("sect-found-name").value, 12) || `${char.name.slice(0, 1)}운문`;
+      char.money -= SECT_FOUND_COST;
+      char.sectData = {
+        name, ideal: selectedIdeal, special: char.faction,
+        buildings: { hall: 0, library: 0, pharmacy: 0, palace: 0, special: 0 },
+        disciples: [], applicants: [], heirId: null,
+        taughtThisYear: false, foundedAge: char.age, tourWins: 0, lostDisciples: 0, defectedToDemon: false,
+        lastLevel: 0
+      };
+      char.formerSect = char.sect;
+      char.sect = name;
+      sect().applicants = [makeApplicant(), makeApplicant()];
+      closeSectFoundModal();
+      addLog(char.age, `★ [문파 창건] '${name}'의 현판을 내걸었습니다! 문규: ${SECT_IDEALS[selectedIdeal].label}`, "text-amber-300 font-brush text-sm");
+      gainFame(10);
+      updateUI();
+      openSectModal("disc");
+    }
+
+    // ----- 관리 모달 -----
+    let sectTab = "build";
+
+    function openSectModal(tab) {
+      if (tab) sectTab = tab;
+      document.getElementById("sect-modal").style.display = "flex";
+      renderSectModal();
+    }
+
+    function closeSectModal() {
+      document.getElementById("sect-modal").style.display = "none";
+      updateUI();
+    }
+
+    function switchSectTab(tab) {
+      sectTab = tab;
+      renderSectModal();
+    }
+
+    function renderSectModal() {
+      const s = sect(); if (!s) return;
+      const lvIdx = getSectLevelIdx();
+      const lvl = SECT_LEVELS[lvIdx];
+      const next = SECT_LEVELS[lvIdx + 1];
+      document.getElementById("sect-modal-level").innerText = `${lvIdx + 1}단계 · ${lvl.name}`;
+      document.getElementById("sect-modal-name").innerText = s.name;
+      document.getElementById("sect-modal-money").innerText = char.money;
+      document.getElementById("sect-modal-income").innerText = getSectIncome();
+      const pts = getSectPoints();
+      document.getElementById("sect-level-bar").innerHTML = next
+        ? `문파 위세 <strong class="text-amber-300">${pts}</strong> / 다음 단계(${sectLevelShort(lvIdx + 1)}) ${next.min} <span class="text-stone-500">· 전각 레벨·제자 수·명성·대회 우승으로 상승</span>`
+        : `문파 위세 <strong class="text-amber-300">${pts}</strong> · 최고 단계에 도달했습니다`;
+
+      ["build", "disc"].forEach(t => {
+        document.getElementById(`sect-tab-${t}`).className = `py-1.5 rounded-lg cursor-pointer transition ${t === sectTab ? "bg-amber-600 text-stone-950 font-extrabold" : "text-stone-400 hover:text-white"}`;
+      });
+
+      const body = document.getElementById("sect-tab-body");
+      body.innerHTML = "";
+      if (sectTab === "build") renderBuildTab(body); else renderDiscTab(body);
+    }
+
+    function renderBuildTab(body) {
+      const s = sect();
+      const list = Object.entries(BUILDINGS).map(([k, b]) => [k, b]);
+      list.push(["special", SPECIAL_BUILDINGS[s.special]]);
+      list.forEach(([key, b]) => {
+        const lv = s.buildings[key];
+        const maxed = lv >= b.costs.length;
+        const cost = maxed ? 0 : b.costs[lv];
+        const affordable = char.money >= cost;
+        const row = document.createElement("div");
+        row.className = "p-2.5 rounded-xl bg-stone-950/80 border border-stone-800 flex items-center justify-between gap-2";
+        row.innerHTML = `
+          <div class="min-w-0">
+            <div class="font-bold text-stone-100">${b.icon} ${b.name} <span class="text-[10px] text-amber-400">Lv.${lv}/3</span></div>
+            <div class="text-[10px] text-stone-400">${lv > 0 ? "현재: " + b.desc(lv) : "미건설"}</div>
+            ${maxed ? "" : `<div class="text-[10px] text-emerald-400">다음: ${b.desc(lv + 1)}</div>`}
+          </div>`;
+        const btn = document.createElement("button");
+        btn.type = "button";
+        if (maxed) {
+          btn.className = "shrink-0 px-2.5 py-2 rounded-lg bg-stone-900 border border-stone-800 text-stone-500 text-[11px] font-bold";
+          btn.innerText = "완공";
+          btn.disabled = true;
+        } else {
+          btn.className = `shrink-0 px-2.5 py-2 rounded-lg text-[11px] font-bold ${affordable ? "bg-amber-600 hover:bg-amber-500 text-stone-950 cursor-pointer" : "bg-stone-900 border border-stone-800 text-stone-500 cursor-not-allowed"}`;
+          btn.innerText = `${lv === 0 ? "건설" : "증축"} ${cost}냥`;
+          btn.onclick = () => upgradeBuilding(key);
+        }
+        row.appendChild(btn);
+        body.appendChild(row);
+      });
+    }
+
+    function upgradeBuilding(key) {
+      const s = sect();
+      const b = key === "special" ? SPECIAL_BUILDINGS[s.special] : BUILDINGS[key];
+      const lv = s.buildings[key];
+      if (lv >= b.costs.length) return;
+      const cost = b.costs[lv];
+      if (char.money < cost) return showCustomAlert(`은자가 부족합니다! (${cost}냥 필요)`);
+      char.money -= cost;
+      s.buildings[key] = lv + 1;
+      addLog(char.age, `[문파 증축] ${b.icon} ${b.name} Lv.${lv + 1} 완공 (-${cost}냥)`, "text-amber-200");
+      checkSectLevelUp();
+      renderSectModal();
+      updateUI();
+    }
+
+    function renderDiscTab(body) {
+      const s = sect();
+      const lvl = SECT_LEVELS[getSectLevelIdx()];
+      const head = document.createElement("div");
+      head.className = "text-[11px] font-bold text-stone-300 flex justify-between";
+      head.innerHTML = `<span>문하 제자 ${s.disciples.length} / ${lvl.maxDisc}명</span><span class="${s.taughtThisYear ? "text-stone-500" : "text-emerald-400"}">올해 지도 ${s.taughtThisYear ? "완료" : "가능 (1명)"}</span>`;
+      body.appendChild(head);
+
+      if (s.disciples.length === 0) {
+        const p = document.createElement("p");
+        p.className = "text-[11px] text-stone-500 text-center py-2";
+        p.innerText = "아직 제자가 없습니다. 아래 입문 지원자를 받아 보세요.";
+        body.appendChild(p);
+      }
+
+      s.disciples.forEach(d => {
+        const isHeir = d.id === s.heirId;
+        const info = PATH_INFO[PERSONAS[d.persona].path];
+        const card = document.createElement("div");
+        card.className = `p-2.5 rounded-xl border space-y-1.5 ${isHeir ? "border-amber-500/70 bg-amber-950/20" : "border-stone-800 bg-stone-950/80"}`;
+        card.innerHTML = `
+          <div class="flex items-center gap-2">
+            <div class="w-9 h-9 rounded-lg bg-stone-900 border border-stone-700 p-0.5 shrink-0">${PIXEL_ASSETS.avatars[d.avatar].svg}</div>
+            <div class="min-w-0 flex-1">
+              <div class="font-bold text-stone-100 truncate">${isHeir ? '<span class="text-amber-300">[대제자]</span> ' : ""}${escapeHtml(d.name)} ${d.title ? `<span class="text-[9px] text-yellow-300">${d.title}</span>` : ""}</div>
+              <div class="text-[10px] text-stone-400">근골 <span class="text-amber-300">${stars(d.talent)}</span> · 오성 <span class="text-sky-300">${stars(d.wit)}</span></div>
+            </div>
+            <div class="text-right shrink-0"><div class="text-[9px] text-stone-500">무력</div><strong class="text-amber-300">${d.power}</strong></div>
+          </div>
+          <div class="flex items-center justify-between text-[10px]">
+            <span><span class="px-1 rounded border ${info.chip}">${d.persona}</span> <span class="text-stone-400">충성 ${d.loyalty}</span></span>
+            <span class="flex gap-1 disc-actions"></span>
+          </div>`;
+        const actions = card.querySelector(".disc-actions");
+        const teachBtn = document.createElement("button");
+        teachBtn.type = "button";
+        teachBtn.className = `px-2 py-1 rounded-lg font-bold ${s.taughtThisYear ? "bg-stone-900 text-stone-600 cursor-not-allowed" : "bg-emerald-700 hover:bg-emerald-600 text-white cursor-pointer"}`;
+        teachBtn.innerText = `📜 지도 (+${discipleGrowth(d, true)})`;
+        teachBtn.disabled = s.taughtThisYear;
+        teachBtn.onclick = () => teachDisciple(d.id);
+        actions.appendChild(teachBtn);
+        if (!isHeir) {
+          const heirBtn = document.createElement("button");
+          heirBtn.type = "button";
+          heirBtn.className = "px-2 py-1 rounded-lg font-bold bg-stone-800 hover:bg-stone-700 text-amber-300 cursor-pointer";
+          heirBtn.innerText = "대제자 지명";
+          heirBtn.onclick = () => appointHeir(d.id);
+          actions.appendChild(heirBtn);
+        }
+        body.appendChild(card);
+      });
+
+      const apTitle = document.createElement("div");
+      apTitle.className = "text-[11px] font-bold text-stone-300 pt-2 border-t border-stone-800";
+      apTitle.innerText = `올해의 입문 지원자 (${s.applicants.length}명)`;
+      body.appendChild(apTitle);
+      if (s.applicants.length === 0) {
+        const p = document.createElement("p");
+        p.className = "text-[11px] text-stone-500 text-center py-1";
+        p.innerText = "지원자가 없습니다. 내년에 새로 찾아옵니다.";
+        body.appendChild(p);
+      }
+      s.applicants.forEach(a => {
+        const full = s.disciples.length >= lvl.maxDisc;
+        const info = PATH_INFO[PERSONAS[a.persona].path];
+        const row = document.createElement("div");
+        row.className = "p-2 rounded-xl border border-dashed border-stone-700 bg-stone-950/60 flex items-center justify-between gap-2";
+        row.innerHTML = `
+          <div class="min-w-0">
+            <div class="font-bold text-stone-200">${escapeHtml(a.name)} <span class="px-1 rounded border text-[9px] ${info.chip}">${a.persona}</span> <span class="text-[10px] text-stone-400">무력 ${a.power}</span></div>
+            <div class="text-[10px] text-stone-400">근골 <span class="text-amber-300">${stars(a.talent)}</span> · 오성 <span class="text-sky-300">${stars(a.wit)}</span> · ${PERSONAS[a.persona].desc}</div>
+          </div>`;
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = `shrink-0 px-2.5 py-2 rounded-lg text-[11px] font-bold ${full ? "bg-stone-900 text-stone-600 cursor-not-allowed" : "bg-amber-600 hover:bg-amber-500 text-stone-950 cursor-pointer"}`;
+        btn.innerText = full ? "정원 초과" : "입문 허락";
+        btn.disabled = full;
+        btn.onclick = () => acceptApplicant(a.id);
+        row.appendChild(btn);
+        body.appendChild(row);
+      });
+    }
+
+    function acceptApplicant(id) {
+      const s = sect();
+      const idx = s.applicants.findIndex(a => a.id === id);
+      if (idx < 0 || s.disciples.length >= SECT_LEVELS[getSectLevelIdx()].maxDisc) return;
+      const d = s.applicants.splice(idx, 1)[0];
+      d.joinedAge = char.age;
+      s.disciples.push(d);
+      if (!s.heirId && s.disciples.length === 1) s.heirId = d.id;
+      addLog(char.age, `[입문] ${d.name}(${d.persona})이(가) ${s.name}의 제자가 되었습니다.`, "text-emerald-300");
+      checkSectLevelUp();
+      renderSectModal();
+      updateUI();
+    }
+
+    function teachDisciple(id) {
+      const s = sect();
+      if (s.taughtThisYear) return;
+      const d = s.disciples.find(x => x.id === id); if (!d) return;
+      const g = discipleGrowth(d, true);
+      d.power += g;
+      d.loyalty = Math.min(100, d.loyalty + 5);
+      s.taughtThisYear = true;
+      addLog(char.age, `[제자 지도] ${d.name}에게 무공을 전수했습니다. (무력 +${g}, 충성 +5)`, "text-emerald-300");
+      renderSectModal();
+      updateUI();
+    }
+
+    function appointHeir(id) {
+      const s = sect();
+      const d = s.disciples.find(x => x.id === id); if (!d) return;
+      s.heirId = id;
+      s.disciples.forEach(x => { if (x.id !== id) x.loyalty = Math.max(0, x.loyalty - 5); });
+      d.loyalty = Math.min(100, d.loyalty + 10);
+      addLog(char.age, `[대제자 지명] ${d.name}을(를) 대제자로 세웠습니다.`, "text-amber-300");
+      renderSectModal();
+      updateUI();
+    }
+
+    function removeDisciple(id) {
+      const s = sect();
+      s.disciples = s.disciples.filter(d => d.id !== id);
+      if (s.heirId === id) {
+        s.heirId = null;
+        if (s.disciples.length) s.heirId = [...s.disciples].sort((a, b) => b.power - a.power)[0].id;
+      }
+      s.lostDisciples++;
+    }
+
+    function checkSectLevelUp() {
+      const s = sect(); if (!s) return;
+      const idx = getSectLevelIdx();
+      if (idx > s.lastLevel) {
+        s.lastLevel = idx;
+        addLog(char.age, `★ [문파 성장] ${s.name}이(가) '${SECT_LEVELS[idx].name}'(으)로 성장했습니다! (제자 정원 ${SECT_LEVELS[idx].maxDisc}명)`, "text-yellow-300 font-brush text-sm");
+      }
+    }
+
+    // ----- 매년 처리 -----
+    function processSectYear() {
+      const s = sect(); if (!s) return;
+      const income = getSectIncome();
+      char.money = Math.max(0, char.money + income);
+      const parts = [`문파 수입 ${income >= 0 ? "+" : ""}${income}냥`];
+
+      const ideal = s.ideal;
+      if (ideal === "chivalry") { addAlign(2, 0, 0); s.disciples.forEach(d => d.loyalty = Math.min(100, d.loyalty + 5)); }
+      if (ideal === "profit") addAlign(0, 1, 0);
+      if (ideal === "might") addAlign(0, 0, 2);
+
+      const pharm = s.buildings.pharmacy;
+      if (pharm) { gainStats(pharm * 2, 0, 0); parts.push(`약당 내공 +${pharm * 2}`); }
+      if (s.buildings.library >= 3) { gainStats(2, 0, 0); parts.push("장경각 내공 +2"); }
+      if (s.buildings.palace) { gainFame(s.buildings.palace * 2); }
+      const sp = s.buildings.special;
+      if (sp) {
+        if (s.special === "orthodox") addAlign(sp, 0, 0);
+        if (s.special === "unorthodox") addAlign(0, 1, 0);
+        if (s.special === "demonic") addAlign(0, 0, sp);
+        if (s.special === "neutral") gainStats(0, 0, 1);
+      }
+
+      s.disciples.forEach(d => { d.power += discipleGrowth(d, false); });
+      s.taughtThisYear = false;
+
+      const count = Math.random() < 0.5 ? 1 : 2;
+      s.applicants = Array.from({ length: count }, makeApplicant);
+
+      addLog(char.age, `[${s.name}] ${parts.join(" · ")} · 입문 지원자 ${count}명`, "text-amber-200");
+      checkSectLevelUp();
+    }
+
+    // ----- 제자 사건 -----
+    function randomDisciple(filter) {
+      const list = (sect()?.disciples || []).filter(filter || (() => true));
+      return list.length ? list[Math.floor(Math.random() * list.length)] : null;
+    }
+
+    const DISCIPLE_EVENTS = [
+      {
+        id: "disc_trouble",
+        cond: () => sect() && sect().disciples.length >= 1,
+        build: () => {
+          const d = randomDisciple();
+          const fine = Math.min(char.money, scaled(30));
+          return {
+            tag: "DISCIPLE INCIDENT", title: "제자의 사고",
+            desc: `${d.name}이(가) 객잔에서 시비 끝에 다른 문파 제자의 팔을 부러뜨렸습니다. 그쪽 문파가 사과와 처벌을 요구하며 몰려왔습니다.`,
+            choices: [
+              { path: "unorthodox", label: "제자를 감싸고 돈으로 입을 막는다", hint: `악명 +4 · 은자 -${fine}냥 · 충성 +15`,
+                apply: () => { addAlign(0, 4, 0); char.money -= fine; d.loyalty = Math.min(100, d.loyalty + 15);
+                  return { text: `${d.name}은(는) 사부의 비호에 깊이 감격했습니다. 하지만 강호에는 뒷말이 돕니다.`, chips: [["악명", "+4"], ["은자", `-${fine}냥`], ["충성", "+15"]] }; } },
+              { path: "orthodox", label: "공개적으로 엄히 벌하고 사과한다", hint: "협의 +4 · 명성 +3 · 충성 -10",
+                apply: () => { addAlign(4, 0, 0); gainFame(3); d.loyalty = Math.max(0, d.loyalty - 10);
+                  return { text: "문규를 바로 세운 처사에 강호가 고개를 끄덕였습니다. 제자는 서운한 기색입니다.", chips: [["협의", "+4"], ["명성", "+3"], ["충성", "-10"]] }; } },
+              { path: "orthodox", label: "문규를 어긴 제자를 파문한다", hint: "협의 +6 · 명성 +4 · 제자 잃음",
+                apply: () => { addAlign(6, 0, 0); gainFame(4); removeDisciple(d.id);
+                  return { text: `${d.name}은(는) 고개를 떨군 채 산문을 떠났습니다.`, chips: [["협의", "+6"], ["명성", "+4"], ["제자", "-1"]] }; } }
+            ]
+          };
+        }
+      },
+      {
+        id: "disc_succession",
+        cond: () => sect() && sect().disciples.length >= 2,
+        build: () => {
+          const s = sect();
+          const top = [...s.disciples].sort((a, b) => b.power - a.power).slice(0, 2);
+          const heir = getHeir();
+          return {
+            tag: "SUCCESSION DISPUTE", title: "후계 다툼",
+            desc: `${top[0].name}와(과) ${top[1].name}이(가) 서로 자신이 문파를 이을 재목이라며 대련장에서 맞붙었습니다. 제자들의 시선이 사부에게 쏠립니다.${heir ? ` (현 대제자: ${heir.name})` : ""}`,
+            choices: [
+              ...top.map(d => ({
+                path: PERSONAS[d.persona].path,
+                label: `${d.name}을(를) 대제자로 확정한다 (${d.persona} · 무력 ${d.power})`,
+                hint: "지명된 제자 충성 +15 · 다른 제자 충성 -10",
+                apply: () => { s.heirId = d.id; d.loyalty = Math.min(100, d.loyalty + 15);
+                  s.disciples.forEach(x => { if (x.id !== d.id) x.loyalty = Math.max(0, x.loyalty - 10); });
+                  return { text: `${d.name}이(가) ${s.name}의 대제자로 공표되었습니다.`, chips: [["대제자", d.name]] }; }
+              })),
+              { path: "orthodox", label: "둘 다 꾸짖고 함께 수련하게 한다", hint: "두 제자 무력 +8 · 협의 +2",
+                apply: () => { top.forEach(d => d.power += 8); addAlign(2, 0, 0);
+                  return { text: "두 제자는 투덜대면서도 함께 땀을 흘렸고, 실력이 한층 늘었습니다.", chips: [["제자 무력", "+8 ×2"], ["협의", "+2"]] }; } }
+            ]
+          };
+        }
+      },
+      {
+        id: "disc_demon",
+        cond: () => sect() && sect().disciples.some(d => d.persona === "냉혹" || d.loyalty < 40),
+        build: () => {
+          const d = randomDisciple(x => x.persona === "냉혹" || x.loyalty < 40);
+          return {
+            tag: "TEMPTATION", title: "마교의 손길",
+            desc: `${d.name}이(가) 밤마다 천마신교의 밀사와 만난다는 보고가 들어왔습니다. 마공이라면 더 빨리 강해질 수 있다는 꾐에 넘어간 모양입니다.`,
+            choices: [
+              { path: "orthodox", label: "밤새 마주 앉아 설득한다", hint: `성공 확률 약 ${Math.min(90, d.loyalty + 20)}% · 협의 +3`,
+                apply: () => { addAlign(3, 0, 0);
+                  if (Math.random() * 100 < Math.min(90, d.loyalty + 20)) { d.loyalty = Math.min(100, d.loyalty + 20);
+                    return { text: `${d.name}은(는) 눈물을 흘리며 마음을 돌렸습니다.`, chips: [["협의", "+3"], ["충성", "+20"]] }; }
+                  removeDisciple(d.id); sect().defectedToDemon = true;
+                  return { text: `설득은 실패했습니다. 다음 날 아침, ${d.name}의 방은 비어 있었습니다.`, chips: [["협의", "+3"], ["제자", "마교로 떠남"]] }; } },
+              { path: "demonic", label: "차라리 마공을 함께 익히게 한다", hint: "마성 +5 · 제자 무력 +30 · 성격 냉혹",
+                apply: () => { addAlign(0, 0, 5); d.power += 30; d.persona = "냉혹"; d.loyalty = Math.min(100, d.loyalty + 10);
+                  return { text: `${d.name}의 눈빛이 붉게 물들었습니다. 강해졌지만, 문파의 공기가 서늘해졌습니다.`, chips: [["마성", "+5"], ["제자 무력", "+30"]] }; } },
+              { path: "unorthodox", label: "배신하기 전에 내쫓는다", hint: "악명 +2 · 제자 잃음",
+                apply: () => { addAlign(0, 2, 0); removeDisciple(d.id);
+                  return { text: `${d.name}을(를) 산문 밖으로 내던졌습니다.`, chips: [["악명", "+2"], ["제자", "-1"]] }; } }
+            ]
+          };
+        }
+      },
+      {
+        id: "disc_fortune",
+        cond: () => sect() && sect().disciples.length >= 1,
+        build: () => {
+          const d = randomDisciple();
+          return {
+            tag: "DISCIPLE FORTUNE", title: "제자의 기연",
+            desc: `하산했던 ${d.name}이(가) 절벽 아래 동굴에서 옛 고수의 유물을 얻어 돌아왔습니다. 품에는 낡은 비급 한 권이 있습니다.`,
+            choices: [
+              { path: "orthodox", label: "제자의 기연이니 온전히 익히게 한다", hint: "제자 무력 +35 · 충성 +10",
+                apply: () => { d.power += 35; d.loyalty = Math.min(100, d.loyalty + 10);
+                  return { text: `${d.name}의 실력이 일취월장했습니다.`, chips: [["제자 무력", "+35"], ["충성", "+10"]] }; } },
+              { path: "unorthodox", label: "비급을 사부에게 바치게 한다", hint: "내공 +10 · 외공 +4 · 제자 충성 -20",
+                apply: () => { gainStats(10, 4, 0); d.loyalty = Math.max(0, d.loyalty - 20);
+                  return { text: "비급의 묘리를 먼저 취했습니다. 제자의 표정이 굳었습니다.", chips: [["내공", "+10년"], ["외공", "+4"], ["충성", "-20"]] }; } }
+            ]
+          };
+        }
+      }
+    ];
+
+    // ----- 엔딩 문단 -----
+    function getSectEpilogue() {
+      const s = sect();
+      if (!s) return "";
+      const lvIdx = getSectLevelIdx();
+      const heir = getHeir();
+      const lvlName = sectLevelShort(lvIdx);
+      let t = `\n\n[${s.name}의 그 후] `;
+      if (lvIdx >= 3) t += `그가 세운 ${s.name}은(는) 백 년 뒤 구파일방과 어깨를 나란히 하는 천하대문파가 되었습니다. `;
+      else if (lvIdx === 2) t += `${s.name}은(는) 강호 누구나 이름을 아는 명문 대파로 자리 잡았습니다. `;
+      else if (lvIdx === 1) t += `${s.name}은(는) 한 지역을 대표하는 ${lvlName}로 이어졌습니다. `;
+      else t += `${s.name}은(는) 작은 도장으로 남아 동네 아이들의 놀이터가 되었습니다. `;
+      if (heir) {
+        t += heir.title
+          ? `천하제일의 칭호를 얻은 대제자 ${heir.name}이(가) 2대 문주가 되어 사부의 이름을 더욱 빛냈습니다.`
+          : `대제자 ${heir.name}이(가) 2대 문주로 그 뜻을 이었습니다.`;
+        const hp = PERSONAS[heir.persona].path;
+        if (hp === "demonic" && s.ideal !== "might") t += " 다만 그의 차가운 손속에 문파의 색이 서서히 붉게 물들어 갔다고 합니다.";
+      } else if (s.disciples.length === 0) {
+        t += "다만 뒤를 이을 제자가 없어 그의 무학은 한 대에서 끊기고 말았습니다.";
+      }
+      if (s.defectedToDemon) t += " 훗날 마교로 떠난 옛 제자가 문파의 숙적이 되었다는 이야기도 전해집니다.";
+      return t;
     }
 
     // === 다음 해 진행 ===
@@ -2956,7 +3649,8 @@
 
       const salary = getCurrentSalary();
       char.money += salary;
-      addLog(char.age, `새해가 밝았습니다. 문파 녹봉 ${salary}냥 지급`, "text-emerald-400 font-bold");
+      addLog(char.age, sect() ? `새해가 밝았습니다. 강호 위명 수입 ${salary}냥` : `새해가 밝았습니다. 문파 녹봉 ${salary}냥 지급`, "text-emerald-400 font-bold");
+      processSectYear();
 
       if (char.age >= 46 && char.age < 60) {
         const decayExt = Math.floor(Math.random() * 3) + 1;
@@ -2986,6 +3680,7 @@
         document.getElementById("btn-train").disabled = true;
         document.getElementById("btn-duel").disabled = true;
         document.getElementById("btn-market").disabled = true;
+        document.getElementById("btn-sect").disabled = true;
         document.getElementById("btn-breakthrough").disabled = true;
         document.getElementById("btn-ascension").disabled = true;
         updateUI();
@@ -3146,7 +3841,9 @@
         btnDuel.disabled = true;
         btnDuel.className = "py-2.5 px-2 bg-stone-950 border border-stone-800 text-stone-600 rounded-xl flex flex-col items-center justify-center cursor-not-allowed";
         duelStatus.innerText = "(완료)";
+        duelStatus.className = "text-[10px] text-stone-600 font-medium";
         duelLabel.innerText = isMajorYear(char.age) ? "👑 비무제 출전" : "⚔️ 강호 비무";
+        duelLabel.className = "text-stone-600 font-brush text-base";
       } else {
         btnDuel.disabled = false;
         if (isMajorYear(char.age)) {
@@ -3181,6 +3878,28 @@
         btnBreakthrough.classList.add("hidden");
       }
 
+      const sectBtnLabel = document.getElementById("sect-btn-label");
+      const sectBtnSub = document.getElementById("sect-btn-sub");
+      const sumBox = document.getElementById("sect-summary");
+      if (sect()) {
+        const sd = sect();
+        const lvIdx = getSectLevelIdx();
+        sectBtnLabel.innerText = "🏯 문파 관리 (전각 · 제자)";
+        sectBtnSub.innerText = sd.taughtThisYear ? `지원자 ${sd.applicants.length}명` : `올해 제자 지도 가능 · 지원자 ${sd.applicants.length}명`;
+        sumBox.classList.remove("hidden");
+        document.getElementById("sect-sum-name").innerText = sd.name;
+        document.getElementById("sect-sum-level").innerText = `${lvIdx + 1}단계 · ${sectLevelShort(lvIdx)}`;
+        document.getElementById("sect-sum-income").innerText = (getSectIncome() >= 0 ? "+" : "") + getSectIncome();
+        document.getElementById("sect-sum-disciples").innerText = `${sd.disciples.length} / ${SECT_LEVELS[lvIdx].maxDisc}명`;
+        document.getElementById("sect-sum-ideal").innerText = SECT_IDEALS[sd.ideal].label.split("(")[0];
+        const heir = getHeir();
+        document.getElementById("sect-sum-heir").innerText = heir ? `대제자: ${heir.name} (무력 ${heir.power})` : "대제자가 아직 없습니다";
+      } else {
+        sumBox.classList.add("hidden");
+        sectBtnLabel.innerText = "🏯 문파 창건";
+        sectBtnSub.innerText = canFoundSect() ? `창건 가능! (${SECT_FOUND_COST}냥)` : `일류 고수 이상 · ${SECT_FOUND_COST}냥 필요`;
+      }
+
       const btnAscension = document.getElementById("btn-ascension");
       if (char.rankIdx === 7 && getCombatPower() >= 2200 && !char.hasAscended) {
         btnAscension.classList.remove("hidden");
@@ -3207,6 +3926,10 @@
           closeDuelSelectModal();
         } else if (document.getElementById("market-modal").style.display === "flex") {
           closeMarketModal();
+        } else if (document.getElementById("sect-found-modal").style.display === "flex") {
+          closeSectFoundModal();
+        } else if (document.getElementById("sect-modal").style.display === "flex") {
+          closeSectModal();
         } else if (document.getElementById("ascension-confirm-modal").style.display === "flex") {
           closeAscensionConfirmModal();
         } else if (document.getElementById("breakthrough-modal").style.display === "flex") {
