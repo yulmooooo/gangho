@@ -12,6 +12,7 @@
         "rankName":  { ".validate": "newData.isString() && newData.val().length <= 20" },
         "age":       { ".validate": "newData.isNumber() && newData.val() >= 16 && newData.val() <= 60" },
         "avatarId":  { ".validate": "newData.isString() && newData.val().length <= 20" },
+        "path":      { ".validate": "newData.isString() && (newData.val() === 'orthodox' || newData.val() === 'unorthodox' || newData.val() === 'demonic' || newData.val() === 'neutral')" },
         "dailyKey":  { ".validate": "newData.isString() && newData.val().length <= 12" },
         "weeklyKey": { ".validate": "newData.isString() && newData.val().length <= 10" },
         "monthlyKey":{ ".validate": "newData.isString() && newData.val().length <= 8" },

@@ -96,6 +96,12 @@
         </div>
 
         <div>
+          <label class="block text-stone-300 mb-1.5">출신 진영 (시작 지점)</label>
+          <div id="faction-grid" class="grid grid-cols-2 gap-1.5"></div>
+          <p id="faction-perk" class="text-[10px] text-amber-300/90 font-medium mt-1.5 text-center"></p>
+        </div>
+
+        <div>
           <label class="block text-stone-300 mb-1">소속 문파 (직접 입력)</label>
           <input id="input-sect" type="text" maxlength="20" value="화산파 (華山派)" placeholder="문파명을 입력하십시오" class="w-full bg-stone-900 border border-stone-700 rounded-xl px-3 py-2 text-white font-bold focus:outline-none focus:border-amber-500">
         </div>
@@ -240,6 +246,12 @@
             <strong id="end-stat-money" class="text-yellow-400 font-bold"></strong>
           </div>
         </div>
+        <div class="grid grid-cols-3 gap-1.5 text-center text-[11px] font-bold">
+          <div class="bg-stone-900/80 p-1 rounded-lg border border-sky-900/60 text-sky-300">협의 <span id="end-stat-righteous"></span></div>
+          <div class="bg-stone-900/80 p-1 rounded-lg border border-rose-900/60 text-rose-300">악명 <span id="end-stat-evil"></span></div>
+          <div class="bg-stone-900/80 p-1 rounded-lg border border-purple-900/60 text-purple-300">마성 <span id="end-stat-demonic"></span></div>
+        </div>
+        <p id="end-path-line" class="text-[10px] text-stone-400 text-center"></p>
       </div>
 
       <div class="space-y-1.5 pt-1">
@@ -430,6 +442,29 @@
           </div>
         </div>
       </div>
+
+      <!-- 성향 (정/사/마) -->
+      <div class="mt-3 pt-3 border-t border-stone-800">
+        <div class="flex justify-between items-center mb-1.5 text-xs font-bold">
+          <span class="text-stone-300">강호 성향 (性向)</span>
+          <span id="char-path" class="text-[10px] px-1.5 py-0.5 rounded border">중립</span>
+        </div>
+        <div class="grid grid-cols-3 gap-1.5 text-center">
+          <div class="bg-stone-950/70 p-1.5 rounded-xl border border-sky-900/60">
+            <div class="text-[10px] text-sky-300 font-bold">협의 (俠義)</div>
+            <div class="flex items-center justify-center gap-1"><strong id="stat-righteous" class="text-sky-300 text-sm font-extrabold">0</strong><span id="delta-righteous" class="text-emerald-400 text-[10px] font-bold hidden"></span></div>
+          </div>
+          <div class="bg-stone-950/70 p-1.5 rounded-xl border border-rose-900/60">
+            <div class="text-[10px] text-rose-300 font-bold">악명 (惡名)</div>
+            <div class="flex items-center justify-center gap-1"><strong id="stat-evil" class="text-rose-300 text-sm font-extrabold">0</strong><span id="delta-evil" class="text-emerald-400 text-[10px] font-bold hidden"></span></div>
+          </div>
+          <div class="bg-stone-950/70 p-1.5 rounded-xl border border-purple-900/60">
+            <div class="text-[10px] text-purple-300 font-bold">마성 (魔性)</div>
+            <div class="flex items-center justify-center gap-1"><strong id="stat-demonic" class="text-purple-300 text-sm font-extrabold">0</strong><span id="delta-demonic" class="text-emerald-400 text-[10px] font-bold hidden"></span></div>
+          </div>
+        </div>
+        <p id="align-perk-text" class="text-[10px] text-stone-500 mt-1.5 text-center leading-snug"></p>
+      </div>
     </section>
 
     <!-- 메이저 대회 배너 -->
@@ -517,6 +552,25 @@
     </div>
   </div>
 
+  <!-- 강호 사건 / 선택 이벤트 모달 -->
+  <div id="event-modal" style="display: none;" class="fixed inset-0 bg-black/95 items-center justify-center p-3 z-[60]">
+    <div class="hanji-card border-2 gold-border w-full max-w-sm p-5 rounded-3xl shadow-2xl space-y-3.5 max-h-[92vh] overflow-y-auto">
+      <div class="text-center space-y-1">
+        <span id="event-tag" class="text-[10px] font-bold tracking-widest uppercase px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40">JIANGHU INCIDENT</span>
+        <h3 id="event-title" class="text-2xl font-brush text-amber-300"></h3>
+      </div>
+      <p id="event-desc" class="text-xs text-stone-300 leading-relaxed font-medium p-3 bg-stone-950/80 rounded-2xl border border-stone-800"></p>
+      <div id="event-choices" class="space-y-2"></div>
+      <div id="event-result" class="hidden p-3 bg-stone-950/90 rounded-2xl border border-stone-800 space-y-2">
+        <p id="event-result-text" class="text-xs text-stone-200 leading-relaxed"></p>
+        <div id="event-result-chips" class="flex flex-wrap gap-1.5 text-[11px] font-bold"></div>
+      </div>
+      <button id="btn-event-close" onclick="closeEventModal()" class="hidden w-full py-3 bg-gradient-to-r from-amber-600 to-amber-500 hover:brightness-110 text-stone-950 font-brush text-base rounded-xl cursor-pointer shadow">
+        길을 계속 가다
+      </button>
+    </div>
+  </div>
+
   <!-- 우화등선 확인 모달 -->
   <div id="ascension-confirm-modal" style="display: none;" class="fixed inset-0 bg-black/95 items-center justify-center p-3 z-50">
     <div class="hanji-card border-2 border-cyan-400 immortal-card w-full max-w-sm p-5 rounded-3xl shadow-2xl space-y-4 text-center">
@@ -573,7 +627,14 @@
         <p id="tour-opp-desc" class="text-[11px] text-stone-400 border-t border-stone-800/80 pt-1"></p>
       </div>
 
-      <div id="tour-log-box" class="h-44 bg-stone-950 p-3 rounded-xl border border-stone-800 overflow-y-auto text-left text-xs space-y-2 font-medium leading-relaxed font-mono"></div>
+      <div id="tour-log-box" class="h-36 bg-stone-950 p-3 rounded-xl border border-stone-800 overflow-y-auto text-left text-xs space-y-2 font-medium leading-relaxed font-mono"></div>
+
+      <div id="strike-area-tour"></div>
+
+      <label class="flex items-center justify-center gap-1.5 text-[11px] text-stone-400 font-bold cursor-pointer select-none">
+        <input type="checkbox" class="minigame-toggle accent-amber-500" onchange="setMinigameEnabled(this.checked)" checked>
+        🎮 직접 조작 (타이밍 미니게임)
+      </label>
 
       <button id="btn-tour-action" onclick="onTourActionButtonClick()" class="w-full py-3 bg-gradient-to-r from-amber-600 to-amber-500 hover:brightness-110 text-stone-950 font-brush text-base rounded-xl transition cursor-pointer shadow-lg">
         비무 개시
@@ -587,9 +648,17 @@
       <div class="flex justify-between items-start pb-2 border-b border-stone-800">
         <div>
           <h3 class="text-lg font-brush text-amber-300">비무 상대 지목</h3>
-          <p class="text-[10px] text-stone-400 font-medium">난이도에 따라 상금과 보상이 다릅니다.</p>
+          <p class="text-[10px] text-stone-400 font-medium">상대의 강함은 나이(강호 경력)에 따라 정해집니다.</p>
         </div>
         <button onclick="closeDuelSelectModal()" class="text-stone-400 hover:text-white font-bold p-1">✕</button>
+      </div>
+
+      <div class="flex items-center justify-between text-[11px] font-bold px-1">
+        <span class="text-stone-400">올해 강호 평균 무력: <strong id="duel-benchmark" class="text-amber-300"></strong></span>
+        <label class="flex items-center gap-1 text-stone-400 cursor-pointer select-none">
+          <input type="checkbox" class="minigame-toggle accent-amber-500" onchange="setMinigameEnabled(this.checked)" checked>
+          🎮 직접 조작
+        </label>
       </div>
 
       <div id="duel-candidates" class="space-y-2"></div>
@@ -602,7 +671,9 @@
       <div class="text-[10px] font-bold text-amber-500 uppercase tracking-wider" id="battle-sub">비무 결전</div>
       <h3 class="text-2xl font-brush text-stone-100" id="battle-title">대결 시작</h3>
       
-      <div id="battle-log-box" class="h-44 bg-stone-950/90 p-3.5 rounded-2xl border border-stone-800 overflow-y-auto text-left text-xs space-y-2 font-medium leading-relaxed"></div>
+      <div id="battle-log-box" class="h-36 bg-stone-950/90 p-3.5 rounded-2xl border border-stone-800 overflow-y-auto text-left text-xs space-y-2 font-medium leading-relaxed"></div>
+
+      <div id="strike-area-duel"></div>
 
       <button id="btn-battle-confirm" style="display: none;" class="w-full py-3 bg-gradient-to-r from-amber-600 to-amber-500 text-stone-950 font-brush text-base rounded-xl transition cursor-pointer">
         비무를 매듭짓다
@@ -753,10 +824,252 @@
       hasDueledThisYear: false,
       hasBreakthroughThisYear: false,
       hasAscended: false,
-      ownedItems: []
+      ownedItems: [],
+      faction: "orthodox",
+      align: { righteous: 0, evil: 0, demonic: 0 },
+      flags: {},
+      seenEvents: []
     };
 
     let yearGains = { qi: 0, ext: 0, agi: 0, fame: 0 };
+
+    // ==========================================
+    // [진영] 시작 지점
+    // ==========================================
+    const FACTIONS = {
+      orthodox: {
+        label: "정파", hanja: "正派", defaultSect: "화산파 (華山派)",
+        desc: "무림맹의 명문정파",
+        perk: "내공 +4 · 문파 녹봉 ×1.2 · 협의 +10으로 시작",
+        bonus: { qi: 4 }, money: 0, salaryMult: 1.2, prizeMult: 1.0, breakBonus: 0, trainAgi: 0,
+        align: { righteous: 10, evil: 0, demonic: 0 },
+        chip: "bg-sky-950 text-sky-300 border-sky-500/60"
+      },
+      unorthodox: {
+        label: "사파", hanja: "邪派", defaultSect: "흑풍채 (黑風寨)",
+        desc: "흑도와 녹림의 무리",
+        perk: "외공 +5 · 자금 +30냥 · 비무 상금 ×1.3 · 녹봉 ×0.8 · 악명 +10",
+        bonus: { ext: 5 }, money: 30, salaryMult: 0.8, prizeMult: 1.3, breakBonus: 0, trainAgi: 0,
+        align: { righteous: 0, evil: 10, demonic: 0 },
+        chip: "bg-rose-950 text-rose-300 border-rose-500/60"
+      },
+      demonic: {
+        label: "마교", hanja: "魔敎", defaultSect: "천마신교 (天魔神敎)",
+        desc: "천마를 받드는 신교",
+        perk: "내공 +3 · 외공 +3 · 폐관 돌파 확률 +8%p · 마성 +10",
+        bonus: { qi: 3, ext: 3 }, money: 0, salaryMult: 1.0, prizeMult: 1.0, breakBonus: 8, trainAgi: 0,
+        align: { righteous: 0, evil: 0, demonic: 10 },
+        chip: "bg-purple-950 text-purple-300 border-purple-500/60"
+      },
+      neutral: {
+        label: "세가·낭인", hanja: "中立", defaultSect: "무명 낭인 (無名浪人)",
+        desc: "어디에도 매이지 않은 몸",
+        perk: "신법 +6 · 자금 +15냥 · 수련 때마다 신법 +1 추가",
+        bonus: { agi: 6 }, money: 15, salaryMult: 1.0, prizeMult: 1.0, breakBonus: 0, trainAgi: 1,
+        align: { righteous: 0, evil: 0, demonic: 0 },
+        chip: "bg-stone-800 text-stone-200 border-stone-500/60"
+      }
+    };
+
+    const PATH_INFO = {
+      orthodox:   { label: "정파 성향", short: "정", chip: "bg-sky-950 text-sky-300 border-sky-500/60" },
+      unorthodox: { label: "사파 성향", short: "사", chip: "bg-rose-950 text-rose-300 border-rose-500/60" },
+      demonic:    { label: "마교 성향", short: "마", chip: "bg-purple-950 text-purple-300 border-purple-500/60" },
+      neutral:    { label: "중립 (독행)", short: "중", chip: "bg-stone-800 text-stone-300 border-stone-600" }
+    };
+
+    let selectedFaction = "orthodox";
+
+    function getFaction() {
+      return FACTIONS[char.faction] || FACTIONS.neutral;
+    }
+
+    // 가장 높은 성향이 25 미만이면 중립
+    function getPath() {
+      const a = char.align;
+      const max = Math.max(a.righteous, a.evil, a.demonic);
+      if (max < 25) return "neutral";
+      if (a.righteous === max) return "orthodox";
+      if (a.evil === max) return "unorthodox";
+      return "demonic";
+    }
+
+    const alignGains = { righteous: 0, evil: 0, demonic: 0 };
+
+    function addAlign(righteous = 0, evil = 0, demonic = 0) {
+      char.align.righteous = Math.max(0, char.align.righteous + righteous);
+      char.align.evil = Math.max(0, char.align.evil + evil);
+      char.align.demonic = Math.max(0, char.align.demonic + demonic);
+      if (righteous > 0) alignGains.righteous += righteous;
+      if (evil > 0) alignGains.evil += evil;
+      if (demonic > 0) alignGains.demonic += demonic;
+    }
+
+    // 성향 효과: 협의 → 녹봉, 악명 → 비무 상금, 마성 → 폐관 돌파
+    function getSalaryForRank(rankIdx) {
+      const base = ranks[rankIdx].salary * getFaction().salaryMult;
+      const righteousBonus = 1 + Math.min(0.3, char.align.righteous / 200);
+      return Math.round(base * righteousBonus);
+    }
+
+    function getPrizeMult() {
+      const ageMult = 1 + Math.max(0, char.age - 16) / 15;
+      const evilBonus = 1 + Math.min(0.5, char.align.evil / 150);
+      return ageMult * getFaction().prizeMult * evilBonus;
+    }
+
+    function getBreakthroughBonus() {
+      return getFaction().breakBonus + Math.min(10, Math.floor(char.align.demonic / 10));
+    }
+
+    // ==========================================
+    // [비무 난이도] 나이별 강호 평균 무력 (내 무력과 무관하게 고정)
+    // ==========================================
+    const BENCHMARK_TABLE = [
+      [16, 52], [18, 82], [20, 118], [25, 220], [30, 295],
+      [35, 420], [40, 480], [45, 520], [50, 530], [60, 540]
+    ];
+
+    function getBenchmarkPower(age = char.age) {
+      for (let i = 0; i < BENCHMARK_TABLE.length - 1; i++) {
+        const [a1, p1] = BENCHMARK_TABLE[i];
+        const [a2, p2] = BENCHMARK_TABLE[i + 1];
+        if (age <= a2) {
+          const t = Math.max(0, (age - a1) / (a2 - a1));
+          return Math.round(p1 + (p2 - p1) * t);
+        }
+      }
+      return BENCHMARK_TABLE[BENCHMARK_TABLE.length - 1][1];
+    }
+
+    // ==========================================
+    // [미니게임] 타이밍 출수
+    // ==========================================
+    let minigameEnabled = true;
+    try { minigameEnabled = localStorage.getItem("gangho_minigame") !== "off"; } catch (e) {}
+
+    function setMinigameEnabled(on) {
+      minigameEnabled = !!on;
+      try { localStorage.setItem("gangho_minigame", on ? "on" : "off"); } catch (e) {}
+      document.querySelectorAll(".minigame-toggle").forEach(el => { el.checked = minigameEnabled; });
+    }
+
+    const STRIKE_BONUS = { PERFECT: 0.25, GOOD: 0.12, MISS: -0.12, AUTO: 0 };
+    const STRIKE_LABEL = {
+      PERFECT: `<span class="text-yellow-300 font-black">【절초】</span>`,
+      GOOD: `<span class="text-emerald-300 font-bold">【적중】</span>`,
+      MISS: `<span class="text-stone-500 font-bold">【헛손질】</span>`,
+      AUTO: ""
+    };
+
+    // ratio = 상대 무력 / 내 무력. 강한 상대일수록 판정 구간이 좁고 바늘이 빠름
+    function playStrikeMinigame(containerId, ratio, roundLabel) {
+      return new Promise(resolve => {
+        const box = document.getElementById(containerId);
+        const d = Math.min(2, Math.max(0.5, ratio));
+        const goodW = Math.min(38, Math.max(14, 30 - (d - 1) * 16));
+        const perfectW = Math.max(4, goodW * 0.3);
+        const center = 25 + Math.random() * 50;
+        const goodL = center - goodW / 2;
+        const perfectL = center - perfectW / 2;
+        const sweepsPerSec = 0.7 + (d - 0.5) * 0.45;
+        const TIME_LIMIT = 4000;
+
+        box.innerHTML = `
+          <div class="p-2.5 rounded-xl bg-stone-950 border border-amber-600/50 space-y-2 text-left">
+            <div class="flex justify-between text-[11px] font-bold">
+              <span class="text-amber-300">[${roundLabel}] 바늘이 급소에 닿을 때 출수!</span>
+              <span class="strike-timer text-stone-400">4.0초</span>
+            </div>
+            <div class="relative h-7 rounded-lg bg-stone-900 border border-stone-700 overflow-hidden">
+              <div class="absolute top-0 bottom-0 bg-emerald-600/45" style="left:${goodL}%;width:${goodW}%"></div>
+              <div class="absolute top-0 bottom-0 bg-yellow-400/80" style="left:${perfectL}%;width:${perfectW}%"></div>
+              <div class="strike-needle absolute top-0 bottom-0 w-1.5 -ml-[3px] bg-white rounded shadow-[0_0_8px_rgba(255,255,255,0.9)]" style="left:0%"></div>
+            </div>
+            <button type="button" class="strike-btn w-full py-3 bg-gradient-to-r from-rose-600 to-red-500 active:scale-[0.98] text-white font-brush text-base rounded-xl cursor-pointer shadow select-none">
+              ⚔️ 출수! (터치 · 스페이스)
+            </button>
+          </div>`;
+
+        const needle = box.querySelector(".strike-needle");
+        const timer = box.querySelector(".strike-timer");
+        const btn = box.querySelector(".strike-btn");
+        const start = performance.now();
+        let pos = 0;
+        let done = false;
+        let rafId = 0;
+
+        const finish = (result) => {
+          if (done) return;
+          done = true;
+          cancelAnimationFrame(rafId);
+          window.removeEventListener("keydown", onKey, true);
+          const color = result === "PERFECT" ? "text-yellow-300" : result === "GOOD" ? "text-emerald-300" : "text-stone-500";
+          const text = result === "PERFECT" ? "절초 작렬!" : result === "GOOD" ? "적중!" : "헛손질...";
+          btn.disabled = true;
+          btn.className = `w-full py-3 bg-stone-900 border border-stone-700 ${color} font-brush text-base rounded-xl`;
+          btn.innerText = text;
+          setTimeout(() => { box.innerHTML = ""; resolve(result); }, 450);
+        };
+
+        const judge = () => {
+          if (pos >= perfectL && pos <= perfectL + perfectW) return finish("PERFECT");
+          if (pos >= goodL && pos <= goodL + goodW) return finish("GOOD");
+          finish("MISS");
+        };
+
+        const onKey = (e) => {
+          if (e.code === "Space" || e.key === " " || e.key === "Enter") {
+            e.preventDefault();
+            e.stopPropagation();
+            judge();
+          }
+        };
+
+        const tick = (now) => {
+          if (done) return;
+          const elapsed = now - start;
+          const phase = (elapsed / 1000) * sweepsPerSec * 2;
+          const tri = phase % 2;
+          pos = (tri <= 1 ? tri : 2 - tri) * 100;
+          needle.style.left = pos + "%";
+          timer.innerText = `${Math.max(0, (TIME_LIMIT - elapsed) / 1000).toFixed(1)}초`;
+          if (elapsed >= TIME_LIMIT) return finish("MISS");
+          rafId = requestAnimationFrame(tick);
+        };
+
+        btn.addEventListener("pointerdown", (e) => { e.preventDefault(); judge(); });
+        window.addEventListener("keydown", onKey, true);
+        rafId = requestAnimationFrame(tick);
+      });
+    }
+
+    // 3합 승부 (일반 비무·대회 공용)
+    async function fightThreeRounds({ myPower, oppPower, rounds, log, strikeContainerId }) {
+      let myWins = 0, oppWins = 0;
+      const ratio = oppPower / Math.max(1, myPower);
+      for (let i = 0; i < rounds.length; i++) {
+        const r = rounds[i];
+        let strike = "AUTO";
+        if (minigameEnabled) {
+          await sleep(250);
+          strike = await playStrikeMinigame(strikeContainerId, ratio, r.round);
+        } else {
+          await sleep(650);
+        }
+        const baseProb = myPower / (myPower + oppPower);
+        const winProb = Math.min(0.95, Math.max(0.05, baseProb + STRIKE_BONUS[strike]));
+        if (Math.random() < winProb) {
+          myWins++;
+          log(`<strong>[${r.round}]</strong> ${STRIKE_LABEL[strike]} <span class="text-cyan-300 font-bold">${r.msgWin}</span>`);
+        } else {
+          oppWins++;
+          log(`<strong>[${r.round}]</strong> ${STRIKE_LABEL[strike]} <span class="text-rose-400 font-bold">${r.msgLose}</span>`);
+        }
+        if (myWins === 2 || oppWins === 2) break;
+      }
+      return { myWins, oppWins };
+    }
 
     const ranks = [
       { name: "삼류 무사 (三流)", minStat: 0, salary: 5, needsBreakthrough: false },
@@ -792,7 +1105,7 @@
     }
 
     function getCurrentSalary() {
-      return ranks[char.rankIdx].salary;
+      return getSalaryForRank(char.rankIdx);
     }
 
     function getAvatarSvg(avatarId) {
@@ -833,6 +1146,26 @@
       });
     }
 
+    function renderFactionSelector() {
+      const grid = document.getElementById("faction-grid");
+      grid.innerHTML = "";
+      Object.entries(FACTIONS).forEach(([key, f]) => {
+        const on = key === selectedFaction;
+        const div = document.createElement("div");
+        div.className = `p-2 rounded-xl border cursor-pointer transition text-center ${on ? f.chip + " shadow-md" : "border-stone-800 bg-stone-900/60 text-stone-400 opacity-70 hover:opacity-100"}`;
+        div.innerHTML = `<div class="font-brush text-sm">${f.label} <span class="text-[10px] opacity-80">(${f.hanja})</span></div><div class="text-[9px] font-medium opacity-80">${f.desc}</div>`;
+        div.onclick = () => {
+          const sectInput = document.getElementById("input-sect");
+          const isDefault = Object.values(FACTIONS).some(x => x.defaultSect === sectInput.value.trim()) || !sectInput.value.trim();
+          selectedFaction = key;
+          if (isDefault) sectInput.value = f.defaultSect;
+          renderFactionSelector();
+        };
+        grid.appendChild(div);
+      });
+      document.getElementById("faction-perk").innerText = `★ ${FACTIONS[selectedFaction].perk}`;
+    }
+
     function startGame() {
       const nameInput = cleanInputText(document.getElementById("input-name").value, 12);
       const sectInput = cleanInputText(document.getElementById("input-sect").value, 20);
@@ -846,9 +1179,18 @@
       char.agi = rolledStats.agi;
       char.money = rolledStats.money;
 
+      char.faction = selectedFaction;
+      char.originFaction = selectedFaction;
+      const f = getFaction();
+      char.qi += f.bonus.qi || 0;
+      char.ext += f.bonus.ext || 0;
+      char.agi += f.bonus.agi || 0;
+      char.money += f.money;
+      char.align = { righteous: f.align.righteous, evil: f.align.evil, demonic: f.align.demonic };
+
       document.getElementById("start-modal").style.display = "none";
       updateUI();
-      addLog(char.age, `${char.sect}의 문하생으로 강호에 입문했습니다. (초기 자금 ${char.money}냥 수령)`, "text-amber-300 font-bold");
+      addLog(char.age, `[${f.label}] ${char.sect}의 문하생으로 강호에 입문했습니다. (초기 자금 ${char.money}냥 수령)`, "text-amber-300 font-bold");
     }
 
     function doTrain() {
@@ -867,6 +1209,8 @@
         dQi = Math.max(1, dQi - 1);
       }
 
+      dAgi += getFaction().trainAgi;
+
       char.qi += dQi;
       char.ext += dExt;
       char.agi += dAgi;
@@ -884,7 +1228,7 @@
 
     function showRankUpPopup(rank) {
       document.getElementById("rankup-new-title").innerText = rank.name;
-      document.getElementById("rankup-new-salary").innerText = rank.salary;
+      document.getElementById("rankup-new-salary").innerText = getSalaryForRank(ranks.indexOf(rank));
       document.getElementById("rankup-modal").style.display = "flex";
     }
 
@@ -911,7 +1255,9 @@
         prob = Math.max(10, prob - Math.floor((nextRank.minStat - getCombatPower()) / 25));
       }
 
-      document.getElementById("breakthrough-prob-text").innerText = `약 ${prob}%`;
+      const btBonus = getBreakthroughBonus();
+      prob = Math.min(75, prob + btBonus);
+      document.getElementById("breakthrough-prob-text").innerText = btBonus > 0 ? `약 ${prob}% (마공 보정 +${btBonus}%p)` : `약 ${prob}%`;
       document.getElementById("breakthrough-modal").dataset.prob = prob;
       document.getElementById("btn-do-breakthrough").disabled = false;
 
@@ -980,7 +1326,7 @@
         desc.innerText = `벼락같은 오도의 섬광이 단전을 관통했습니다. 굳게 닫혀 있던 천지인의 혈맥이 뚫리며 마침내 '${rank.name}'의 반열에 올랐습니다!`;
         details.innerHTML = `
           <div class="text-amber-300">내공 +${dQi}년 | 외공 +${dExt} | 신법 +${dAgi} 상승</div>
-          <div class="text-emerald-400">연간 문파 녹봉이 ${rank.salary}냥으로 상승했습니다.</div>
+          <div class="text-emerald-400">연간 문파 녹봉이 ${getSalaryForRank(ranks.indexOf(rank))}냥으로 상승했습니다.</div>
         `;
       } else if (type === "FAIL") {
         card.classList.add("border-stone-600");
@@ -1050,6 +1396,69 @@
       }
     }
 
+    // ==========================================
+    // [엔딩] 성향 × 무력 등급
+    // ==========================================
+    const PATH_ROAD = { orthodox: "정도(正道)", unorthodox: "사도(邪道)", demonic: "마도(魔道)", neutral: "독행(獨行)의 길" };
+    const PATH_TITLE_COLOR = { orthodox: "text-sky-300", unorthodox: "text-rose-300", demonic: "text-purple-300", neutral: "text-amber-300" };
+    const PATH_BORDER = { orthodox: "border-sky-500", unorthodox: "border-rose-500", demonic: "border-purple-500", neutral: "border-amber-500" };
+
+    const ENDINGS = {
+      orthodox: [
+        { min: 950, title: "무림맹주(武林盟主) - 정도의 태양",
+          text: "협의를 검 끝에 새긴 채 수많은 사파와 마두를 꺾어 온 {name}은(는) 마침내 무림맹 대전에서 만장일치로 맹주에 추대되었습니다. 그가 맹주로 있는 동안 강호에는 억울한 피가 흐르지 않았고, 훗날 사람들은 그 시절을 '정도의 태평성대'라 불렀습니다." },
+        { min: 500, title: "대협(大俠) - 백성이 기억하는 이름",
+          text: "천하제일의 경지에 이르진 못했으나 {name}이(가) 지나간 고을마다 산적이 사라지고 억울한 자의 한이 풀렸습니다. 늙어서도 사람들은 길에서 그를 만나면 '대협'이라 부르며 고개를 숙였습니다." },
+        { min: 0, title: "의협 촌로(義俠村老) - 마을의 수호자",
+          text: "천하에 이름을 떨치진 못했지만, 작은 마을에 자리 잡고 아이들에게 목검을 쥐여 주며 여생을 보냈습니다. 도적이 들 때마다 마을 앞을 막아선 노인의 이야기는 오래도록 전해졌습니다." }
+      ],
+      unorthodox: [
+        { min: 950, title: "흑도패왕(黑道霸王) - 사파련 총련주",
+          text: "피와 은자로 쌓아 올린 권세 끝에 {name}은(는) 천하 흑도를 하나로 묶은 사파련의 총련주가 되었습니다. 정파조차 그의 눈치를 살폈고, 강호의 밤은 온전히 그의 것이었습니다." },
+        { min: 500, title: "녹림대채주(綠林大寨主) - 산채의 왕",
+          text: "험준한 산채를 거점으로 수백의 녹림호걸을 거느린 대채주가 되었습니다. 관부도 함부로 손대지 못하는 산의 왕으로 군림하며 호탕하고 거친 여생을 보냈습니다." },
+        { min: 0, title: "뒷골목 왈패 - 현상금 수배서의 얼굴",
+          text: "크게 한탕 하겠다는 꿈은 끝내 이루지 못했습니다. 객잔 뒷골목에서 푼돈을 뜯으며 살다가, 어느 날 관아 담벼락에 붙은 현상 수배서 속 자신의 얼굴을 보고 쓴웃음을 지었습니다." }
+      ],
+      demonic: [
+        { min: 950, title: "천마재림(天魔再臨) - 신교의 교주",
+          text: "끝없는 마성을 끌어안고 마공의 극에 이른 {name}은(는) 천마신교의 교주 자리에 올라 '천마'의 이름을 이었습니다. 십만대산에 울려 퍼진 신교도들의 함성에 중원 무림은 밤마다 떨며 잠들었습니다." },
+        { min: 500, title: "혈마장로(血魔長老) - 붉은 눈의 마두",
+          text: "신교의 장로가 되어 혈마의 이름으로 악명을 떨쳤습니다. 그가 지나간 자리에는 핏빛 손자국만 남았고, 정파의 아이들은 '혈마가 온다'는 말에 울음을 그쳤습니다." },
+        { min: 0, title: "주화입마(走火入魔) - 마공에 삼켜진 자",
+          text: "감당할 수 없는 마공에 손을 댄 대가는 혹독했습니다. 끝내 기혈이 뒤틀려 정신을 잃은 그는 이름 없는 동굴에서 홀로 광소하며 생을 마쳤다고 전해집니다." }
+      ],
+      neutral: [
+        { min: 1500, title: "천하무적(天下無敵) - 무림지존",
+          text: "환갑을 맞이할 때까지 당대 강호에서 그를 마주하여 물러서지 않은 고수가 없었습니다. 어느 진영에도 속하지 않은 채 천하제일의 패도를 완성한 뒤, 스스로 검을 거두고 명산에 은거하니 그 이름 석 자는 강호 역사상 가장 눈부신 전설로 남았습니다." },
+        { min: 950, title: "일대종사(一代宗師) - 태산북두",
+          text: "정도 사도 어느 쪽에도 기울지 않고 오직 무(武)의 길만을 걸어 태산북두(泰山北斗)로 우뚝 섰습니다. 환갑에 이르러 강호의 전선에서 물러난 뒤, 수많은 제자들을 길러내며 그가 남긴 무학은 천하에 길이 이어지게 되었습니다." },
+        { min: 500, title: "풍운협객(風雲俠客) - 주막의 옛이야기",
+          text: "수많은 비무와 사선을 넘나들며 치열하게 강호를 풍미했습니다. 나이가 들어 손의 검은 무뎌졌으나, 단골 주막에서 술 한 잔을 기울이며 청춘 시절 천하를 주름잡던 무용담을 안주 삼아 평온하고 낭만 있는 여생을 보냈습니다." },
+        { min: 0, title: "평범한 촌부(村夫) - 칼을 쟁기로 바꾸다",
+          text: "강호의 비정함과 삼류의 높은 벽을 실감하며 칼을 내려놓았습니다. 큰 명성을 떨치진 못했으나 모진 암투에서 목숨을 건져 고향으로 돌아가 밭을 일구며 소박하고 평화로운 삶을 매듭지었습니다." }
+      ]
+    };
+
+    function getEndingInfo() {
+      const path = getPath();
+      const power = getCombatPower();
+      if (char.hasAscended) {
+        if (path === "demonic") {
+          return { path, tier: "MYTHIC", rankLabel: "마신 / 등선경 (魔神)",
+            title: "천마승천(天魔昇天) - 마신 등극",
+            text: "마성의 극에서 구천현뢰마저 집어삼킨 {name}은(는) 육신을 벗고 마계의 신좌에 올랐습니다. 이후 천 년 동안 마교도들은 그를 '마신(魔神)'이라 부르며 제를 올렸습니다." };
+        }
+        return { path, tier: "MYTHIC", rankLabel: "신선 / 등선경 (神仙)",
+          title: "우화등선(羽化登仙) - 신선 승천",
+          text: "{sect}의 평범한 문하생으로 시작하여, 인간의 한계를 초월하고 아홉 줄기 구천현뢰를 뚫어냈습니다. 강호의 먼지를 털어내고 육신을 벗어던진 그의 영혼은 천상으로 승천하여 영원불멸의 '검선(劍仙)'으로 신화가 되었습니다." };
+      }
+      const list = ENDINGS[path];
+      const e = list.find(x => power >= x.min) || list[list.length - 1];
+      const tier = power >= 1500 ? "LEGENDARY" : power >= 950 ? "MASTER" : power >= 500 ? "NORMAL" : "COMMON";
+      return { path, tier, rankLabel: ranks[char.rankIdx].name, title: e.title, text: e.text };
+    }
+
     function showFinalEnding(forcedEnding = null) {
       const modal = document.getElementById("ending-modal");
       const card = document.getElementById("ending-card");
@@ -1062,62 +1471,53 @@
       document.getElementById("end-stat-power").innerText = getCombatPower();
       document.getElementById("end-stat-age").innerText = `${char.age}세`;
       document.getElementById("end-stat-money").innerText = `${char.money}냥`;
+      document.getElementById("end-stat-righteous").innerText = char.align.righteous;
+      document.getElementById("end-stat-evil").innerText = char.align.evil;
+      document.getElementById("end-stat-demonic").innerText = char.align.demonic;
 
-      card.classList.remove("immortal-card", "flash-gold", "border-cyan-400", "border-yellow-400", "border-amber-600", "border-stone-600");
+      card.classList.remove("immortal-card", "flash-gold", "border-cyan-400", "border-yellow-400", "border-amber-500", "border-amber-600",
+        "border-stone-500", "border-stone-600", "border-stone-800", "border-sky-500", "border-rose-500", "border-purple-500");
 
-      if (forcedEnding === "ASCENSION" || char.hasAscended) {
-        rankStatElem.innerText = "신선 / 등선경 (神仙)";
-        rankStatElem.className = "text-cyan-300 font-extrabold";
+      const info = getEndingInfo();
+      char.endingTitle = info.title;
+      const pathLabel = PATH_INFO[info.path].label;
 
+      rankStatElem.innerText = info.rankLabel;
+      rankStatElem.className = info.tier === "MYTHIC" ? "text-cyan-300 font-extrabold" : "text-amber-300 font-bold";
+
+      const tierName = { MYTHIC: "MYTHIC (신화)", LEGENDARY: "LEGENDARY (전설)", MASTER: "MASTER (명인)", NORMAL: "NORMAL (풍운)", COMMON: "COMMON (서민)" }[info.tier];
+      badge.innerText = `${tierName} · ${pathLabel}`;
+
+      if (info.tier === "MYTHIC") {
         card.classList.add("immortal-card", "border-cyan-400");
         badge.className = "text-[10px] font-bold tracking-widest uppercase px-2.5 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-400";
-        badge.innerText = "MYTHIC ENDING (신화)";
         title.className = "text-2xl font-brush text-cyan-300";
-        title.innerText = "우화등선(羽化登仙) - 신선 승천";
-        epilogue.innerText = `${char.sect}의 평범한 문하생으로 시작하여, 인간의 한계를 초월하고 아홉 줄기 구천현뢰를 뚫어냈습니다. 강호의 먼지를 털어내고 육신을 벗어던진 그의 영혼은 천상으로 승천하여 영원불멸의 '검선(劍仙)'으로 신화가 되었습니다.`;
+      } else if (info.tier === "LEGENDARY") {
+        card.classList.add("flash-gold", "border-yellow-400");
+        badge.className = "text-[10px] font-bold tracking-widest uppercase px-2.5 py-0.5 rounded bg-yellow-950 text-yellow-300 border border-yellow-400";
+        title.className = `text-2xl font-brush ${PATH_TITLE_COLOR[info.path]}`;
       } else {
-        rankStatElem.innerText = ranks[char.rankIdx].name;
-        rankStatElem.className = "text-amber-300 font-bold";
-
-        const totalPower = getCombatPower();
-
-        if (totalPower >= 1500) {
-          card.classList.add("flash-gold", "border-yellow-400");
-          badge.className = "text-[10px] font-bold tracking-widest uppercase px-2.5 py-0.5 rounded bg-yellow-950 text-yellow-300 border border-yellow-400";
-          badge.innerText = "LEGENDARY ENDING (전설)";
-          title.className = "text-2xl font-brush text-yellow-300";
-          title.innerText = "천하무적(天下無敵) - 무림지존";
-          epilogue.innerText = `환갑을 맞이할 때까지 당대 강호에서 그를 마주하여 물러서지 않은 고수가 없었습니다. 천하제일의 패도를 완성한 절대자로 군림한 뒤, 스스로 검을 거두고 명산에 은거하니 그 이름 석 자는 강호 역사상 가장 눈부신 전설로 남았습니다.`;
-        } else if (totalPower >= 950) {
-          card.classList.add("border-amber-500");
-          badge.className = "text-[10px] font-bold tracking-widest uppercase px-2.5 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-500";
-          badge.innerText = "MASTER ENDING (명인)";
-          title.className = "text-2xl font-brush text-amber-300";
-          title.innerText = "일대종사(一代宗師) - 태산북두";
-          epilogue.innerText = `무림의 험난한 풍파를 이겨내고 한 문파를 대표하는 큰 어른이자 태산북두(泰山北斗)로 우뚝 섰습니다. 환갑에 이르러 강호의 전선에서 물러난 뒤, 수많은 제자들을 길러내며 그가 남긴 무학은 천하에 길이 이어지게 되었습니다.`;
-        } else if (totalPower >= 500) {
-          card.classList.add("border-stone-500");
-          badge.className = "text-[10px] font-bold tracking-widest uppercase px-2.5 py-0.5 rounded bg-stone-900 text-stone-300 border border-stone-600";
-          badge.innerText = "NORMAL ENDING (풍운)";
-          title.className = "text-2xl font-brush text-stone-200";
-          title.innerText = "풍운협객(風雲俠客) - 주막의 옛이야기";
-          epilogue.innerText = `수많은 비무와 사선을 넘나들며 치열하게 강호를 풍미했습니다. 나이가 들어 손의 검은 무뎌졌으나, 단골 주막에서 술 한 잔을 기울이며 청춘 시절 천하를 주름잡던 무용담을 안주 삼아 평온하고 낭만 있는 여생을 보냈습니다.`;
-        } else {
-          card.classList.add("border-stone-800");
-          badge.className = "text-[10px] font-bold tracking-widest uppercase px-2.5 py-0.5 rounded bg-stone-950 text-stone-500 border border-stone-800";
-          badge.innerText = "COMMON ENDING (서민)";
-          title.className = "text-2xl font-brush text-stone-400";
-          title.innerText = "평범한 촌부(村夫) - 칼을 쟁기로 바꾸다";
-          epilogue.innerText = `강호의 비정함과 삼류의 높은 벽을 실감하며 칼을 내려놓았습니다. 큰 명성을 떨치진 못했으나 모진 암투에서 목숨을 건져 고향으로 돌아가 밭을 일구며 소박하고 평화로운 삶을 매듭지었습니다.`;
-        }
+        card.classList.add(PATH_BORDER[info.path]);
+        badge.className = `text-[10px] font-bold tracking-widest uppercase px-2.5 py-0.5 rounded border ${PATH_INFO[info.path].chip}`;
+        title.className = `text-2xl font-brush ${info.tier === "COMMON" ? "text-stone-300" : PATH_TITLE_COLOR[info.path]}`;
       }
+
+      title.innerText = info.title;
+
+      // 출신 진영과 최종 성향이 다르면 한 줄 덧붙임
+      const origin = char.originFaction || char.faction;
+      let prefix = "";
+      if (origin !== info.path && info.path !== "neutral" && origin !== "neutral") {
+        prefix = `${FACTIONS[origin].label}의 문하생으로 출발했으나, 그가 걸어온 길은 결국 ${PATH_ROAD[info.path]}였습니다. `;
+      }
+      epilogue.innerText = prefix + info.text.replace(/\{name\}/g, char.name).replace(/\{sect\}/g, char.sect);
+
+      document.getElementById("end-path-line").innerText =
+        `출신: ${FACTIONS[origin].label} → 최종: ${getFaction().label} 소속 · ${pathLabel}`;
 
       modal.style.display = "flex";
     }
 
-    // ==========================================
-    // 📸 공유 썸네일 카드 캔버스 생성 및 전송 로직
-    // ==========================================
     function generateShareCard() {
       const canvas = document.getElementById("share-canvas");
       const ctx = canvas.getContext("2d");
@@ -1179,13 +1579,23 @@
       ctx.stroke();
 
       // 아바타 그리기
-      const avSvg = getAvatarSvg(char.avatarId);
+      // 이미지로 그리려면 SVG에 xmlns 속성이 반드시 있어야 함
+      let avSvg = getAvatarSvg(char.avatarId);
+      if (!avSvg.includes("xmlns=")) avSvg = avSvg.replace("<svg", '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"');
       const avImg = new Image();
       const svgBlob = new Blob([avSvg], { type: "image/svg+xml;charset=utf-8" });
       const avUrl = URL.createObjectURL(svgBlob);
 
-      avImg.onload = function() {
-        ctx.drawImage(avImg, 65, boxY + 28, 120, 120);
+      avImg.onerror = function() {
+        URL.revokeObjectURL(avUrl);
+        avImg.onload(null, true);
+      };
+
+      avImg.onload = function(_e, failed) {
+        if (!failed) {
+          ctx.imageSmoothingEnabled = false;
+          ctx.drawImage(avImg, 65, boxY + 28, 120, 120);
+        }
         URL.revokeObjectURL(avUrl);
 
         // 텍스트 정보 (우측)
@@ -1196,12 +1606,17 @@
 
         ctx.fillStyle = "#cbd5e1";
         ctx.font = "bold 16px sans-serif";
-        ctx.fillText(`소속 : ${char.sect}`, 210, boxY + 98);
+        ctx.fillText(`소속 : ${getFaction().label} · ${char.sect}`, 210, boxY + 98);
 
         ctx.fillStyle = "#38bdf8";
         ctx.font = "bold 15px sans-serif";
-        const endingRankName = char.hasAscended ? "신선 / 등선경 (神仙)" : ranks[char.rankIdx].name;
-        ctx.fillText(`경지 : ${endingRankName}`, 210, boxY + 128);
+        const endInfo = getEndingInfo();
+        ctx.fillText(`경지 : ${endInfo.rankLabel}`, 210, boxY + 128);
+
+        const pathColor = { orthodox: "#7dd3fc", unorthodox: "#fda4af", demonic: "#d8b4fe", neutral: "#e7e5e4" }[endInfo.path];
+        ctx.fillStyle = pathColor;
+        ctx.font = "bold 14px sans-serif";
+        ctx.fillText(`성향 : ${PATH_INFO[endInfo.path].label}  (협의 ${char.align.righteous} · 악명 ${char.align.evil} · 마성 ${char.align.demonic})`, 210, boxY + 156);
 
         // 5. 스탯 박스 4분할
         const statY = 375;
@@ -1352,6 +1767,7 @@
         rankName: ranks[char.rankIdx].name.split(" ")[0],
         age: char.age,
         avatarId: char.avatarId,
+        path: getPath(),
         dailyKey: period.daily,
         weeklyKey: period.weekly,
         monthlyKey: period.monthly,
@@ -1491,7 +1907,7 @@
                   </span>
                 </div>
                 <div class="text-[10px] text-stone-400 mt-0.5">
-                  <span>${escapeHtml(entry.rankName)}</span> · <span>${Number(entry.age) || "?"}세 은퇴</span>
+                  ${PATH_INFO[entry.path] ? `<span class="px-1 rounded border ${PATH_INFO[entry.path].chip}">${PATH_INFO[entry.path].short}</span> ` : ""}<span>${escapeHtml(entry.rankName)}</span> · <span>${Number(entry.age) || "?"}세 은퇴</span>
                 </div>
               </div>
             </div>
@@ -1530,14 +1946,15 @@
     }
 
     function startMajorTournament() {
-      const basePower = getCombatPower();
+      const basePower = getBenchmarkPower();
+      setMinigameEnabled(minigameEnabled);
       tournamentState.stage = 0;
       tournamentState.buttonMode = 'FIGHT';
       tournamentState.isFighting = false;
       tournamentState.opponents = [
-        { round: "본선 8강", name: "종남파 수제자 배도운", power: Math.max(20, Math.round(basePower * 0.90)), desc: "검로가 바르고 탄탄한 청년 고수", icon: PIXEL_ASSETS.enemies["호각"] },
-        { round: "준결승 4강", name: "사파의 혈랑도 단목량", power: Math.max(30, Math.round(basePower * 1.08)), desc: "수많은 비무로 피를 묻힌 실전파 칼잡이", icon: PIXEL_ASSETS.enemies["도전"] },
-        { round: "천하 결승", name: "전대 챔피언 천검존자", power: Math.max(45, Math.round(basePower * 1.25)), desc: "대회 2연패를 노리는 당대 천하제일 후보", icon: PIXEL_ASSETS.enemies["boss"] }
+        { round: "본선 8강", name: "종남파 수제자 배도운", power: Math.max(20, Math.round(basePower * 0.95)), desc: "검로가 바르고 탄탄한 청년 고수", icon: PIXEL_ASSETS.enemies["호각"] },
+        { round: "준결승 4강", name: "사파의 혈랑도 단목량", power: Math.max(30, Math.round(basePower * 1.2)), desc: "수많은 비무로 피를 묻힌 실전파 칼잡이", icon: PIXEL_ASSETS.enemies["도전"] },
+        { round: "천하 결승", name: "전대 챔피언 천검존자", power: Math.max(45, Math.round(basePower * 1.5)), desc: "대회 2연패를 노리는 당대 천하제일 후보", icon: PIXEL_ASSETS.enemies["boss"] }
       ];
 
       document.getElementById("tour-log-box").innerHTML = "";
@@ -1604,7 +2021,7 @@
         logBox.scrollTop = logBox.scrollHeight;
       };
 
-      log(`▶ ── ${opp.round}: ${char.name}(${myPower}) vs ${opp.name}(${opp.power}) ──`, "text-amber-400 font-bold pb-1 border-b border-stone-800");
+      log(`▶ ── ${opp.round}: ${escapeHtml(char.name)}(${myPower}) vs ${opp.name}(${opp.power}) ──`, "text-amber-400 font-bold pb-1 border-b border-stone-800");
 
       const rounds = [
         { round: "1합", msgWin: "날카로운 신법으로 상대의 빈틈을 파고들어 선제 강타!", msgLose: "상대의 묵직한 패도에 밀려 호흡이 흐트러졌습니다." },
@@ -1612,40 +2029,27 @@
         { round: "3합", msgWin: "천하를 뒤흔드는 비기 오의를 작렬시켜 상대 무기를 격파!", msgLose: "상대의 기습적인 연환 필살기에 허를 찔리고 말았습니다." }
       ];
 
-      let myWins = 0;
-      let oppWins = 0;
-
-      for (let i = 0; i < rounds.length; i++) {
-        await sleep(650);
-        const r = rounds[i];
-        const winProb = myPower / (myPower + opp.power);
-        const isRoundWin = Math.random() < winProb;
-
-        if (isRoundWin) {
-          myWins++;
-          log(`<strong>[${r.round}]</strong> <span class="text-cyan-300 font-bold">${r.msgWin}</span>`);
-        } else {
-          oppWins++;
-          log(`<strong>[${r.round}]</strong> <span class="text-rose-400 font-bold">${r.msgLose}</span>`);
-        }
-      }
+      const { myWins, oppWins } = await fightThreeRounds({
+        myPower, oppPower: opp.power, rounds, log, strikeContainerId: "strike-area-tour"
+      });
 
       await sleep(600);
       const isFinalWin = myWins > oppWins;
 
       if (isFinalWin) {
-        log(`\n★ [승리] ${char.name}의 초식이 승리를 거두며 ${opp.name}을(를) 격파했습니다!`, "text-yellow-400 font-brush text-sm pt-2 border-t border-stone-800");
+        log(`\n★ [승리] ${escapeHtml(char.name)}의 초식이 승리를 거두며 ${opp.name}을(를) 격파했습니다!`, "text-yellow-400 font-brush text-sm pt-2 border-t border-stone-800");
 
         if (tournamentState.stage === 2) {
           await sleep(500);
-          char.money += 250;
+          const grandPrize = Math.round(250 * getPrizeMult());
+          char.money += grandPrize;
           char.fame += 70;
           char.qi += 6; char.ext += 6; char.agi += 6;
           yearGains.fame += 70; yearGains.qi += 6; yearGains.ext += 6; yearGains.agi += 6;
           char.title = "천하제일(天下第一)";
 
-          addLog(char.age, `★★★ [천하비무제 제패] 우승! 칭호 '천하제일', 은자 250냥, 올스탯 +6 획득!`, "text-yellow-300 font-brush text-sm");
-          log(`\n🏆 [천하제일 우승] 관중들의 환호 속에 우승 상금 250냥 획득!`, "text-yellow-400 font-brush text-sm");
+          addLog(char.age, `★★★ [천하비무제 제패] 우승! 칭호 '천하제일', 은자 ${grandPrize}냥, 올스탯 +6 획득!`, "text-yellow-300 font-brush text-sm");
+          log(`\n🏆 [천하제일 우승] 관중들의 환호 속에 우승 상금 ${grandPrize}냥 획득!`, "text-yellow-400 font-brush text-sm");
 
           checkRankUp();
           updateUI();
@@ -1667,7 +2071,7 @@
       } else {
         log(`\n✕ [패배] ${opp.name}의 벽을 넘지 못하고 패배하여 탈락했습니다.`, "text-rose-400 font-bold pt-2 border-t border-stone-800");
         
-        let prize = tournamentState.stage === 0 ? 30 : 60;
+        let prize = Math.round((tournamentState.stage === 0 ? 30 : 60) * getPrizeMult());
         char.money += prize;
         char.fame += 10;
         yearGains.fame += 10;
@@ -1687,92 +2091,74 @@
     }
 
     function openDuelSelectModal() {
+      const bench = getBenchmarkPower();
       const myPower = getCombatPower();
+      const pm = getPrizeMult();
       const container = document.getElementById("duel-candidates");
       container.innerHTML = "";
+      document.getElementById("duel-benchmark").innerText = bench;
+      setMinigameEnabled(minigameEnabled);
+
+      const prize = (n) => Math.round(n * pm);
+      const blindPrize = prize(Math.floor(Math.random() * 70) + 20);
 
       const options = [
         {
-          tag: "쉬움",
-          tagColor: "text-emerald-400 border-emerald-500/40 bg-emerald-950/40",
-          name: "하급 무뢰배 / 초보 비무자",
-          desc: "손쉬운 적수. 안정적인 푼돈벌이.",
-          ratio: 0.72,
-          isBlind: false,
-          icon: PIXEL_ASSETS.enemies["쉬움"],
-          winPrize: 10,
-          losePrize: 2,
-          rewardDesc: "10냥, 명성 +2",
-          onWin: () => { 
-            char.money += 10; char.fame += 2;
-            yearGains.fame += 2;
-          },
-          onLose: () => { char.money += 2; }
+          tag: "쉬움", tagColor: "text-emerald-400 border-emerald-500/40 bg-emerald-950/40",
+          name: "하급 무뢰배 / 초보 비무자", desc: "손쉬운 적수. 안정적인 푼돈벌이.",
+          ratio: 0.65, isBlind: false, icon: PIXEL_ASSETS.enemies["쉬움"],
+          winPrize: prize(10), losePrize: prize(2),
+          rewardDesc: "명성 +2",
+          onWin: () => { char.fame += 2; yearGains.fame += 2; },
+          onLose: () => {}
         },
         {
-          tag: "호각",
-          tagColor: "text-blue-400 border-blue-500/40 bg-blue-950/40",
-          name: "동문 사형 / 표국의 표사",
-          desc: "치열한 승부. 쏠쏠한 상금.",
-          ratio: 1.0,
-          isBlind: false,
-          icon: PIXEL_ASSETS.enemies["호각"],
-          winPrize: 25,
-          losePrize: 5,
-          rewardDesc: "25냥, 명성 +5, 외공 +1",
-          onWin: () => { 
-            char.money += 25; char.fame += 5; char.ext += 1;
-            yearGains.fame += 5; yearGains.ext += 1;
-          },
-          onLose: () => { char.money += 5; }
+          tag: "호각", tagColor: "text-blue-400 border-blue-500/40 bg-blue-950/40",
+          name: "동문 사형 / 표국의 표사", desc: "강호 평균 수준. 쏠쏠한 상금.",
+          ratio: 1.0, isBlind: false, icon: PIXEL_ASSETS.enemies["호각"],
+          winPrize: prize(25), losePrize: prize(5),
+          rewardDesc: "명성 +5, 외공 +1",
+          onWin: () => { char.fame += 5; char.ext += 1; yearGains.fame += 5; yearGains.ext += 1; },
+          onLose: () => {}
         },
         {
-          tag: "도전",
-          tagColor: "text-rose-400 border-rose-500/40 bg-rose-950/40",
-          name: "인근 문파 수제자 / 흑도 고수",
-          desc: "한 수 위의 강자. 큰 판돈.",
-          ratio: 1.25,
-          isBlind: false,
-          icon: PIXEL_ASSETS.enemies["도전"],
-          winPrize: 50,
-          losePrize: 10,
-          rewardDesc: "50냥, 명성 +12, 외공 +2, 신법 +1",
-          onWin: () => { 
-            char.money += 50; char.fame += 12; char.ext += 2; char.agi += 1;
+          tag: "도전", tagColor: "text-rose-400 border-rose-500/40 bg-rose-950/40",
+          name: "인근 문파 수제자 / 흑도 고수", desc: "한 수 위의 강자. 큰 판돈.",
+          ratio: 1.35, isBlind: false, icon: PIXEL_ASSETS.enemies["도전"],
+          winPrize: prize(50), losePrize: prize(10),
+          rewardDesc: "명성 +12, 외공 +2, 신법 +1",
+          onWin: () => {
+            char.fame += 12; char.ext += 2; char.agi += 1;
             yearGains.fame += 12; yearGains.ext += 2; yearGains.agi += 1;
           },
-          onLose: () => { char.money += 10; char.qi += 1; yearGains.qi += 1; }
+          onLose: () => { char.qi += 1; yearGains.qi += 1; }
         },
         {
-          tag: "무작위",
-          tagColor: "text-purple-400 border-purple-500/30 bg-purple-950/40",
-          name: "방랑하는 의문의 복면인",
-          desc: "건달일 수도, 은거 기인일 수도 있는 미지의 상대.",
-          ratio: (0.6 + Math.random() * 1.0),
-          isBlind: true,
-          icon: PIXEL_ASSETS.enemies["무작위"],
-          winPrize: Math.floor(Math.random() * 70) + 20,
-          losePrize: 5,
-          rewardDesc: "알 수 없음 (???냥, 기연 또는 낭패)",
-          onWin: function() {
-            char.money += this.winPrize;
-            char.fame += 10;
-            char.qi += 3;
-            yearGains.fame += 10;
-            yearGains.qi += 3;
-          },
-          onLose: () => { char.money += 5; }
+          tag: "무작위", tagColor: "text-purple-400 border-purple-500/30 bg-purple-950/40",
+          name: "방랑하는 의문의 복면인", desc: "건달일 수도, 은거 기인일 수도 있는 미지의 상대.",
+          ratio: 0.5 + Math.random() * 1.4, isBlind: true, icon: PIXEL_ASSETS.enemies["무작위"],
+          winPrize: blindPrize, losePrize: prize(5),
+          rewardDesc: "알 수 없음",
+          onWin: () => { char.fame += 10; char.qi += 3; yearGains.fame += 10; yearGains.qi += 3; },
+          onLose: () => {}
         }
       ];
 
       options.forEach(opt => {
-        const oppPower = Math.max(15, Math.round(myPower * opt.ratio));
+        const oppPower = Math.max(15, Math.round(bench * opt.ratio));
         const card = document.createElement("div");
         card.className = "p-3 rounded-2xl bg-stone-950/80 border border-stone-800 hover:border-amber-500/60 transition cursor-pointer flex items-center justify-between gap-2.5";
-        
-        const powerText = opt.isBlind ? `<strong class="text-purple-400 font-extrabold tracking-widest">???</strong>` : `<strong class="text-amber-400">${oppPower}</strong>`;
-        const rewardText = opt.isBlind 
-          ? `<span class="text-purple-300 font-bold">승리 상금: ???냥</span> <span class="text-stone-500">(미지의 보상)</span>` 
+
+        let edge = "";
+        if (!opt.isBlind) {
+          const r = myPower / oppPower;
+          edge = r >= 1.3 ? `<span class="text-emerald-400">압도</span>` : r >= 1.0 ? `<span class="text-sky-400">우세</span>` : r >= 0.8 ? `<span class="text-amber-400">열세</span>` : `<span class="text-rose-400">위험</span>`;
+        }
+        const powerText = opt.isBlind
+          ? `<strong class="text-purple-400 font-extrabold tracking-widest">???</strong>`
+          : `<strong class="text-amber-400">${oppPower}</strong><span class="block text-[10px] font-bold">${edge}</span>`;
+        const rewardText = opt.isBlind
+          ? `<span class="text-purple-300 font-bold">승리 상금: ???냥</span> <span class="text-stone-500">(미지의 보상)</span>`
           : `승리 상금: ${opt.winPrize}냥 (${opt.rewardDesc})`;
 
         card.innerHTML = `
@@ -1797,6 +2183,7 @@
         card.onclick = () => {
           document.getElementById("duel-select-modal").style.display = "none";
           char.hasDueledThisYear = true;
+          updateUI();
           startBattleSequence(opt, oppPower);
         };
         container.appendChild(card);
@@ -1829,40 +2216,29 @@
         logBox.scrollTop = logBox.scrollHeight;
       };
 
-      appendBattleLine(`▶ 대치: ${char.name}(무력 ${myPower}) vs ${opponent.name}(무력 ${oppPower})`, "text-stone-400 pb-1 border-b border-stone-800 font-bold");
+      appendBattleLine(`▶ 대치: ${escapeHtml(char.name)}(무력 ${myPower}) vs ${opponent.name}(무력 ${oppPower})`, "text-stone-400 pb-1 border-b border-stone-800 font-bold");
 
-      let myWins = 0;
-      let oppWins = 0;
       const rounds = [
         { round: "1합", msgWin: "신법으로 상대의 빈틈을 파고들어 강타!", msgLose: "상대의 묵직한 초식에 밀렸습니다." },
         { round: "2합", msgWin: "검 끝에 실린 내기로 상대 기세를 꺾었습니다!", msgLose: "거친 패도에 검이 튕겨나갈 뻔했습니다." },
         { round: "3합", msgWin: "비기를 작렬시켜 상대의 무기를 격파!", msgLose: "기습적인 연환격에 허를 찔렸습니다." }
       ];
 
-      for (let i = 0; i < rounds.length; i++) {
-        await sleep(650);
-        const r = rounds[i];
-        const winProb = myPower / (myPower + oppPower);
-        const isRoundWin = Math.random() < winProb;
+      const { myWins, oppWins } = await fightThreeRounds({
+        myPower, oppPower, rounds, log: appendBattleLine, strikeContainerId: "strike-area-duel"
+      });
 
-        if (isRoundWin) {
-          myWins++;
-          appendBattleLine(`<strong>[${r.round}]</strong> <span class="text-cyan-300 font-bold">${r.msgWin}</span>`);
-        } else {
-          oppWins++;
-          appendBattleLine(`<strong>[${r.round}]</strong> <span class="text-rose-400 font-bold">${r.msgLose}</span>`);
-        }
-      }
-
-      await sleep(600);
+      await sleep(400);
       const isFinalWin = myWins > oppWins;
 
       if (isFinalWin) {
-        appendBattleLine(`\n★ [승리] 상금 ${opponent.winPrize}냥을 거머쥐었습니다!`, "text-yellow-400 font-brush text-sm pt-2 border-t border-stone-800");
+        char.money += opponent.winPrize;
+        appendBattleLine(`★ [승리] 상금 ${opponent.winPrize}냥을 거머쥐었습니다!`, "text-yellow-400 font-brush text-sm pt-2 border-t border-stone-800");
         opponent.onWin();
         addLog(char.age, `[비무 승리] ${opponent.name} 격파 (+${opponent.winPrize}냥)`, "text-amber-300 font-bold");
       } else {
-        appendBattleLine(`\n✕ [패배] 아쉽게 패배하여 위로금 ${opponent.losePrize}냥을 받았습니다.`, "text-stone-400 font-bold pt-2 border-t border-stone-800");
+        char.money += opponent.losePrize;
+        appendBattleLine(`✕ [패배] 아쉽게 패배하여 위로금 ${opponent.losePrize}냥을 받았습니다.`, "text-stone-400 font-bold pt-2 border-t border-stone-800");
         opponent.onLose();
         addLog(char.age, `[비무 패배] ${opponent.name}에게 석패 (+${opponent.losePrize}냥)`, "text-stone-400");
       }
@@ -1870,10 +2246,39 @@
       checkRankUp();
       updateUI();
 
+      confirmBtn.innerText = isFinalWin ? "패자를 어떻게 할 것인가 ➔" : "비무를 매듭짓다";
       confirmBtn.style.display = "block";
       confirmBtn.onclick = () => {
         modal.style.display = "none";
+        if (isFinalWin) showPostDuelChoice(opponent);
       };
+    }
+
+    // 비무 승리 후 선택: 성향이 갈리는 지점
+    function showPostDuelChoice(opponent) {
+      const loot = Math.max(5, Math.round(opponent.winPrize * 0.6));
+      openEventModal({
+        tag: "AFTER THE DUEL",
+        title: "쓰러진 패자 앞에서",
+        desc: `쓰러진 상대(${opponent.name})가 무릎을 꿇은 채 거친 숨을 몰아쉽니다. 구경꾼들의 시선이 당신의 다음 행동에 쏠립니다.`,
+        choices: [
+          {
+            path: "orthodox", label: "예를 갖추고 손을 내밀어 일으켜 준다", hint: "협의 +3 · 명성 +2",
+            apply: () => { addAlign(3, 0, 0); char.fame += 2; yearGains.fame += 2;
+              return { text: "패자는 고개 숙여 감사를 표했고, 구경꾼들 사이에서 당신의 도량을 칭송하는 말이 퍼졌습니다.", chips: [["협의", "+3"], ["명성", "+2"]] }; }
+          },
+          {
+            path: "unorthodox", label: "판돈은 물론 품속 전낭까지 털어 간다", hint: `악명 +3 · 은자 +${loot}냥`,
+            apply: () => { addAlign(0, 3, 0); char.money += loot;
+              return { text: "패자의 전낭이 묵직합니다. 뒤에서 수군거리는 소리가 들리지만 개의치 않습니다.", chips: [["악명", "+3"], ["은자", `+${loot}냥`]] }; }
+          },
+          {
+            path: "demonic", label: "패자의 단전에 손을 얹어 내력을 빨아들인다", hint: "마성 +3 · 내공 +2 · 명성 -2",
+            apply: () => { addAlign(0, 0, 3); char.qi += 2; yearGains.qi += 2; char.fame = Math.max(0, char.fame - 2);
+              return { text: "흡성(吸星)의 마공이 패자의 내력을 집어삼킵니다. 구경꾼들이 비명을 지르며 흩어집니다.", chips: [["마성", "+3"], ["내공", "+2년"], ["명성", "-2"]] }; }
+          }
+        ]
+      });
     }
 
     // === 상점 & 암시장 ===
@@ -2204,10 +2609,350 @@
       });
     }
 
+    // ==========================================
+    // [강호 사건] 선택형 이벤트
+    // ==========================================
+    const PATH_CHIP_TEXT = { orthodox: "정", unorthodox: "사", demonic: "마", neutral: "중" };
+
+    function openEventModal(ev) {
+      document.getElementById("event-tag").innerText = ev.tag || "JIANGHU INCIDENT";
+      document.getElementById("event-title").innerText = ev.title;
+      document.getElementById("event-desc").innerText = ev.desc;
+      document.getElementById("event-result").classList.add("hidden");
+      document.getElementById("btn-event-close").classList.add("hidden");
+
+      const box = document.getElementById("event-choices");
+      box.innerHTML = "";
+      box.classList.remove("hidden");
+      ev.choices.forEach(ch => {
+        const info = PATH_INFO[ch.path] || PATH_INFO.neutral;
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "w-full p-2.5 rounded-xl bg-stone-950/80 border border-stone-700 hover:border-amber-500/70 text-left cursor-pointer transition flex items-start gap-2";
+        btn.innerHTML = `
+          <span class="shrink-0 w-6 h-6 rounded-lg border text-xs font-brush flex items-center justify-center ${info.chip}">${PATH_CHIP_TEXT[ch.path] || "중"}</span>
+          <span class="min-w-0">
+            <span class="block text-xs font-bold text-stone-100 leading-snug">${ch.label}</span>
+            <span class="block text-[10px] text-amber-300/80 font-medium mt-0.5">${ch.hint}</span>
+          </span>`;
+        btn.onclick = () => resolveEventChoice(ev, ch);
+        box.appendChild(btn);
+      });
+
+      document.getElementById("event-modal").style.display = "flex";
+    }
+
+    function resolveEventChoice(ev, ch) {
+      const res = ch.apply() || { text: "", chips: [] };
+      document.getElementById("event-choices").classList.add("hidden");
+      document.getElementById("event-result-text").innerText = res.text;
+      const chips = document.getElementById("event-result-chips");
+      chips.innerHTML = "";
+      (res.chips || []).forEach(([label, val]) => {
+        const neg = String(val).startsWith("-");
+        const span = document.createElement("span");
+        span.className = `px-2 py-1 rounded-lg bg-stone-900 border border-stone-800 ${neg ? "text-rose-400" : "text-emerald-300"}`;
+        span.innerHTML = `${label} <strong>${val}</strong>`;
+        chips.appendChild(span);
+      });
+      document.getElementById("event-result").classList.remove("hidden");
+      document.getElementById("btn-event-close").classList.remove("hidden");
+
+      const chipText = (res.chips || []).map(([l, v]) => `${l} ${v}`).join(", ");
+      addLog(char.age, `[${ev.title}] ${ch.label}${chipText ? ` (${chipText})` : ""}`, "text-amber-200");
+      checkRankUp();
+      updateUI();
+    }
+
+    function closeEventModal() {
+      document.getElementById("event-modal").style.display = "none";
+    }
+
+    function gainStats(qi = 0, ext = 0, agi = 0) {
+      char.qi = Math.max(10, char.qi + qi);
+      char.ext = Math.max(10, char.ext + ext);
+      char.agi = Math.max(10, char.agi + agi);
+      if (qi > 0) yearGains.qi += qi;
+      if (ext > 0) yearGains.ext += ext;
+      if (agi > 0) yearGains.agi += agi;
+    }
+
+    function gainFame(n) {
+      char.fame = Math.max(0, char.fame + n);
+      if (n > 0) yearGains.fame += n;
+    }
+
+    // 사건 보상은 나이에 따라 커짐
+    function scaled(n) {
+      return Math.round(n * (1 + Math.max(0, char.age - 16) / 15));
+    }
+
+    function switchFaction(newFaction, newSect) {
+      char.faction = newFaction;
+      char.sect = newSect;
+    }
+
+    // 진영과 성향이 크게 어긋나면 먼저 일어나는 특수 사건
+    const SPECIAL_EVENTS = [
+      {
+        id: "expel",
+        cond: () => char.faction === "orthodox" && !char.flags.expelChecked &&
+          (char.align.evil + char.align.demonic) >= char.align.righteous + 35,
+        build: () => {
+          const fine = Math.min(char.money, scaled(40));
+          return {
+            tag: "SECT TRIBUNAL", title: "문파의 심판 (파문 위기)",
+            desc: `${char.sect}의 장로회가 당신을 불러 세웠습니다. "네 손에 묻은 피와 더러운 소문을 해명하라. 참회하지 않는다면 파문이다!"`,
+            choices: [
+              { path: "orthodox", label: "무릎 꿇고 참회하며 벌금을 바친다", hint: `협의 +12 · 악명·마성 -8 · 은자 -${fine}냥`,
+                apply: () => { char.flags.expelChecked = true; addAlign(12, -8, -8); char.money -= fine;
+                  return { text: "장로들은 마지막 기회를 주기로 했습니다. 다시는 같은 일이 없어야 할 것입니다.", chips: [["협의", "+12"], ["악명", "-8"], ["마성", "-8"], ["은자", `-${fine}냥`]] }; } },
+              { path: char.align.demonic > char.align.evil ? "demonic" : "unorthodox", label: "검을 뽑아 장로회를 박차고 나간다 (파문)", hint: "진영 이탈 · 녹봉 체계 변경 · 외공 +4",
+                apply: () => {
+                  char.flags.expelChecked = true;
+                  const to = char.align.demonic > char.align.evil ? "demonic" : "unorthodox";
+                  switchFaction(to, to === "demonic" ? "천마신교 (天魔神敎)" : "파문제자 · 흑도 (破門)");
+                  gainStats(0, 4, 0); addAlign(0, 5, 0);
+                  return { text: `정파의 이름을 버렸습니다. 이제 당신은 ${FACTIONS[to].label}의 길을 걷습니다.`, chips: [["진영", FACTIONS[to].label], ["외공", "+4"], ["악명", "+5"]] };
+                } }
+            ]
+          };
+        }
+      },
+      {
+        id: "demon_envoy",
+        cond: () => char.faction !== "demonic" && !char.flags.envoyChecked && char.align.demonic >= 40,
+        build: () => ({
+          tag: "SECRET ENVOY", title: "천마신교의 밀사",
+          desc: "피처럼 붉은 옷을 입은 밀사가 찾아왔습니다. \"그대의 마성은 이미 신교의 것. 교주께서 그대를 장로로 맞이하겠다 하셨소.\"",
+          choices: [
+            { path: "demonic", label: "피의 맹세를 하고 천마신교에 입교한다", hint: "마교로 전향 · 내공 +12 · 마성 +8",
+              apply: () => { char.flags.envoyChecked = true; switchFaction("demonic", "천마신교 (天魔神敎)"); gainStats(12, 0, 0); addAlign(0, 0, 8);
+                return { text: "천마의 인장이 새겨진 영패를 받았습니다. 신교의 비전 심법이 단전을 휘감습니다.", chips: [["진영", "마교"], ["내공", "+12년"], ["마성", "+8"]] }; } },
+            { path: "orthodox", label: "밀사를 포박해 무림맹에 넘긴다", hint: "협의 +8 · 명성 +8 · 마성 -10",
+              apply: () => { char.flags.envoyChecked = true; addAlign(8, 0, -10); gainFame(8);
+                return { text: "무림맹이 당신의 결단을 높이 샀습니다. 마성을 다스리려는 의지가 단전을 맑게 합니다.", chips: [["협의", "+8"], ["명성", "+8"], ["마성", "-10"]] }; } },
+            { path: "neutral", label: "정중히 거절하고 돌려보낸다", hint: "변화 없음",
+              apply: () => { char.flags.envoyChecked = true;
+                return { text: "밀사는 묘한 미소를 남기고 사라졌습니다.", chips: [] }; } }
+          ]
+        })
+      },
+      {
+        id: "apostate",
+        cond: () => char.faction === "demonic" && !char.flags.apostateChecked && char.align.righteous >= char.align.demonic + 30,
+        build: () => ({
+          tag: "BLOOD PURGE", title: "배교자 색출",
+          desc: "신교의 혈위대가 당신을 포위했습니다. \"정파 놈들처럼 협의 따위를 입에 올리는 자는 배교자다!\"",
+          choices: [
+            { path: "neutral", label: "포위를 뚫고 신교를 탈출한다", hint: "중립(낭인)으로 전향 · 신법 +5 · 마성 -10",
+              apply: () => { char.flags.apostateChecked = true; switchFaction("neutral", "탈교 낭인 (脫敎浪人)"); gainStats(0, 0, 5); addAlign(0, 0, -10);
+                return { text: "핏자국을 남기며 신교의 영역을 벗어났습니다. 이제 누구의 명령도 받지 않습니다.", chips: [["진영", "낭인"], ["신법", "+5"], ["마성", "-10"]] }; } },
+            { path: "demonic", label: "혈위대 앞에 엎드려 피의 숙청을 받아들인다", hint: "마성 +12 · 협의 -10 · 내공 -8",
+              apply: () => { char.flags.apostateChecked = true; addAlign(-10, 0, 12); gainStats(-8, 0, 0);
+                return { text: "고문 끝에 신교에 대한 충성을 다시 증명했습니다. 마음 한구석이 차갑게 식어 갑니다.", chips: [["마성", "+12"], ["협의", "-10"], ["내공", "-8년"]] }; } }
+          ]
+        })
+      }
+    ];
+
+    const RANDOM_EVENTS = [
+      {
+        id: "bandits",
+        build: () => ({
+          title: "산적의 마을 습격",
+          desc: "길목의 작은 마을에 산적 떼가 들이닥쳤습니다. 산적 두목이 당신을 알아보고는 \"한몫 끼겠나?\" 하고 히죽 웃습니다.",
+          choices: [
+            { path: "orthodox", label: "마을 사람들 앞을 막아서 산적을 쫓아낸다", hint: "협의 +6 · 명성 +5 · 외공 +2",
+              apply: () => { addAlign(6, 0, 0); gainFame(5); gainStats(0, 2, 0);
+                return { text: "산적들이 혼비백산 달아났습니다. 마을 사람들이 당신의 이름을 비석에 새기겠다 합니다.", chips: [["협의", "+6"], ["명성", "+5"], ["외공", "+2"]] }; } },
+            { path: "unorthodox", label: "두목과 손잡고 약탈 몫을 챙긴다", hint: `악명 +6 · 은자 +${scaled(40)}냥`,
+              apply: () => { const g = scaled(40); addAlign(0, 6, 0); char.money += g;
+                return { text: "묵직한 은자 꾸러미를 챙겼습니다. 불타는 마을을 뒤로하고 길을 떠납니다.", chips: [["악명", "+6"], ["은자", `+${g}냥`]] }; } },
+            { path: "neutral", label: "못 본 체하고 길을 재촉한다", hint: "변화 없음",
+              apply: () => ({ text: "등 뒤로 비명이 들려왔지만 돌아보지 않았습니다.", chips: [] }) }
+          ]
+        })
+      },
+      {
+        id: "escort",
+        build: () => ({
+          title: "표국의 의뢰",
+          desc: "어느 표국에서 귀한 표물의 호위를 부탁해 왔습니다. 그런데 흑도의 정보원이 은밀히 다가와 표물을 함께 빼돌리자고 속삭입니다.",
+          choices: [
+            { path: "orthodox", label: "약속대로 표물을 무사히 호송한다", hint: `협의 +3 · 명성 +3 · 은자 +${scaled(25)}냥`,
+              apply: () => { const g = scaled(25); addAlign(3, 0, 0); gainFame(3); char.money += g;
+                return { text: "표물을 무사히 전달했습니다. 표국주가 두둑한 사례금을 건넵니다.", chips: [["협의", "+3"], ["명성", "+3"], ["은자", `+${g}냥`]] }; } },
+            { path: "unorthodox", label: "흑도와 짜고 표물을 강탈한다", hint: `악명 +7 · 은자 +${scaled(70)}냥`,
+              apply: () => { const g = scaled(70); addAlign(0, 7, 0); char.money += g;
+                return { text: "표물은 감쪽같이 사라졌고, 당신의 전낭은 두둑해졌습니다.", chips: [["악명", "+7"], ["은자", `+${g}냥`]] }; } }
+          ]
+        })
+      },
+      {
+        id: "blood_manual",
+        build: () => ({
+          title: "혈마의 비급",
+          desc: "무너진 동굴 속 해골의 품에서 핏빛 비급 한 권을 발견했습니다. 표지에는 '혈마대법(血魔大法)'이라 쓰여 있습니다.",
+          choices: [
+            { path: "demonic", label: "비급을 펼쳐 마공을 익힌다", hint: "마성 +8 · 내공 +10 · 외공 +4",
+              apply: () => { addAlign(0, 0, 8); gainStats(10, 4, 0);
+                return { text: "핏빛 기운이 혈맥을 타고 흐릅니다. 강해졌지만, 눈빛이 조금 붉어진 것 같습니다.", chips: [["마성", "+8"], ["내공", "+10년"], ["외공", "+4"]] }; } },
+            { path: "orthodox", label: "세상에 해가 될 마공서를 불태운다", hint: "협의 +5 · 명성 +4",
+              apply: () => { addAlign(5, 0, 0); gainFame(4);
+                return { text: "비급이 재가 되어 흩어졌습니다. 소문을 들은 정파 고수들이 당신을 칭송합니다.", chips: [["협의", "+5"], ["명성", "+4"]] }; } },
+            { path: "unorthodox", label: "암시장에 비싼 값에 팔아넘긴다", hint: `악명 +3 · 은자 +${scaled(80)}냥`,
+              apply: () => { const g = scaled(80); addAlign(0, 3, 0); char.money += g;
+                return { text: "흑도의 거간꾼이 눈을 번뜩이며 은자를 세어 줍니다.", chips: [["악명", "+3"], ["은자", `+${g}냥`]] }; } }
+          ]
+        })
+      },
+      {
+        id: "refugees",
+        build: () => {
+          const give = Math.min(char.money, scaled(25));
+          return {
+            title: "굶주린 유민 행렬",
+            desc: "흉년으로 고향을 잃은 유민들이 길가에 늘어서 있습니다. 한 인신매매꾼이 \"저 애들 몇 데려가면 값을 쳐주지\"라며 다가옵니다.",
+            choices: [
+              { path: "orthodox", label: "가진 은자를 털어 죽을 쑤어 나눈다", hint: `협의 +7 · 은자 -${give}냥`,
+                apply: () => { addAlign(7, 0, 0); char.money -= give;
+                  return { text: "따뜻한 죽 한 그릇에 아이들이 웃음을 되찾았습니다.", chips: [["협의", "+7"], ["은자", `-${give}냥`]] }; } },
+              { path: "unorthodox", label: "매매꾼과 거래해 유민을 넘긴다", hint: `악명 +9 · 은자 +${scaled(35)}냥`,
+                apply: () => { const g = scaled(35); addAlign(0, 9, 0); char.money += g;
+                  return { text: "울부짖는 소리를 외면한 채 은자를 받아 챙겼습니다.", chips: [["악명", "+9"], ["은자", `+${g}냥`]] }; } },
+              { path: "neutral", label: "안타깝지만 갈 길을 간다", hint: "변화 없음",
+                apply: () => ({ text: "세상의 모든 불행을 구할 수는 없는 법입니다.", chips: [] }) }
+            ]
+          };
+        }
+      },
+      {
+        id: "war_call",
+        build: () => ({
+          title: "정사대전의 전운",
+          desc: "무림맹과 사파연합의 충돌이 임박했습니다. 양측 모두 당신에게 사람을 보내 합류를 청합니다.",
+          choices: [
+            { path: "orthodox", label: "무림맹의 깃발 아래 사파를 토벌한다", hint: "협의 +6 · 명성 +8 · 외공 +2",
+              apply: () => { addAlign(6, 0, 0); gainFame(8); gainStats(0, 2, 0);
+                return { text: "선봉에 서서 사파의 진을 무너뜨렸습니다. 맹주가 직접 당신의 이름을 불렀습니다.", chips: [["협의", "+6"], ["명성", "+8"], ["외공", "+2"]] }; } },
+            { path: "unorthodox", label: "사파연합에 가담해 정파를 친다", hint: `악명 +6 · 외공 +2 · 은자 +${scaled(40)}냥`,
+              apply: () => { const g = scaled(40); addAlign(0, 6, 0); gainStats(0, 2, 0); char.money += g;
+                return { text: "정파 고수들의 목에 걸린 현상금을 챙겼습니다.", chips: [["악명", "+6"], ["외공", "+2"], ["은자", `+${g}냥`]] }; } },
+            { path: "demonic", label: "혼란을 틈타 쓰러진 고수들의 내력을 흡수한다", hint: "마성 +7 · 내공 +8",
+              apply: () => { addAlign(0, 0, 7); gainStats(8, 0, 0);
+                return { text: "양측의 시체 사이를 걸으며 남은 내력을 거둬들였습니다.", chips: [["마성", "+7"], ["내공", "+8년"]] }; } }
+          ]
+        })
+      },
+      {
+        id: "avenger",
+        build: () => ({
+          title: "원수의 아들",
+          desc: "예전 비무에서 당신에게 패해 몰락한 자의 아들이 복수를 하겠다며 칼을 겨눕니다. 아직 앳된 얼굴입니다.",
+          choices: [
+            { path: "orthodox", label: "칼을 거두고 사과한 뒤 무공을 가르쳐 준다", hint: "협의 +5 · 신법 +2",
+              apply: () => { addAlign(5, 0, 0); gainStats(0, 0, 2);
+                return { text: "소년은 한참을 울다 당신에게 절을 올렸습니다.", chips: [["협의", "+5"], ["신법", "+2"]] }; } },
+            { path: "unorthodox", label: "후환을 남기지 않는다", hint: "악명 +7 · 명성 -3",
+              apply: () => { addAlign(0, 7, 0); gainFame(-3);
+                return { text: "강호에 또 하나의 흉흉한 소문이 퍼졌습니다.", chips: [["악명", "+7"], ["명성", "-3"]] }; } },
+            { path: "demonic", label: "마공의 시험대로 삼는다", hint: "마성 +6 · 내공 +5",
+              apply: () => { addAlign(0, 0, 6); gainStats(5, 0, 0);
+                return { text: "새로 익힌 마공을 시험해 보았습니다. 효과는 확실했습니다.", chips: [["마성", "+6"], ["내공", "+5년"]] }; } }
+          ]
+        })
+      },
+      {
+        id: "gambling",
+        build: () => {
+          const bet = Math.min(char.money, scaled(30));
+          return {
+            title: "객잔의 노름판",
+            desc: "객잔 뒷방에서 큰 노름판이 벌어졌습니다. 자세히 보니 주사위에 수은이 들어 있는 사기판입니다.",
+            choices: [
+              { path: "unorthodox", label: "판을 빼앗아 직접 사기 도박을 운영한다", hint: `악명 +5 · 은자 +${scaled(50)}냥`,
+                apply: () => { const g = scaled(50); addAlign(0, 5, 0); char.money += g;
+                  return { text: "하룻밤 사이에 판돈이 당신 품으로 들어왔습니다.", chips: [["악명", "+5"], ["은자", `+${g}냥`]] }; } },
+              { path: "neutral", label: `모른 척 한 판 걸어 본다 (${bet}냥)`, hint: "운에 맡김",
+                apply: () => {
+                  if (Math.random() < 0.45) { char.money += bet; return { text: "사기판인 줄 알면서도 이겼습니다! 운이 좋았습니다.", chips: [["은자", `+${bet}냥`]] }; }
+                  char.money -= bet; return { text: "역시 사기판이었습니다. 판돈을 날렸습니다.", chips: [["은자", `-${bet}냥`]] };
+                } },
+              { path: "orthodox", label: "사기를 폭로하고 피해자들에게 돈을 돌려준다", hint: "협의 +4 · 명성 +3",
+                apply: () => { addAlign(4, 0, 0); gainFame(3);
+                  return { text: "노름꾼들이 고마워하며 당신의 이름을 외쳤습니다.", chips: [["협의", "+4"], ["명성", "+3"]] }; } }
+            ]
+          };
+        }
+      },
+      {
+        id: "poison_well",
+        build: () => {
+          const cost = Math.min(char.money, scaled(20));
+          return {
+            title: "독이 풀린 우물",
+            desc: "누군가 마을 우물에 독을 풀어 사람들이 쓰러지고 있습니다. 해독약은 비싸고, 우물에서는 짙은 독기가 피어오릅니다.",
+            choices: [
+              { path: "orthodox", label: "사비를 들여 해독약을 구해 온다", hint: `협의 +7 · 명성 +5 · 은자 -${cost}냥`,
+                apply: () => { addAlign(7, 0, 0); gainFame(5); char.money -= cost;
+                  return { text: "마을 사람들이 목숨을 건졌습니다.", chips: [["협의", "+7"], ["명성", "+5"], ["은자", `-${cost}냥`]] }; } },
+              { path: "demonic", label: "우물의 독기를 단전에 끌어들여 연공한다", hint: "마성 +6 · 내공 +6",
+                apply: () => { addAlign(0, 0, 6); gainStats(6, 0, 0);
+                  return { text: "독기가 내력과 뒤섞여 기묘한 힘이 되었습니다.", chips: [["마성", "+6"], ["내공", "+6년"]] }; } },
+              { path: "unorthodox", label: "해독약을 사들여 비싼 값에 되판다", hint: `악명 +6 · 은자 +${scaled(45)}냥`,
+                apply: () => { const g = scaled(45); addAlign(0, 6, 0); char.money += g;
+                  return { text: "급한 사람들은 값을 따지지 않았습니다.", chips: [["악명", "+6"], ["은자", `+${g}냥`]] }; } }
+            ]
+          };
+        }
+      },
+      {
+        id: "hermit",
+        build: () => ({
+          title: "은거 기인의 시험",
+          desc: "깊은 산중에서 백발의 노인이 바둑을 두고 있습니다. 범상치 않은 기운이 느껴집니다. 노인 곁에는 낡은 보물 상자가 놓여 있습니다.",
+          choices: [
+            { path: "orthodox", label: "무릎 꿇고 가르침을 청한다", hint: "협의 +2 · 무작위 무공 +6",
+              apply: () => { addAlign(2, 0, 0); const k = ["qi", "ext", "agi"][Math.floor(Math.random() * 3)];
+                gainStats(k === "qi" ? 6 : 0, k === "ext" ? 6 : 0, k === "agi" ? 6 : 0);
+                const nm = { qi: "내공", ext: "외공", agi: "신법" }[k];
+                return { text: "노인은 껄껄 웃으며 한 수를 전수해 주었습니다.", chips: [["협의", "+2"], [nm, "+6"]] }; } },
+            { path: "unorthodox", label: "노인이 한눈파는 틈에 보물 상자를 노린다", hint: "악명 +5 · 성공 시 큰돈, 실패 시 부상",
+              apply: () => { addAlign(0, 5, 0);
+                if (Math.random() < 0.5) { const g = scaled(90); char.money += g; return { text: "상자를 들고 줄행랑쳤습니다! 금괴가 가득합니다.", chips: [["악명", "+5"], ["은자", `+${g}냥`]] }; }
+                gainStats(0, -4, 0); return { text: "노인의 손가락 하나에 혈도가 막혀 나뒹굴었습니다.", chips: [["악명", "+5"], ["외공", "-4"]] }; } },
+            { path: "neutral", label: "말없이 술 한 잔을 따라 대접한다", hint: "신법 +3",
+              apply: () => { gainStats(0, 0, 3);
+                return { text: "노인과 밤새 술잔을 기울였습니다. 깨어 보니 몸이 가볍습니다.", chips: [["신법", "+3"]] }; } }
+          ]
+        })
+      }
+    ];
+
+    function maybeTriggerYearEvent() {
+      if (char.age >= 60) return;
+      const special = SPECIAL_EVENTS.find(e => e.cond());
+      if (special) {
+        openEventModal(special.build());
+        return;
+      }
+      if (isMajorYear(char.age)) return;
+      if (Math.random() > 0.6) return;
+
+      // 최근에 본 사건은 피함
+      let pool = RANDOM_EVENTS.filter(e => !char.seenEvents.slice(-4).includes(e.id));
+      if (pool.length === 0) pool = RANDOM_EVENTS;
+      const ev = pool[Math.floor(Math.random() * pool.length)];
+      char.seenEvents.push(ev.id);
+      openEventModal(ev.build());
+    }
+
     // === 다음 해 진행 ===
     function nextYear() {
       char.age += 1;
       yearGains = { qi: 0, ext: 0, agi: 0, fame: 0 };
+      alignGains.righteous = 0; alignGains.evil = 0; alignGains.demonic = 0;
 
       const salary = getCurrentSalary();
       char.money += salary;
@@ -2249,6 +2994,7 @@
 
       checkRankUp();
       updateUI();
+      maybeTriggerYearEvent();
     }
 
     function checkRankUp() {
@@ -2257,7 +3003,7 @@
         const nextRank = ranks[char.rankIdx + 1];
         if (totalPower >= nextRank.minStat) {
           char.rankIdx += 1;
-          addLog(char.age, `★ [경지 돌파] '${nextRank.name}' 반열 등극! (녹봉 ${nextRank.salary}냥으로 상승)`, "text-amber-300 font-brush text-sm");
+          addLog(char.age, `★ [경지 돌파] '${nextRank.name}' 반열 등극! (녹봉 ${getSalaryForRank(char.rankIdx)}냥으로 상승)`, "text-amber-300 font-brush text-sm");
           showRankUpPopup(nextRank);
         }
       }
@@ -2299,7 +3045,7 @@
 
     function updateUI() {
       document.getElementById("char-name").innerText = char.name;
-      document.getElementById("char-sect").innerText = char.sect;
+      document.getElementById("char-sect").innerText = `${getFaction().label} · ${char.sect}`;
       document.getElementById("char-age").innerText = char.age;
       document.getElementById("char-rank").innerText = ranks[char.rankIdx].name;
       document.getElementById("char-total-power").innerText = getCombatPower();
@@ -2350,12 +3096,30 @@
         }
       };
 
+      document.getElementById("stat-righteous").innerText = char.align.righteous;
+      document.getElementById("stat-evil").innerText = char.align.evil;
+      document.getElementById("stat-demonic").innerText = char.align.demonic;
+      const path = getPath();
+      const pathElem = document.getElementById("char-path");
+      pathElem.className = `text-[10px] px-1.5 py-0.5 rounded border font-bold ${PATH_INFO[path].chip}`;
+      pathElem.innerText = `현재 ${PATH_INFO[path].label}`;
+      const perkBits = [];
+      if (char.align.righteous > 0) perkBits.push(`녹봉 +${Math.round(Math.min(0.3, char.align.righteous / 200) * 100)}%`);
+      if (char.align.evil > 0) perkBits.push(`비무 상금 +${Math.round(Math.min(0.5, char.align.evil / 150) * 100)}%`);
+      if (char.align.demonic >= 10) perkBits.push(`폐관 돌파 +${Math.min(10, Math.floor(char.align.demonic / 10))}%p`);
+      document.getElementById("align-perk-text").innerText = perkBits.length
+        ? `성향 효과: ${perkBits.join(" · ")}`
+        : "비무 후의 행동과 강호 사건에서의 선택이 성향과 결말을 정합니다.";
+
       const totalGain = yearGains.qi + yearGains.ext + yearGains.agi;
       renderDelta("delta-power", totalGain);
       renderDelta("delta-qi", yearGains.qi);
       renderDelta("delta-ext", yearGains.ext);
       renderDelta("delta-agi", yearGains.agi);
       renderDelta("delta-fame", yearGains.fame);
+      renderDelta("delta-righteous", alignGains.righteous);
+      renderDelta("delta-evil", alignGains.evil);
+      renderDelta("delta-demonic", alignGains.demonic);
 
       renderMultiTierBar(char.qi, "bg-gradient-to-r from-amber-600 to-amber-400", "tier-qi", "bar-qi-bg", "bar-qi-fill");
       renderMultiTierBar(char.ext, "bg-gradient-to-r from-red-600 to-red-400", "tier-ext", "bar-ext-bg", "bar-ext-fill");
@@ -2456,6 +3220,7 @@
     window.onload = function() {
       rollInitialStats();
       renderAvatarSelector();
+      renderFactionSelector();
       updateUI();
     };
   </script>
