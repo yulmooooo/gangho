@@ -20,7 +20,7 @@
         "sectLevel": { ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 4" },
         "discipleCount": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 5" },
         "heirName":  { ".validate": "newData.isString() && newData.val().length <= 12" },
-        "createdAt": { ".validate": "newData.isNumber() && newData.val() <= now + 60000" },
+        "createdAt": { ".validate": "newData.isNumber()" },
         "$other":    { ".validate": false }
       }
     }
