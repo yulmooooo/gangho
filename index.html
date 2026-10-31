@@ -251,7 +251,7 @@
           <div class="bg-stone-900/80 p-1 rounded-lg border border-rose-900/60 text-rose-300">악명 <span id="end-stat-evil"></span></div>
           <div class="bg-stone-900/80 p-1 rounded-lg border border-purple-900/60 text-purple-300">마성 <span id="end-stat-demonic"></span></div>
         </div>
-        <p id="end-path-line" class="text-[10px] text-stone-400 text-center"></p>
+        <p id="end-path-line" class="text-[10px] text-stone-400 text-center whitespace-pre-line"></p>
       </div>
 
       <div class="space-y-1.5 pt-1">
@@ -310,6 +310,11 @@
           <h3 class="text-xl font-brush text-yellow-300">천하 서열록 (天下序列錄)</h3>
         </div>
         <button onclick="closeLeaderboardModal()" class="text-stone-400 hover:text-white font-bold p-1 text-lg">✕</button>
+      </div>
+
+      <div class="grid grid-cols-2 gap-1 p-1 bg-stone-950 rounded-xl border border-amber-700/50 text-center font-bold text-xs">
+        <button id="mode-person" onclick="switchRankMode('person')" class="py-1.5 rounded-lg cursor-pointer transition">🗡️ 개인 서열</button>
+        <button id="mode-sect" onclick="switchRankMode('sect')" class="py-1.5 rounded-lg cursor-pointer transition">🏯 문파 서열</button>
       </div>
 
       <div class="grid grid-cols-3 gap-1 p-1 bg-stone-950 rounded-xl border border-stone-800 text-center font-bold text-xs">
@@ -800,6 +805,18 @@
     const FIREBASE_DB_URL = "https://gangho-rank-default-rtdb.firebaseio.com/";
 
     let currentRankTab = 'daily';
+    let currentRankMode = 'person';
+
+    // 문파 총 무력 = 문주 무력 + 모든 제자 무력
+    function getSectTotalPower() {
+      if (!char.sectData) return 0;
+      return getCombatPower() + char.sectData.disciples.reduce((sum, d) => sum + d.power, 0);
+    }
+
+    function switchRankMode(mode) {
+      currentRankMode = mode;
+      switchRankTab(currentRankTab);
+    }
     let hasSubmittedThisLife = false;
 
     const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
@@ -1604,7 +1621,8 @@
       epilogue.innerText = prefix + info.text.replace(/\{name\}/g, char.name).replace(/\{sect\}/g, char.formerSect || char.sect) + getSectEpilogue();
 
       document.getElementById("end-path-line").innerText =
-        `출신: ${FACTIONS[origin].label} → 최종: ${getFaction().label} 소속 · ${pathLabel}`;
+        `출신: ${FACTIONS[origin].label} → 최종: ${getFaction().label} 소속 · ${pathLabel}` +
+        (char.sectData ? `\n🏯 ${char.sectData.name} · ${sectLevelShort(getSectLevelIdx())} · 문파 총 무력 ${getSectTotalPower()}` : "");
 
       modal.style.display = "flex";
     }
@@ -1859,6 +1877,12 @@
         age: char.age,
         avatarId: char.avatarId,
         path: getPath(),
+        ...(char.sectData ? {
+          sectPower: getSectTotalPower(),
+          sectLevel: getSectLevelIdx() + 1,
+          discipleCount: char.sectData.disciples.length,
+          heirName: getHeir() ? getHeir().name : ""
+        } : {}),
         dailyKey: period.daily,
         weeklyKey: period.weekly,
         monthlyKey: period.monthly,
@@ -1901,12 +1925,13 @@
         }
       });
 
-      const infoMap = {
-        daily: "오늘 달성한 무력 순위 Top 30",
-        weekly: "이번 주 달성한 무력 순위 Top 30",
-        monthly: "이번 달 달성한 무력 순위 Top 30"
-      };
-      document.getElementById("rank-period-info").innerText = infoMap[type];
+      ["person", "sect"].forEach(m => {
+        document.getElementById(`mode-${m}`).className = `py-1.5 rounded-lg cursor-pointer transition ${m === currentRankMode ? "bg-amber-500/90 text-stone-950 font-extrabold" : "text-stone-400 hover:text-white"}`;
+      });
+      const periodName = { daily: "오늘", weekly: "이번 주", monthly: "이번 달" }[type];
+      document.getElementById("rank-period-info").innerText = currentRankMode === "sect"
+        ? `${periodName} 문파 총 무력 순위 Top 30`
+        : `${periodName} 달성한 무력 순위 Top 30`;
       loadLeaderboard();
     }
 
@@ -1953,12 +1978,16 @@
           return;
         }
 
-        let list = Object.values(data).filter(item => item && item[filterKey] === currentTargetKey);
-        list.sort((a, b) => (Number(b.power) || 0) - (Number(a.power) || 0));
+        const isSectMode = currentRankMode === "sect";
+        const scoreOf = item => Number(isSectMode ? item.sectPower : item.power) || 0;
+        let list = Object.values(data).filter(item => item && item[filterKey] === currentTargetKey && (!isSectMode || Number(item.sectPower) > 0));
+        list.sort((a, b) => scoreOf(b) - scoreOf(a));
         list = list.slice(0, 30);
 
         if (list.length === 0) {
-          listElem.innerHTML = `<div class="text-center py-10 text-stone-500 font-medium">해당 기간에 헌액된 고수가 아직 없습니다.<br>첫 번째 전설이 되어보세요!</div>`;
+          listElem.innerHTML = isSectMode
+            ? `<div class="text-center py-10 text-stone-500 font-medium">해당 기간에 헌액된 문파가 아직 없습니다.<br>문파를 세우고 천하에 이름을 올려 보세요!</div>`
+            : `<div class="text-center py-10 text-stone-500 font-medium">해당 기간에 헌액된 고수가 아직 없습니다.<br>첫 번째 전설이 되어보세요!</div>`;
           return;
         }
 
@@ -1982,6 +2011,29 @@
           }
 
           row.className = `p-2 rounded-xl border flex items-center justify-between gap-2 ${borderHighlight}`;
+          if (isSectMode) {
+            const lv = Math.min(4, Math.max(1, Number(entry.sectLevel) || 1));
+            row.innerHTML = `
+              <div class="flex items-center gap-2.5 min-w-0">
+                <span class="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-brush shrink-0 ${rankBadgeClass}">${rankNum}</span>
+                <div class="w-8 h-8 rounded-lg bg-stone-950 border border-amber-800/60 flex items-center justify-center text-lg shrink-0">🏯</div>
+                <div class="min-w-0">
+                  <div class="font-bold text-stone-100 truncate flex items-center gap-1.5">
+                    <span class="truncate">${escapeHtml(entry.sect)}</span>
+                    <span class="text-[9px] px-1 rounded bg-amber-950/60 text-amber-300 border border-amber-700/60 shrink-0 font-normal">${sectLevelShort(lv - 1)}</span>
+                  </div>
+                  <div class="text-[10px] text-stone-400 mt-0.5 truncate">
+                    ${PATH_INFO[entry.path] ? `<span class="px-1 rounded border ${PATH_INFO[entry.path].chip}">${PATH_INFO[entry.path].short}</span> ` : ""}문주 ${escapeHtml(entry.name)} · 제자 ${Number(entry.discipleCount) || 0}명${entry.heirName ? ` · 대제자 ${escapeHtml(entry.heirName)}` : ""}
+                  </div>
+                </div>
+              </div>
+              <div class="text-right shrink-0">
+                <span class="text-[9px] text-stone-500 block font-bold">총 무력</span>
+                <strong class="text-amber-300 text-sm font-extrabold">${Number(entry.sectPower) || 0}</strong>
+              </div>`;
+            listElem.appendChild(row);
+            return;
+          }
           row.innerHTML = `
             <div class="flex items-center gap-2.5 min-w-0">
               <span class="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-brush shrink-0 ${rankBadgeClass}">
