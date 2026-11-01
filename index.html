@@ -141,6 +141,8 @@
         </div>
       </div>
 
+      <button id="btn-archive" onclick="openArchiveModal()" class="w-full py-2 bg-stone-900 border border-stone-700 hover:bg-stone-800 text-stone-300 font-bold text-xs rounded-xl cursor-pointer">📜 강호 열전</button>
+
       <button id="btn-start" onclick="startGame()" class="w-full py-3.5 bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 hover:brightness-110 text-stone-950 font-brush text-base rounded-xl transition duration-150 shadow-xl cursor-pointer">
         강호에 발을 들이다
       </button>
@@ -221,6 +223,7 @@
       <div class="space-y-1">
         <span id="ending-badge" class="text-[10px] font-bold tracking-widest uppercase px-2.5 py-0.5 rounded border"></span>
         <h2 id="ending-title" class="text-2xl font-brush"></h2>
+        <p id="end-death-line" class="text-[11px] text-stone-400"></p>
       </div>
 
       <div class="w-16 h-16 mx-auto rounded-2xl bg-stone-950 border-2 border-amber-500/60 p-1.5 flex items-center justify-center shadow-inner relative overflow-hidden" id="ending-avatar-box"></div>
@@ -252,6 +255,7 @@
           <div class="bg-stone-900/80 p-1 rounded-lg border border-purple-900/60 text-purple-300">마성 <span id="end-stat-demonic"></span></div>
         </div>
         <p id="end-path-line" class="text-[10px] text-stone-400 text-center whitespace-pre-line"></p>
+        <div id="ending-extra" class="pt-2 border-t border-stone-800 space-y-2 text-left"></div>
       </div>
 
       <div class="space-y-1.5 pt-1">
@@ -493,21 +497,25 @@
     <div id="major-banner" class="hidden p-3 rounded-2xl bg-gradient-to-r from-amber-950 via-stone-900 to-red-950 border-2 border-amber-500/80 shadow-lg text-center space-y-1">
       <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 uppercase">Major Festival</span>
       <h4 class="text-base font-brush text-yellow-300">★ 10년 주기 천하비무대회 개최의 해 ★</h4>
-      <p class="text-[11px] text-stone-300">토너먼트 우승 시 천하제일의 칭호와 거금이 주어집니다!</p>
+      <p class="text-[11px] text-stone-300">올해 한 해를 보내면 천하비무대회 초청장이 도착합니다!</p>
     </div>
 
-    <!-- 행동 버튼 컨트롤 패널 -->
-    <section class="hanji-card rounded-2xl p-3 gold-border border space-y-2">
-      <div class="grid grid-cols-2 gap-2 font-bold">
-        <button id="btn-train" onclick="doTrain()" class="py-2.5 px-2 bg-stone-900 hover:bg-stone-800 text-stone-100 border border-stone-700/80 rounded-xl transition flex flex-col items-center justify-center cursor-pointer shadow">
-          <span class="text-amber-400 font-brush text-base">🥋 무공 수련</span>
-          <span id="train-status" class="text-[10px] text-stone-400 font-medium">(연 1회)</span>
-        </button>
+    <!-- 행동 패널: 올해의 방향 + 한 해 보내기 -->
+    <section class="hanji-card rounded-2xl p-3 gold-border border space-y-2.5">
+      <div class="flex items-center justify-between">
+        <span class="text-sm font-brush text-amber-300">올해의 방향 <span class="text-[11px] text-stone-400">(<span id="focus-age">16</span>세)</span></span>
+        <span id="injury-badge" class="hidden text-[10px] font-bold px-1.5 py-0.5 rounded bg-rose-950 text-rose-300 border border-rose-600/60"></span>
+      </div>
+      <div id="focus-grid" class="grid grid-cols-5 gap-1"></div>
+      <p id="focus-desc" class="text-[10px] text-stone-400 text-center leading-snug min-h-[26px]"></p>
 
-        <button id="btn-duel" onclick="handleDuelClick()" class="py-2.5 px-2 bg-stone-900 hover:bg-stone-800 text-stone-100 border border-stone-700/80 rounded-xl transition flex flex-col items-center justify-center cursor-pointer shadow">
-          <span id="duel-label" class="text-rose-400 font-brush text-base">⚔️ 강호 비무</span>
-          <span id="duel-status" class="text-[10px] text-stone-400 font-medium">(은자 파밍)</span>
-        </button>
+      <button id="btn-pass-year" onclick="passYear()" class="w-full py-3.5 bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 hover:brightness-110 text-stone-950 font-brush text-lg rounded-xl transition shadow-xl cursor-pointer">
+        ▶ 한 해 보내기
+      </button>
+
+      <div class="flex items-center gap-1.5">
+        <button id="btn-auto" onclick="toggleAuto()" class="flex-1 py-2 rounded-xl border font-bold text-xs">⏩ 운명에 맡기기 (자동 진행)</button>
+        <button id="btn-speed" onclick="cycleSpeed()" class="w-12 py-2 rounded-xl border border-stone-700 bg-stone-900 text-stone-300 font-bold text-xs cursor-pointer">1x</button>
       </div>
 
       <button id="btn-breakthrough" onclick="openBreakthroughModal()" class="w-full py-2.5 bg-gradient-to-r from-red-950 via-stone-900 to-red-950 border-2 border-red-600/70 text-red-300 breakthrough-pulse rounded-xl font-brush text-base flex items-center justify-center gap-1.5 cursor-pointer shadow hidden">
@@ -518,18 +526,18 @@
         <span>⚡ 우화등선(羽化登仙): 구천현뢰 천겁 돌파</span>
       </button>
 
-      <button id="btn-sect" onclick="handleSectButton()" class="w-full py-2.5 bg-stone-900 hover:bg-stone-800 text-amber-200 border border-amber-600/40 rounded-xl font-brush text-base flex flex-col items-center justify-center cursor-pointer shadow">
-        <span id="sect-btn-label">🏯 문파 창건</span>
-        <span id="sect-btn-sub" class="text-[10px] text-stone-400 font-medium"></span>
-      </button>
-
-      <button id="btn-market" onclick="openMarketModal()" class="w-full py-2.5 bg-stone-900 hover:bg-stone-800 text-amber-300 border border-amber-600/40 rounded-xl font-brush text-base flex items-center justify-center gap-1.5 cursor-pointer shadow">
-        <span>🏮 강호 전포 & 암시장 궤짝</span>
-      </button>
-
-      <button id="btn-next-year" onclick="nextYear()" class="w-full py-3.5 bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 hover:brightness-110 text-stone-950 font-brush text-lg rounded-xl transition shadow-xl cursor-pointer">
-        다음 해로 진행 (녹봉 수령) ➔
-      </button>
+      <div class="grid grid-cols-3 gap-1.5">
+        <button id="btn-sect" onclick="handleSectButton()" class="py-2 bg-stone-900 hover:bg-stone-800 text-amber-200 border border-amber-600/40 rounded-xl font-brush text-sm flex flex-col items-center justify-center cursor-pointer shadow">
+          <span id="sect-btn-label">🏯 문파 창건</span>
+          <span id="sect-btn-sub" class="text-[9px] text-stone-400 font-medium leading-tight"></span>
+        </button>
+        <button id="btn-market" onclick="openMarketModal()" class="py-2 bg-stone-900 hover:bg-stone-800 text-amber-300 border border-amber-600/40 rounded-xl font-brush text-sm flex flex-col items-center justify-center cursor-pointer shadow">
+          <span>🏮 전포·궤짝</span>
+        </button>
+        <button onclick="openChronicleModal()" class="py-2 bg-stone-900 hover:bg-stone-800 text-amber-300 border border-amber-600/40 rounded-xl font-brush text-sm flex flex-col items-center justify-center cursor-pointer shadow">
+          <span>📜 연대기</span>
+        </button>
+      </div>
     </section>
 
     <!-- 강호록 타임라인 피드 -->
@@ -576,6 +584,65 @@
           마음을 가다듬고 물러남
         </button>
       </div>
+    </div>
+  </div>
+
+  <!-- 연말 결과 화면 -->
+  <div id="year-result-modal" style="display: none;" class="fixed inset-0 bg-black/90 items-center justify-center p-3 z-[55]">
+    <div class="hanji-card border-2 gold-border w-full max-w-sm p-4 rounded-3xl shadow-2xl space-y-3 max-h-[92vh] flex flex-col">
+      <div class="text-center space-y-1">
+        <span id="yr-focus" class="text-[10px] font-bold tracking-widest px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40"></span>
+        <h3 id="yr-title" class="text-2xl font-brush text-amber-300"></h3>
+      </div>
+      <div id="yr-chips" class="flex flex-wrap justify-center gap-1.5 text-[11px] font-bold"></div>
+      <div class="flex-1 overflow-y-auto space-y-2 pr-1">
+        <div class="p-3 bg-stone-950/90 rounded-2xl border border-stone-800 space-y-1.5 text-xs">
+          <div class="text-[10px] font-bold text-amber-500 tracking-widest">강호록</div>
+          <div id="yr-lines" class="space-y-1.5"></div>
+        </div>
+        <div class="p-3 bg-stone-950/90 rounded-2xl border border-stone-800 space-y-1.5 text-xs">
+          <div class="text-[10px] font-bold text-amber-500 tracking-widest">강호 풍문</div>
+          <div id="yr-rumors" class="space-y-1.5"></div>
+        </div>
+      </div>
+      <button id="yr-next" class="w-full py-3 bg-gradient-to-r from-amber-600 to-amber-500 hover:brightness-110 text-stone-950 font-brush text-base rounded-xl cursor-pointer shadow"></button>
+    </div>
+  </div>
+
+  <!-- 회고 -->
+  <div id="reflection-modal" style="display: none;" class="fixed inset-0 bg-black/95 items-center justify-center p-3 z-[60]">
+    <div class="hanji-card border-2 gold-border w-full max-w-sm p-5 rounded-3xl shadow-2xl space-y-3 text-center">
+      <span class="text-[10px] font-bold tracking-widest px-2 py-0.5 rounded bg-stone-800 text-stone-300 border border-stone-600">A MOMENT OF REFLECTION</span>
+      <h3 id="refl-title" class="text-2xl font-brush text-amber-300"></h3>
+      <p class="text-xs text-stone-300 leading-relaxed">잠시 걸음을 멈추고 지나온 길을 돌아봅니다.<br>훗날의 나에게 한마디를 남기겠습니까?</p>
+      <input id="refl-input" type="text" maxlength="60" placeholder="예) 아직은 검이 무겁다" class="w-full bg-stone-900 border border-stone-700 rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:border-amber-500">
+      <p class="text-[10px] text-stone-500">남긴 말은 생을 마칠 때 다시 보여드립니다.</p>
+      <div class="grid grid-cols-2 gap-2">
+        <button id="refl-save" class="py-3 bg-gradient-to-r from-amber-600 to-amber-500 text-stone-950 font-brush text-sm rounded-xl cursor-pointer">마음에 새기다</button>
+        <button id="refl-skip" class="py-3 bg-stone-800 text-stone-300 font-brush text-sm rounded-xl cursor-pointer">말없이 지나가다</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 연대기 -->
+  <div id="chronicle-modal" style="display: none;" class="fixed inset-0 bg-black/90 items-center justify-center p-3 z-40">
+    <div class="hanji-card border-2 gold-border w-full max-w-sm p-4 rounded-3xl shadow-2xl space-y-3 max-h-[90vh] flex flex-col">
+      <div class="flex justify-between items-center pb-2 border-b border-stone-800">
+        <h3 class="text-lg font-brush text-amber-300">연대기 (年代記)</h3>
+        <button onclick="closeChronicleModal()" class="text-stone-400 hover:text-white font-bold p-1 text-lg">✕</button>
+      </div>
+      <div id="chronicle-list" class="flex-1 overflow-y-auto space-y-1.5 pr-1"></div>
+    </div>
+  </div>
+
+  <!-- 강호 열전 -->
+  <div id="archive-modal" style="display: none;" class="fixed inset-0 bg-black/95 items-center justify-center p-3 z-[70]">
+    <div class="hanji-card border-2 gold-border w-full max-w-sm p-4 rounded-3xl shadow-2xl space-y-3 max-h-[90vh] flex flex-col">
+      <div class="flex justify-between items-start pb-2 border-b border-stone-800">
+        <div><span class="text-[9px] font-bold text-amber-500 tracking-widest">PAST LIVES</span><h3 class="text-lg font-brush text-amber-300">강호 열전 (江湖列傳)</h3><p class="text-[10px] text-stone-500">이 기기에서 살았던 인생들 (최근 30개)</p></div>
+        <button onclick="closeArchiveModal()" class="text-stone-400 hover:text-white font-bold p-1 text-lg">✕</button>
+      </div>
+      <div id="archive-list" class="flex-1 overflow-y-auto space-y-1.5 pr-1"></div>
     </div>
   </div>
 
@@ -819,7 +886,7 @@
     }
     let hasSubmittedThisLife = false;
 
-    const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+    const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms * (typeof timeScale === "number" ? timeScale : 1)));
 
     // 랭킹 등 외부에서 온 글자를 화면에 넣을 때 HTML로 실행되지 않도록 변환
     function escapeHtml(value) {
@@ -1008,7 +1075,7 @@
 
     function getBreakthroughBonus() {
       const bloodPool = sect() && sect().special === "demonic" ? sect().buildings.special * 3 : 0;
-      return getFaction().breakBonus + Math.min(10, Math.floor(char.align.demonic / 10)) + bloodPool;
+      return getFaction().breakBonus + Math.min(10, Math.floor(char.align.demonic / 10)) + bloodPool + (char.focus === "seclusion" ? 5 : 0);
     }
 
     // ==========================================
@@ -1202,7 +1269,7 @@
     }
 
     function isMajorYear(age) {
-      return [20, 30, 40, 50].includes(age);
+      return [20, 30, 40, 50, 60, 70, 80].includes(age);
     }
 
     function getCombatPower() {
@@ -1295,7 +1362,10 @@
 
       document.getElementById("start-modal").style.display = "none";
       updateUI();
+      initLife();
       addLog(char.age, `[${f.label}] ${char.sect}의 문하생으로 강호에 입문했습니다. (초기 자금 ${char.money}냥 수령)`, "text-amber-300 font-bold");
+      addLog(char.age, `같은 해 입문한 동기: ${char.peers.map(p => `${p.name}(${FACTIONS[p.faction].label})`).join(", ")}`, "text-stone-400");
+      updateUI();
     }
 
     function doTrain() {
@@ -1395,6 +1465,7 @@
         yearGains.qi += 20; yearGains.ext += 15; yearGains.agi += 15;
 
         addLog(char.age, `★★★ [사경 돌파 대성공] 환골탈태! '${nextRank.name}' 등극!`, "text-yellow-300 font-brush text-sm");
+        addStory(`생사 폐관 끝에 ${nextRank.name.split(" ")[0]}의 경지에 올랐다.`);
         showBreakthroughResultPopup("SUCCESS", nextRank, 20, 15, 15);
       } else if (roll < prob + 45) {
         char.qi += 5;
@@ -1407,6 +1478,7 @@
         char.qi = Math.max(10, char.qi - lostQi);
 
         addLog(char.age, `✕ [주화입마] 사경 돌파 중 기운이 역류하여 심각한 내상을 입었습니다. (내공 -${lostQi})`, "text-red-400 font-bold");
+        if (Math.random() < 0.04) { char.dead = true; char.deathCause = "폐관 중 주화입마로 끝내 숨을 거두었다"; }
         showBreakthroughResultPopup("DEVIATION", nextRank, -lostQi, 0, 0);
       }
 
@@ -1467,6 +1539,7 @@
 
     function closeBreakthroughResultModal() {
       document.getElementById("breakthrough-result-modal").style.display = "none";
+      if (char.dead && !yearBusy && document.getElementById("ending-modal").style.display !== "flex") finishLife();
     }
 
     function getAscensionProb() {
@@ -1494,7 +1567,11 @@
         char.hasAscended = true;
         char.title = "천상선인(天上仙人)";
         addLog(char.age, `★★★★★ [우화등선] 천겁을 뚫고 신선의 반열에 올랐습니다!`, "text-cyan-300 font-brush text-base");
+        autoMode = false;
+        addStory("구천현뢰를 뚫고 우화등선하였다.");
         showFinalEnding("ASCENSION");
+        saveLifeToArchive();
+        updateUI();
       } else {
         const lostQi = 45;
         char.qi = Math.max(10, char.qi - lostQi);
@@ -1538,9 +1615,9 @@
       ],
       neutral: [
         { min: 1500, title: "천하무적(天下無敵) - 무림지존",
-          text: "환갑을 맞이할 때까지 당대 강호에서 그를 마주하여 물러서지 않은 고수가 없었습니다. 어느 진영에도 속하지 않은 채 천하제일의 패도를 완성한 뒤, 스스로 검을 거두고 명산에 은거하니 그 이름 석 자는 강호 역사상 가장 눈부신 전설로 남았습니다." },
+          text: "생을 마칠 때까지 당대 강호에서 그를 마주하여 물러서지 않은 고수가 없었습니다. 어느 진영에도 속하지 않은 채 천하제일의 패도를 완성한 뒤, 스스로 검을 거두고 명산에 은거하니 그 이름 석 자는 강호 역사상 가장 눈부신 전설로 남았습니다." },
         { min: 950, title: "일대종사(一代宗師) - 태산북두",
-          text: "정도 사도 어느 쪽에도 기울지 않고 오직 무(武)의 길만을 걸어 태산북두(泰山北斗)로 우뚝 섰습니다. 환갑에 이르러 강호의 전선에서 물러난 뒤, 수많은 제자들을 길러내며 그가 남긴 무학은 천하에 길이 이어지게 되었습니다." },
+          text: "정도 사도 어느 쪽에도 기울지 않고 오직 무(武)의 길만을 걸어 태산북두(泰山北斗)로 우뚝 섰습니다. 노년에 이르러 강호의 전선에서 물러난 뒤, 수많은 제자들을 길러내며 그가 남긴 무학은 천하에 길이 이어지게 되었습니다." },
         { min: 500, title: "풍운협객(風雲俠客) - 주막의 옛이야기",
           text: "수많은 비무와 사선을 넘나들며 치열하게 강호를 풍미했습니다. 나이가 들어 손의 검은 무뎌졌으나, 단골 주막에서 술 한 잔을 기울이며 청춘 시절 천하를 주름잡던 무용담을 안주 삼아 평온하고 낭만 있는 여생을 보냈습니다." },
         { min: 0, title: "평범한 촌부(村夫) - 칼을 쟁기로 바꾸다",
@@ -1620,6 +1697,7 @@
       }
       epilogue.innerText = prefix + info.text.replace(/\{name\}/g, char.name).replace(/\{sect\}/g, char.formerSect || char.sect) + getSectEpilogue();
 
+      if (char.story) renderEndingExtra();
       document.getElementById("end-path-line").innerText =
         `출신: ${FACTIONS[origin].label} → 최종: ${getFaction().label} 소속 · ${pathLabel}` +
         (char.sectData ? `\n🏯 ${char.sectData.name} · ${sectLevelShort(getSectLevelIdx())} · 문파 총 무력 ${getSectTotalPower()}` : "");
@@ -2050,7 +2128,7 @@
                   </span>
                 </div>
                 <div class="text-[10px] text-stone-400 mt-0.5">
-                  ${PATH_INFO[entry.path] ? `<span class="px-1 rounded border ${PATH_INFO[entry.path].chip}">${PATH_INFO[entry.path].short}</span> ` : ""}<span>${escapeHtml(entry.rankName)}</span> · <span>${Number(entry.age) || "?"}세 은퇴</span>
+                  ${PATH_INFO[entry.path] ? `<span class="px-1 rounded border ${PATH_INFO[entry.path].chip}">${PATH_INFO[entry.path].short}</span> ` : ""}<span>${escapeHtml(entry.rankName)}</span> · <span>향년 ${Number(entry.age) || "?"}세</span>
                 </div>
               </div>
             </div>
@@ -2097,7 +2175,12 @@
       tournamentState.isFighting = false;
       tournamentState.opponents = [
         { round: "본선 8강", name: "종남파 수제자 배도운", power: Math.max(20, Math.round(basePower * 0.95)), desc: "검로가 바르고 탄탄한 청년 고수", icon: PIXEL_ASSETS.enemies["호각"] },
-        { round: "준결승 4강", name: "사파의 혈랑도 단목량", power: Math.max(30, Math.round(basePower * 1.2)), desc: "수많은 비무로 피를 묻힌 실전파 칼잡이", icon: PIXEL_ASSETS.enemies["도전"] },
+        (() => {
+          const rival = (char.peers || []).filter(p => p.alive && p.power >= basePower * 0.8).sort((a, b) => b.power - a.power)[0];
+          return rival
+            ? { round: "준결승 4강", name: `동기 ${rival.name}`, power: Math.max(30, rival.power), desc: "같은 해 강호에 입문한 동기. 운명의 맞수와 마주쳤다!", icon: PIXEL_ASSETS.enemies["도전"], peer: rival }
+            : { round: "준결승 4강", name: "사파의 혈랑도 단목량", power: Math.max(30, Math.round(basePower * 1.2)), desc: "수많은 비무로 피를 묻힌 실전파 칼잡이", icon: PIXEL_ASSETS.enemies["도전"] };
+        })(),
         { round: "천하 결승", name: "전대 챔피언 천검존자", power: Math.max(45, Math.round(basePower * 1.5)), desc: "대회 2연패를 노리는 당대 천하제일 후보", icon: PIXEL_ASSETS.enemies["boss"] }
       ];
 
@@ -2200,6 +2283,7 @@
           await sleep(500);
           const grandPrize = Math.round(250 * getPrizeMult());
           char.money += grandPrize;
+          tourResult = { win: true, stage: 3, text: fighter.isHeir ? `대제자 ${fighter.name}이(가) 우승했다!` : "우승하여 천하제일의 칭호를 얻었다!" };
           if (fighter.isHeir) {
             const h = fighter.ref;
             h.power += 30; h.title = "천하제일(天下第一)"; h.wins++; h.loyalty = Math.min(100, h.loyalty + 20);
@@ -2246,6 +2330,7 @@
         log(`\n✕ [패배] ${opp.name}의 벽을 넘지 못하고 패배하여 탈락했습니다.`, "text-rose-400 font-bold pt-2 border-t border-stone-800");
         
         let prize = Math.round((tournamentState.stage === 0 ? 30 : 60) * getPrizeMult());
+        tourResult = { win: false, stage: tournamentState.stage, text: `${fighter.isHeir ? "대제자가 " : ""}${["8강", "4강", "결승"][tournamentState.stage]}에서 ${opp.name}에게 패했다.` };
         char.money += prize;
         char.fame += 10;
         yearGains.fame += 10;
@@ -2364,10 +2449,12 @@
       });
 
       document.getElementById("duel-select-modal").style.display = "flex";
+      if (autoMode) setTimeout(() => container.children[1].click(), 500 * timeScale);
     }
 
     function closeDuelSelectModal() {
       document.getElementById("duel-select-modal").style.display = "none";
+      if (duelResolver) { const r = duelResolver; duelResolver = null; r({ skipped: true }); }
     }
 
     async function startBattleSequence(opponent, oppPower) {
@@ -2420,12 +2507,14 @@
       checkRankUp();
       updateUI();
 
-      confirmBtn.innerText = isFinalWin ? "패자를 어떻게 할 것인가 ➔" : "비무를 매듭짓다";
+      confirmBtn.innerText = "비무를 매듭짓다";
       confirmBtn.style.display = "block";
       confirmBtn.onclick = () => {
         modal.style.display = "none";
-        if (isFinalWin) showPostDuelChoice(opponent);
+        if (duelResolver) { const r = duelResolver; duelResolver = null; r({ won: isFinalWin, opponent }); }
+        else if (isFinalWin) showPostDuelChoice(opponent);
       };
+      if (autoMode) setTimeout(() => confirmBtn.onclick(), 900 * timeScale);
     }
 
     // 비무 승리 후 선택: 성향이 갈리는 지점
@@ -2814,6 +2903,13 @@
       });
 
       document.getElementById("event-modal").style.display = "flex";
+
+      if (autoMode) {
+        setTimeout(() => {
+          resolveEventChoice(ev, autoPickChoice(ev));
+          setTimeout(closeEventModal, 1100 * timeScale);
+        }, 700 * timeScale);
+      }
     }
 
     function resolveEventChoice(ev, ch) {
@@ -2864,6 +2960,7 @@
     function switchFaction(newFaction, newSect) {
       char.faction = newFaction;
       char.sect = newSect;
+      if (char.story) addStory(`${FACTIONS[newFaction].label}로 몸을 옮겼다.`);
     }
 
     // 진영과 성향이 크게 어긋나면 먼저 일어나는 특수 사건
@@ -3104,15 +3201,14 @@
       }
     ];
 
-    function maybeTriggerYearEvent() {
-      if (char.age >= 60) return;
+    function maybeTriggerYearEvent(chance = 0.6) {
+      if (char.dead) return;
       const special = SPECIAL_EVENTS.find(e => e.cond());
       if (special) {
         openEventModal(special.build());
         return;
       }
-      if (isMajorYear(char.age)) return;
-      if (Math.random() > 0.6) return;
+      if (Math.random() > chance) return;
 
       // 제자가 있으면 제자 사건도 섞임 (최근에 본 사건은 피함)
       const all = [...RANDOM_EVENTS, ...DISCIPLE_EVENTS].filter(e => !e.cond || e.cond());
@@ -3288,7 +3384,7 @@
       char.sectData = {
         name, ideal: selectedIdeal, special: char.faction,
         buildings: { hall: 0, library: 0, pharmacy: 0, palace: 0, special: 0 },
-        disciples: [], applicants: [], heirId: null,
+        disciples: [], applicants: [], heirId: null, released: [],
         taughtThisYear: false, foundedAge: char.age, tourWins: 0, lostDisciples: 0, defectedToDemon: false,
         lastLevel: 0
       };
@@ -3297,6 +3393,7 @@
       sect().applicants = [makeApplicant(), makeApplicant()];
       closeSectFoundModal();
       addLog(char.age, `★ [문파 창건] '${name}'의 현판을 내걸었습니다! 문규: ${SECT_IDEALS[selectedIdeal].label}`, "text-amber-300 font-brush text-sm");
+      addStory(`${name}을(를) 창건하였다.`);
       gainFame(10);
       updateUI();
       openSectModal("disc");
@@ -3433,6 +3530,11 @@
         teachBtn.disabled = s.taughtThisYear;
         teachBtn.onclick = () => teachDisciple(d.id);
         actions.appendChild(teachBtn);
+        const outBtn = document.createElement("button");
+        outBtn.type = "button";
+        outBtn.className = "px-2 py-1 rounded-lg font-bold bg-stone-800 hover:bg-stone-700 text-stone-300 cursor-pointer";
+        outBtn.innerText = "내보내기";
+        outBtn.onclick = () => openReleaseChoice(d.id);
         if (!isHeir) {
           const heirBtn = document.createElement("button");
           heirBtn.type = "button";
@@ -3441,6 +3543,7 @@
           heirBtn.onclick = () => appointHeir(d.id);
           actions.appendChild(heirBtn);
         }
+        actions.appendChild(outBtn);
         body.appendChild(card);
       });
 
@@ -3513,14 +3616,37 @@
       updateUI();
     }
 
-    function removeDisciple(id) {
+    // 제자 내보내기: 하산(좋게) / 파문(쫓아냄)
+    function openReleaseChoice(id) {
+      const s = sect();
+      const d = s.disciples.find(x => x.id === id); if (!d) return;
+      closeSectModal();
+      openEventModal({
+        tag: "PARTING WAYS", title: `${d.name}을(를) 내보낸다`,
+        desc: `${d.name}(${d.persona} · 무력 ${d.power} · 충성 ${d.loyalty})을(를) 문하에서 내보내려 합니다. 자리가 비면 새 제자를 받을 수 있습니다.`,
+        choices: [
+          { path: "orthodox", label: "하산을 허락하고 축복하며 보낸다", hint: "협의 +2 · 충성이 높으면 훗날 보은하러 돌아옴",
+            apply: () => { addAlign(2, 0, 0); s.released.push({ name: d.name, power: d.power, loyalty: d.loyalty, kind: "release", age: char.age }); removeDisciple(id, true);
+              addLog(char.age, `[하산] ${d.name}이(가) 큰절을 올리고 산문을 나섰습니다.`, "text-emerald-300");
+              return { text: `${d.name}은(는) 눈시울을 붉히며 세 번 절하고 떠났습니다.`, chips: [["협의", "+2"], ["제자", "-1"]] }; } },
+          { path: "unorthodox", label: "쓸모없다며 파문하고 쫓아낸다", hint: "악명 +2 · 충성이 낮으면 원한을 품고 돌아올 수 있음",
+            apply: () => { addAlign(0, 2, 0); s.released.push({ name: d.name, power: d.power, loyalty: d.loyalty, kind: "expel", age: char.age }); removeDisciple(id, true);
+              addLog(char.age, `[파문] ${d.name}을(를) 문하에서 쫓아냈습니다.`, "text-rose-300");
+              return { text: `${d.name}은(는) 이를 악물고 산문을 나섰습니다.`, chips: [["악명", "+2"], ["제자", "-1"]] }; } },
+          { path: "neutral", label: "다시 생각해 본다", hint: "취소",
+            apply: () => ({ text: "제자는 아무것도 모른 채 수련을 이어갑니다.", chips: [] }) }
+        ]
+      });
+    }
+
+    function removeDisciple(id, voluntary) {
       const s = sect();
       s.disciples = s.disciples.filter(d => d.id !== id);
       if (s.heirId === id) {
         s.heirId = null;
         if (s.disciples.length) s.heirId = [...s.disciples].sort((a, b) => b.power - a.power)[0].id;
       }
-      s.lostDisciples++;
+      if (!voluntary) s.lostDisciples++;
     }
 
     function checkSectLevelUp() {
@@ -3533,9 +3659,9 @@
     }
 
     // ----- 매년 처리 -----
-    function processSectYear() {
+    function processSectYear(mult = 1) {
       const s = sect(); if (!s) return;
-      const income = getSectIncome();
+      const income = Math.round(getSectIncome() * (getSectIncome() > 0 ? mult : 1));
       char.money = Math.max(0, char.money + income);
       const parts = [`문파 수입 ${income >= 0 ? "+" : ""}${income}냥`];
 
@@ -3668,6 +3794,55 @@
       }
     ];
 
+    DISCIPLE_EVENTS.push(
+      {
+        id: "disc_return",
+        cond: () => sect() && sect().released.some(r => r.kind === "release" && r.loyalty >= 60 && !r.done && char.age - r.age >= 3),
+        build: () => {
+          const r = sect().released.find(x => x.kind === "release" && x.loyalty >= 60 && !x.done && char.age - x.age >= 3);
+          r.done = true;
+          const gift = scaled(60);
+          return {
+            tag: "OLD DISCIPLE RETURNS", title: "옛 제자의 보은",
+            desc: `몇 해 전 하산한 ${r.name}이(가) 이름난 고수가 되어 돌아왔습니다. "사부님의 가르침 덕분입니다." 품에서 예물을 꺼냅니다.`,
+            choices: [
+              { path: "orthodox", label: "기쁘게 받고 함께 술잔을 기울인다", hint: `은자 +${gift} · 명성 +6`,
+                apply: () => { char.money += gift; gainFame(6); addStory(`하산한 제자 ${r.name}이(가) 보은하러 돌아왔다.`);
+                  return { text: "사제가 밤새 지난 이야기를 나눴습니다.", chips: [["은자", `+${gift}냥`], ["명성", "+6"]] }; } },
+              { path: "neutral", label: "예물 대신 한 수 겨뤄 보자고 한다", hint: "외공 +4 · 신법 +4",
+                apply: () => { gainStats(0, 4, 4);
+                  return { text: "제자의 성장한 검에서 오히려 배운 것이 많았습니다.", chips: [["외공", "+4"], ["신법", "+4"]] }; } }
+            ]
+          };
+        }
+      },
+      {
+        id: "disc_grudge",
+        cond: () => sect() && sect().released.some(r => r.kind === "expel" && r.loyalty < 50 && !r.done && char.age - r.age >= 2),
+        build: () => {
+          const r = sect().released.find(x => x.kind === "expel" && x.loyalty < 50 && !x.done && char.age - x.age >= 2);
+          r.done = true;
+          const pay = Math.min(char.money, scaled(50));
+          return {
+            tag: "GRUDGE", title: "원한을 품은 옛 제자",
+            desc: `파문당한 ${r.name}이(가) 흑도의 무리를 이끌고 산문 앞에 나타났습니다. "그날의 치욕을 갚으러 왔소!"`,
+            choices: [
+              { path: "neutral", label: "검을 뽑아 정면으로 맞선다", hint: "승리 시 명성 +8, 패배 시 내상",
+                apply: () => { const res = autoDuel(1.0);
+                  if (res.won) { gainFame(8); return { text: `${r.name}과(와) 무리를 단숨에 물리쳤습니다.`, chips: [["명성", "+8"]] }; }
+                  char.injury = { ...INJURIES[0] }; return { text: "간신히 물리쳤지만 내상을 입었습니다.", chips: [["부상", INJURIES[0].name]] }; } },
+              { path: "unorthodox", label: "은자를 던져 주고 돌려보낸다", hint: `은자 -${pay}냥 · 악명 +2`,
+                apply: () => { char.money -= pay; addAlign(0, 2, 0);
+                  return { text: "옛 제자는 은자를 챙겨 사라졌습니다.", chips: [["은자", `-${pay}냥`], ["악명", "+2"]] }; } },
+              { path: "orthodox", label: "그날의 일을 사과한다", hint: "협의 +5",
+                apply: () => { addAlign(5, 0, 0);
+                  return { text: `${r.name}은(는) 한참을 말없이 서 있다가 칼을 거두었습니다.`, chips: [["협의", "+5"]] }; } }
+            ]
+          };
+        }
+      }
+    );
+
     // ----- 엔딩 문단 -----
     function getSectEpilogue() {
       const s = sect();
@@ -3694,55 +3869,691 @@
     }
 
     // === 다음 해 진행 ===
-    function nextYear() {
+    // ==========================================
+    // [인생 흐름] 올해의 방향 · 한 해 보내기 · 동기 · 수명
+    // ==========================================
+    const FOCUS = {
+      seclusion: { short: "폐관", icon: "🧘", label: "폐관 수련", desc: "세상과 연을 끊고 수련에만 전념합니다. 성장 ↑↑ · 폐관 돌파 +5%p · 사건 적음", train: 1.7, eventChance: 0.3, injury: 0.02 },
+      wander:    { short: "유람", icon: "🗺️", label: "강호 유람", desc: "천하를 떠돌며 견문을 넓힙니다. 기연 · 강호 사건 ↑ · 명성 ↑ · 부상 위험", train: 0.6, eventChance: 0.95, injury: 0.08 },
+      duel:      { short: "비무", icon: "⚔️", label: "비무 행각", desc: "고수를 찾아 겨룹니다. 맞수와의 한판 + 연이은 비무 · 상금·명성 ↑ · 부상 위험 ↑", train: 0.8, eventChance: 0.45, injury: 0.12 },
+      sect:      { short: "문파", icon: "🏯", label: "문파 활동", desc: "문파 일에 힘씁니다. 녹봉·문파 수입 ×1.5 · 문파가 있으면 제자 모두 지도", train: 0.6, eventChance: 0.6, injury: 0.02 },
+      rest:      { short: "양생", icon: "🍵", label: "휴식·양생", desc: "몸을 돌보고 사람을 만납니다. 부상 회복 · 수명 +1 · 인연 사건", train: 0.3, eventChance: 0.55, injury: 0 }
+    };
+
+    const GROWTH_TYPES = {
+      early:    { label: "조숙형(早熟型)", desc: "남보다 빨리 크지만 일찍 쇠한다", decline: 42, lifeBonus: 0,
+                  curve: a => a <= 25 ? 1.35 : a <= 35 ? 1.0 : a <= 42 ? 0.55 : 0.25 },
+      normal:   { label: "평범형(平凡型)", desc: "고르게 크고 고르게 쇠한다", decline: 46, lifeBonus: 0,
+                  curve: a => a <= 35 ? 1.0 : a <= 45 ? 0.6 : 0.3 },
+      late:     { label: "대기만성형(大器晩成型)", desc: "늦게 피어나 오래 강하다", decline: 52, lifeBonus: 2,
+                  curve: a => a <= 25 ? 0.7 : a <= 45 ? 1.3 : a <= 52 ? 0.8 : 0.35 },
+      enduring: { label: "장수형(長壽型)", desc: "크게 튀지 않지만 오래 버틴다", decline: 56, lifeBonus: 6,
+                  curve: a => a <= 40 ? 0.95 : a <= 55 ? 0.8 : 0.4 }
+    };
+
+    const INJURIES = [
+      { name: "가벼운 내상", years: 1, mult: 0.6, w: 50 },
+      { name: "갈비뼈 골절", years: 1, mult: 0.5, w: 28 },
+      { name: "경맥 손상", years: 2, mult: 0.4, w: 16 },
+      { name: "단전 손상(중상)", years: 3, mult: 0.25, w: 6 }
+    ];
+
+    const REALM_LIFE = [0, 0, 0, 1, 3, 6, 15, 30];
+    const PLACES = ["낙양", "장안", "항주", "소주", "개봉", "성도", "곤륜산 기슭", "남만의 밀림", "북해의 빙원", "황하 나루", "무이산", "동정호", "서역 길목", "운남의 차마고도"];
+    const PEER_NAMES = ["백소운", "진무량", "한설화", "유태호", "설하린", "위청아", "연비", "하운학", "천율", "모용단", "독고현", "남궁초희", "황보강", "제갈서진", "구양월", "당이경"];
+
+    let autoMode = false;
+    let timeScale = 1;
+    let yearBusy = false;
+    let pendingTurns = [];
+    let duelResolver = null;
+    let tourResult = null;
+
+    const lifeFocus = () => FOCUS[char.focus] || FOCUS.seclusion;
+    const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+    const josa = (word, a, b) => { const c = word.charCodeAt(word.length - 1); return (c >= 0xac00 && c <= 0xd7a3 && (c - 0xac00) % 28 > 0) ? a : b; };
+
+    function getLifespan() {
+      return char.baseLife + REALM_LIFE[char.rankIdx] + (GROWTH_TYPES[char.growthType].lifeBonus) + char.lifeBonus;
+    }
+
+    function addStory(text) {
+      char.story.push({ age: char.age, text });
+    }
+
+    function waitHidden(id) {
+      return new Promise(resolve => {
+        const el = document.getElementById(id);
+        const check = () => (el.style.display === "none" ? resolve() : setTimeout(check, 120));
+        check();
+      });
+    }
+
+    // ----- 시작 시 초기화 -----
+    function initLife() {
+      const r = Math.random();
+      char.growthType = r < 0.25 ? "early" : r < 0.6 ? "normal" : r < 0.85 ? "late" : "enduring";
+      char.baseLife = 58 + ri(0, 8);
+      char.lifeBonus = 0;
+      char.focus = "seclusion";
+      char.injury = null;
+      char.story = [];
+      char.history = [];
+      char.reflections = [];
+      char.spouse = "";
+      char.dead = false;
+      char.deathCause = "";
+      char.growthRevealed = false;
+      char.peers = makePeers();
+      addStory(`${FACTIONS[char.faction].label} ${char.sect}에 입문하여 강호에 첫발을 내디뎠다.`);
+    }
+
+    function makePeers() {
+      const names = [...PEER_NAMES].sort(() => Math.random() - 0.5).slice(0, 4);
+      const factionKeys = Object.keys(FACTIONS);
+      const typeKeys = Object.keys(GROWTH_TYPES);
+      return names.map(name => {
+        const faction = pick(factionKeys);
+        return {
+          name, faction, path: faction === "neutral" ? "neutral" : faction,
+          growth: pick(typeKeys), talent: 0.8 + Math.random() * 0.45,
+          power: 0, alive: true, life: 58 + ri(0, 22), deathAge: 0, deathCause: "",
+          lastRank: 0, married: false, tourWins: 0
+        };
+      });
+    }
+
+    // ----- 수련 -----
+    function applyTraining(mult) {
+      const gt = GROWTH_TYPES[char.growthType];
+      const curve = gt.curve(char.age);
+      const inj = char.injury ? char.injury.mult : 1;
+      const hall = buildingLv("hall");
+      let dQi = Math.round((ri(2, 5) * Math.max(0.6, curve) * mult + hall) * inj);
+      let dExt = Math.round((ri(2, 5) * curve * mult + hall) * inj);
+      let dAgi = Math.round((ri(1, 3) * curve * mult + getFaction().trainAgi) * inj);
+      dQi = Math.max(0, dQi); dExt = Math.max(0, dExt); dAgi = Math.max(0, dAgi);
+      gainStats(dQi, dExt, dAgi);
+      return { dQi, dExt, dAgi };
+    }
+
+    // 자동 비무 (화면 없이 판정)
+    function autoDuel(ratio) {
+      const my = getCombatPower() * (char.injury ? 0.85 : 1);
+      const opp = Math.max(15, Math.round(getBenchmarkPower() * ratio));
+      let w = 0, l = 0;
+      while (w < 2 && l < 2) { Math.random() < my / (my + opp) ? w++ : l++; }
+      return { won: w > l, opp };
+    }
+
+    function rollInjury(chance, rec) {
+      if (Math.random() >= chance) return;
+      const total = INJURIES.reduce((s, x) => s + x.w, 0);
+      let r = Math.random() * total, inj = INJURIES[0];
+      for (const x of INJURIES) { if ((r -= x.w) < 0) { inj = x; break; } }
+      if (char.injury && char.injury.years > inj.years) return;
+      char.injury = { ...inj };
+      rec.lines.push({ t: `✕ ${inj.name}을(를) 입었다. (${inj.years}년간 수련 효율 감소)`, c: "text-rose-400 font-bold" });
+      if (inj.years >= 3) addStory(`${inj.name}을 입고 오랫동안 칼을 들지 못했다.`);
+    }
+
+    // ----- 올해의 방향별 활동 -----
+    async function runFocus(rec) {
+      const f = char.focus;
+      if (f === "seclusion") {
+        const g = applyTraining(FOCUS.seclusion.train);
+        rec.lines.push({ t: pick(["깊은 동굴에서 홀로 운기조식하며 한 해를 보냈다.", "폭포 아래에서 사계절 내내 검을 휘둘렀다.", "문을 걸어 잠그고 비급 한 권을 천 번 읽었다.", "설산 꼭대기에서 찬 기운을 견디며 내공을 다졌다."]) + ` (내공 +${g.dQi}, 외공 +${g.dExt}, 신법 +${g.dAgi})` });
+      }
+      if (f === "wander") {
+        const g = applyTraining(FOCUS.wander.train);
+        const p1 = pick(PLACES); let p2 = pick(PLACES); if (p2 === p1) p2 = pick(PLACES);
+        gainFame(ri(3, 6));
+        rec.lines.push({ t: `${p1}에서 ${p2}까지 발길 닿는 대로 떠돌았다. (내공 +${g.dQi}, 외공 +${g.dExt}, 신법 +${g.dAgi})` });
+        if (Math.random() < 0.3) {
+          const boon = pick([
+            { t: "산삼 캐는 노인에게 백년 묵은 산삼을 얻었다.", f: () => gainStats(8, 0, 0), c: "내공 +8" },
+            { t: "폐허가 된 장원에서 녹슬지 않은 명검을 주웠다.", f: () => gainStats(0, 7, 0), c: "외공 +7" },
+            { t: "늙은 거지에게 밥 한 끼를 대접하고 보법 한 수를 배웠다.", f: () => gainStats(0, 0, 6), c: "신법 +6" },
+            { t: "강가에서 주인 잃은 전낭을 발견했다.", f: () => { char.money += scaled(40); }, c: `은자 +${scaled(40)}` }
+          ]);
+          boon.f();
+          rec.lines.push({ t: `✦ 기연: ${boon.t} (${boon.c})`, c: "text-cyan-300 font-bold" });
+        }
+      }
+      if (f === "duel") {
+        applyTraining(FOCUS.duel.train);
+        // 1) 맞수와의 한판
+        const res = await new Promise(resolve => { duelResolver = resolve; openDuelSelectModal(); });
+        if (res && !res.skipped) {
+          rec.lines.push({ t: `⚔ 맞수 ${res.opponent.name}과의 한판: ${res.won ? "승리!" : "패배"}`, c: res.won ? "text-amber-300 font-bold" : "text-stone-400" });
+          if (res.won) pendingTurns.push(() => showPostDuelChoice(res.opponent));
+        }
+        // 2) 연이은 비무
+        const n = ri(2, 3);
+        let wins = 0, earned = 0;
+        for (let i = 0; i < n; i++) {
+          const ratio = pick([0.65, 1.0, 1.0, 1.35]);
+          const r = autoDuel(ratio);
+          if (r.won) { wins++; const m = Math.round(20 * ratio * getPrizeMult()); earned += m; char.money += m; gainFame(Math.round(3 * ratio)); }
+        }
+        rec.lines.push({ t: `떠돌며 ${n}번 더 겨뤄 ${wins}승 ${n - wins}패. (상금 +${earned}냥)` });
+      }
+      if (f === "sect") {
+        const g = applyTraining(FOCUS.sect.train);
+        if (sect() && sect().disciples.length) {
+          const s = sect();
+          s.disciples.forEach(d => { const gg = Math.round(discipleGrowth(d, true) * 0.6); d.power += gg; d.loyalty = Math.min(100, d.loyalty + 3); });
+          rec.lines.push({ t: `${s.name}의 제자 ${s.disciples.length}명을 고루 가르쳤다. (내공 +${g.dQi}, 외공 +${g.dExt})` });
+        } else {
+          const m = scaled(25); char.money += m;
+          rec.lines.push({ t: `사문의 크고 작은 일을 도맡았다. (수당 +${m}냥, 내공 +${g.dQi})` });
+        }
+      }
+      if (f === "rest") {
+        applyTraining(FOCUS.rest.train);
+        char.lifeBonus += 1;
+        if (char.injury) { rec.lines.push({ t: `약초를 달여 먹으며 ${char.injury.name}을(를) 다스렸다.`, c: "text-emerald-300" }); char.injury = null; }
+        else rec.lines.push({ t: pick(["고향 마을에서 느긋하게 차를 마시며 한 해를 보냈다.", "명산의 절에 머물며 마음을 비웠다.", "옛 벗들을 찾아다니며 술잔을 기울였다."]) + " (수명 +1)" });
+        if (!char.spouse && char.age >= 20 && char.age <= 50 && Math.random() < 0.4) pendingTurns.push(() => openEventModal(buildRomanceEvent()));
+      }
+      rollInjury(lifeFocus().injury, rec);
+    }
+
+    function buildRomanceEvent() {
+      const name = pick(["소연", "하은", "청란", "월향", "운비", "서린", "도화", "설매"]);
+      return {
+        tag: "FATED ENCOUNTER", title: "홍안지기(紅顔知己)",
+        desc: `머물던 객잔에서 ${name}이라는 사람과 밤새 이야기를 나누었습니다. 무공을 모르지만 당신의 검보다 당신의 사람됨을 보는 눈을 가졌습니다.`,
+        choices: [
+          { path: "orthodox", label: "평생을 함께하자고 청한다", hint: "혼인 · 협의 +3 · 엔딩에 반려 등장",
+            apply: () => { char.spouse = name; addAlign(3, 0, 0); addStory(`${name}과(와) 혼례를 올렸다.`);
+              return { text: `${name}은(는) 수줍게 고개를 끄덕였습니다. 강호의 피바람 속에서도 돌아갈 곳이 생겼습니다.`, chips: [["반려", name], ["협의", "+3"]] }; } },
+          { path: "neutral", label: "강호의 몸이라며 인연을 놓아준다", hint: "신법 +3",
+            apply: () => { gainStats(0, 0, 3);
+              return { text: "새벽안개 속으로 떠나며 한 번도 뒤돌아보지 않았습니다.", chips: [["신법", "+3"]] }; } }
+        ]
+      };
+    }
+
+    // ----- 동기들의 한 해 -----
+    function peerShape(p, age) {
+      if (p.growth === "early") return age <= 30 ? 1.15 : age <= 42 ? 1.0 : 0.8;
+      if (p.growth === "late") return age <= 30 ? 0.8 : 1.15;
+      if (p.growth === "enduring") return 0.95;
+      return age <= 46 ? 1.0 : 0.88;
+    }
+
+    function simulatePeers(rec) {
+      const age = char.age;
+      char.peers.forEach(p => {
+        if (!p.alive) return;
+        const before = p.power;
+        p.power = Math.round(getBenchmarkPower(age) * p.talent * peerShape(p, age) * (0.95 + Math.random() * 0.1));
+        let newRank = 0;
+        ranks.forEach((rk, i) => { if (p.power >= rk.minStat) newRank = i; });
+        if (newRank > p.lastRank && newRank >= 3 && before > 0) {
+          rec.rumors.push(`동기 ${p.name}${josa(p.name, "이", "가")} ${ranks[newRank].name.split(" ")[0]}의 경지에 올랐다고 한다.`);
+        }
+        p.lastRank = Math.max(p.lastRank, newRank);
+        const risk = (p.path === "demonic" || p.path === "unorthodox") ? 0.012 : 0.006;
+        if (age >= p.life || (age >= 22 && Math.random() < risk)) {
+          p.alive = false; p.deathAge = age;
+          p.deathCause = age >= p.life ? "천수를 누리고" : pick(p.path === "demonic" ? ["주화입마로", "정파 토벌대에 쫓기다"] : p.path === "unorthodox" ? ["관군의 화살에 맞아", "원한을 산 자의 칼에"] : ["비무 중 입은 상처로", "산적 떼를 막다가", "병으로"]);
+          rec.rumors.push({ t: `동기 ${p.name}${josa(p.name, "이", "가")} ${p.deathCause} ${age}세에 세상을 떠났다.`, c: "text-rose-300" });
+          if (!char.story.some(s => s.text.includes("동기") && s.text.includes("떠났다"))) addStory(`동기 ${p.name}의 부고를 들었다.`);
+          return;
+        }
+        if (Math.random() < 0.28) {
+          const n = "동기 " + p.name + josa(p.name, "이", "가");
+          const pool = {
+            orthodox: [`${n} 마을을 습격한 산적 떼를 홀로 물리쳤다고 한다.`, `${n} 무림맹의 부름을 받았다는 소문이다.`, `${n} 억울한 누명을 쓴 백성을 구해 칭송이 자자하다.`],
+            unorthodox: [`${n} 표물을 털다 관부에 쫓기고 있다고 한다.`, `${n} 녹림 산채 하나를 통째로 집어삼켰다는 소문이다.`, `${n} 도박판에서 하룻밤에 천 냥을 땄다고 한다.`],
+            demonic: [`${n} 혈마대법을 익혔다는 흉흉한 소문이 돈다.`, `${n} 천마신교의 장로 자리에 올랐다고 한다.`, `${n} 지나간 마을에서 사람들이 사라졌다는 소문이다.`],
+            neutral: [`${n} 홀로 서역까지 유람 중이라는 소식이다.`, `${n} 이름 모를 산에서 은거 기인을 만났다고 한다.`, `${n} 객잔에서 시비를 건 고수 셋을 단숨에 눕혔다고 한다.`]
+          }[p.path];
+          if (!p.married && age >= 24 && age <= 38 && Math.random() < 0.3) { p.married = true; rec.rumors.push(`${n} 혼례를 올렸다는 소식이 들려왔다.`); }
+          else rec.rumors.push(pick(pool));
+        }
+      });
+    }
+
+    // ----- 나에 대한 강호의 평판 -----
+    function rumorAboutMe(rec) {
+      const path = getPath();
+      if (Math.random() > 0.35) return;
+      const n = char.name + josa(char.name, "이", "가");
+      const pool = {
+        orthodox: [`객잔의 이야기꾼이 ${char.name}의 협행을 노래로 지어 부른다.`, `"${char.name} 대협이 우리 마을에도 오셨으면…" 하는 말이 들린다.`],
+        unorthodox: [`관아 담벼락에 ${char.name}의 얼굴이 그려진 방이 붙었다.`, `장사꾼들이 ${n} 온다는 말에 서둘러 가게 문을 닫는다.`],
+        demonic: [`아이들이 ${char.name}의 이름만 들어도 울음을 그친다고 한다.`, `정파 고수들 사이에서 ${char.name}을(를) 토벌해야 한다는 말이 나온다.`],
+        neutral: [`${char.name}? 어디에도 속하지 않는 괴짜 고수라던데.`, `${n} 어느 편인지 아는 사람이 없다고 한다.`]
+      }[path];
+      rec.rumors.push({ t: pick(pool), c: "text-amber-200" });
+    }
+
+    // ----- 해가 바뀔 때 -----
+    function yearEnd(rec) {
       char.age += 1;
-      yearGains = { qi: 0, ext: 0, agi: 0, fame: 0 };
-      alignGains.righteous = 0; alignGains.evil = 0; alignGains.demonic = 0;
-
-      const salary = getCurrentSalary();
+      const salaryMult = char.focus === "sect" ? 1.5 : 1;
+      const salary = Math.round(getCurrentSalary() * salaryMult);
       char.money += salary;
-      addLog(char.age, sect() ? `새해가 밝았습니다. 강호 위명 수입 ${salary}냥` : `새해가 밝았습니다. 문파 녹봉 ${salary}냥 지급`, "text-emerald-400 font-bold");
-      processSectYear();
+      rec.lines.push({ t: `${sect() ? "강호 위명 수입" : "문파 녹봉"} ${salary}냥을 받았다.`, c: "text-emerald-400" });
+      processSectYear(char.focus === "sect" ? 1.5 : 1);
 
-      if (char.age >= 46 && char.age < 60) {
-        const decayExt = Math.floor(Math.random() * 3) + 1;
-        const decayAgi = Math.floor(Math.random() * 3) + 1;
-
-        char.ext = Math.max(10, char.ext - decayExt);
-        char.agi = Math.max(10, char.agi - decayAgi);
-
-        addLog(char.age, `[세월의 무상함] 나이가 들어 기혈이 쇠약해집니다. (외공 -${decayExt}, 신법 -${decayAgi})`, "text-stone-500 font-medium");
+      const gt = GROWTH_TYPES[char.growthType];
+      if (char.age >= gt.decline) {
+        const dE = ri(1, 3), dA = ri(1, 3);
+        char.ext = Math.max(10, char.ext - dE);
+        char.agi = Math.max(10, char.agi - dA);
+        rec.lines.push({ t: `세월의 무상함… 기혈이 쇠약해진다. (외공 -${dE}, 신법 -${dA})`, c: "text-stone-500" });
       }
-
-      if (isMajorYear(char.age)) {
-        addLog(char.age, `★ [10년 주기] 강호 최대의 제전, '천하비무대회'가 개막했습니다!`, "text-yellow-300 font-brush text-sm");
+      if (char.injury) {
+        char.injury.years -= 1;
+        if (char.injury.years <= 0) { rec.lines.push({ t: `${char.injury.name}이(가) 다 나았다.`, c: "text-emerald-300" }); char.injury = null; }
       }
-
+      if (!char.growthRevealed && char.age >= 25) {
+        char.growthRevealed = true;
+        rec.lines.push({ t: `✦ 스스로의 근골을 깨달았다: ${gt.label} — ${gt.desc}`, c: "text-cyan-300 font-bold" });
+        addStory(`스스로가 ${gt.label}임을 깨달았다.`);
+      }
       char.hasTrainedThisYear = false;
       char.hasDueledThisYear = false;
       char.hasBreakthroughThisYear = false;
-
-      if (char.age >= 60) {
-        showFinalEnding();
-        const btnNext = document.getElementById("btn-next-year");
-        btnNext.disabled = true;
-        btnNext.innerText = "천하를 풍미하고 은퇴하다";
-        btnNext.className = "w-full py-3.5 bg-stone-800 text-stone-500 font-brush text-base rounded-xl cursor-not-allowed";
-        
-        document.getElementById("btn-train").disabled = true;
-        document.getElementById("btn-duel").disabled = true;
-        document.getElementById("btn-market").disabled = true;
-        document.getElementById("btn-sect").disabled = true;
-        document.getElementById("btn-breakthrough").disabled = true;
-        document.getElementById("btn-ascension").disabled = true;
-        updateUI();
-        return;
-      }
-
       checkRankUp();
-      updateUI();
-      maybeTriggerYearEvent();
+
+      // 죽음
+      const lifespan = getLifespan();
+      let deathCause = "";
+      if (char.age >= lifespan) deathCause = pick([
+        "천수를 다하고 평온히 눈을 감았다", "어느 봄날 아침, 좌선한 채로 세상을 떠났다",
+        sect() && sect().disciples.length ? "제자들이 지켜보는 가운데 조용히 숨을 거두었다" : "홀로 오른 산정에서 노을을 바라보며 눈을 감았다",
+        char.spouse ? `반려 ${char.spouse}의 손을 잡은 채 잠들듯 떠났다` : "단골 주막에서 마지막 술잔을 비우고 잠들었다"
+      ]);
+      else if (char.age >= 25) {
+        let risk = 0;
+        if (char.focus === "duel") risk += 0.006;
+        if (char.focus === "wander") risk += 0.004;
+        risk += Math.min(0.006, char.align.evil / 15000);
+        if (char.injury && char.injury.years >= 3 && char.age > 50) risk += 0.02;
+        if (Math.random() < risk) deathCause = pick(["비무 중 입은 치명상으로 쓰러졌다", "원한을 품은 자객의 칼에 쓰러졌다", "독에 당해 끝내 일어나지 못했다"]);
+      }
+      if (deathCause) { char.dead = true; char.deathCause = deathCause; }
     }
+
+    // ----- 한 해 보내기 (메인 루프) -----
+    function autoChooseFocus() {
+      if (char.injury && char.injury.years >= 1) return "rest";
+      if (isMajorYear(char.age)) return Math.random() < 0.6 ? "seclusion" : "duel";
+      const w = { seclusion: 34, wander: 22, duel: 20, sect: sect() ? 16 : 4, rest: 8 + (char.age > 55 ? 15 : 0) };
+      let r = Math.random() * Object.values(w).reduce((a, b) => a + b, 0);
+      for (const [k, v] of Object.entries(w)) { if ((r -= v) < 0) return k; }
+      return "seclusion";
+    }
+
+    async function passYear() {
+      if (yearBusy || char.dead || char.hasAscended) return;
+      if (autoMode) char.focus = autoChooseFocus();
+      yearBusy = true;
+      updateUI();
+      const before = { qi: char.qi, ext: char.ext, agi: char.agi, money: char.money, fame: char.fame, r: char.align.righteous, e: char.align.evil, d: char.align.demonic };
+      const startAge = char.age;
+      const rec = { age: startAge, focus: char.focus, lines: [], rumors: [] };
+      pendingTurns = [];
+      yearGains = { qi: 0, ext: 0, agi: 0, fame: 0 };
+      alignGains.righteous = 0; alignGains.evil = 0; alignGains.demonic = 0;
+
+      try {
+        await runFocus(rec);
+
+        if (isMajorYear(startAge)) {
+          tourResult = null;
+          const go = await askTournament();
+          if (go) {
+            startMajorTournament();
+            if (autoMode) await autoRunTournament(); else await waitHidden("tournament-modal");
+            if (tourResult) {
+              rec.lines.push({ t: `👑 천하비무대회: ${tourResult.text}`, c: tourResult.win ? "text-yellow-300 font-bold" : "text-stone-300" });
+              if (tourResult.win || tourResult.stage >= 1) addStory(`천하비무대회에서 ${tourResult.text}`);
+            }
+          } else rec.lines.push({ t: "천하비무대회에 나가지 않았다." });
+        }
+
+        simulatePeers(rec);
+        rumorAboutMe(rec);
+        yearEnd(rec);
+
+        const diff = {
+          qi: char.qi - before.qi, ext: char.ext - before.ext, agi: char.agi - before.agi,
+          money: char.money - before.money, fame: char.fame - before.fame,
+          r: char.align.righteous - before.r, e: char.align.evil - before.e, d: char.align.demonic - before.d
+        };
+        char.history.push({ age: startAge, focus: rec.focus, rank: ranks[char.rankIdx].name.split(" ")[0], power: getCombatPower(), money: char.money, note: (rec.lines.find(l => /font-bold|text-cyan|text-rose/.test(l.c || "")) || rec.lines[0] || { t: "" }).t.replace(/\s*\(.*?\)\s*$/, "") });
+        updateUI();
+        await showYearResult(rec, diff);
+        if (autoMode) closeRankUpModal();
+
+        if (char.dead) { finishLife(); return; }
+
+        for (const turn of pendingTurns) { turn(); await waitHidden("event-modal"); }
+        if (!char.dead) maybeTriggerYearEvent(lifeFocus().eventChance);
+        await waitHidden("event-modal");
+        if (autoMode) { closeRankUpModal(); closeGachaResultModal(); }
+        await waitHidden("rankup-modal");
+        if ([20, 30, 40, 50].includes(char.age) && !autoMode) await askReflection();
+        if (autoMode) await autoManage();
+      } finally {
+        yearBusy = false;
+        updateUI();
+      }
+      if (autoMode && !char.dead && !char.hasAscended) setTimeout(passYear, 500 * timeScale);
+    }
+
+    function askTournament() {
+      return new Promise(resolve => {
+        const heir = getHeir();
+        openEventModal({
+          tag: "TEN-YEAR MAJOR FESTIVAL", title: "천하비무대회 초청장",
+          desc: `십 년에 한 번 열리는 천하비무대회의 초청장이 도착했습니다. 천하의 고수들이 모여듭니다.${heir ? ` (대제자 ${heir.name}을(를) 대신 내보낼 수도 있습니다)` : ""}`,
+          choices: [
+            { path: "neutral", label: "출전한다", hint: "8강부터 결승까지 세 판", apply: () => { resolve(true); return { text: "대회장으로 향합니다.", chips: [] }; } },
+            { path: "neutral", label: "이번에는 나가지 않는다", hint: "변화 없음", apply: () => { resolve(false); return { text: "초청장을 접어 품에 넣었습니다.", chips: [] }; } }
+          ]
+        });
+      }).then(async go => { await waitHidden("event-modal"); return go; });
+    }
+
+    async function autoRunTournament() {
+      const prev = minigameEnabled;
+      minigameEnabled = false;
+      const heir = getHeir();
+      if (heir && heir.power > getCombatPower()) setTourEntrant("heir");
+      for (let guard = 0; guard < 20; guard++) {
+        while (tournamentState.isFighting || document.getElementById("btn-tour-action").disabled) await sleep(100);
+        const mode = tournamentState.buttonMode;
+        await sleep(300);
+        onTourActionButtonClick();
+        if (mode === "CLOSE") break;
+      }
+      minigameEnabled = prev;
+    }
+
+    // ----- 연말 결과 화면 -----
+    function showYearResult(rec, diff) {
+      return new Promise(resolve => {
+        document.getElementById("yr-title").innerText = `${rec.age}세의 한 해`;
+        const f = FOCUS[rec.focus];
+        document.getElementById("yr-focus").innerText = `${f.icon} ${f.label}`;
+        const chips = [
+          ["무력", diff.qi + diff.ext + diff.agi, "text-amber-300"], ["내공", diff.qi, "text-amber-300"], ["외공", diff.ext, "text-red-400"], ["신법", diff.agi, "text-cyan-400"],
+          ["은자", diff.money, "text-yellow-400"], ["명성", diff.fame, "text-emerald-400"],
+          ["협의", diff.r, "text-sky-300"], ["악명", diff.e, "text-rose-300"], ["마성", diff.d, "text-purple-300"]
+        ].filter(([, v], i) => i < 6 || v !== 0);
+        document.getElementById("yr-chips").innerHTML = chips.map(([l, v, c]) =>
+          `<span class="px-2 py-1 rounded-lg bg-stone-900 border border-stone-800 ${v < 0 ? "text-rose-400" : c}">${l} <strong>${v > 0 ? "+" : ""}${v}</strong></span>`).join("");
+        document.getElementById("yr-lines").innerHTML = rec.lines.map(l => `<div class="${l.c || "text-stone-300"} leading-relaxed">${escapeHtml(l.t)}</div>`).join("");
+        const rum = document.getElementById("yr-rumors");
+        rum.innerHTML = rec.rumors.length
+          ? rec.rumors.map(r => `<div class="${(r.c) || "text-stone-300"} leading-relaxed">💬 ${escapeHtml(r.t || r)}</div>`).join("")
+          : `<div class="text-stone-500">올해는 조용히 지나갔다.</div>`;
+        const btn = document.getElementById("yr-next");
+        btn.innerText = char.dead ? "생을 마치다…" : `${char.age}세를 맞이하다 ➔`;
+        const modal = document.getElementById("year-result-modal");
+        modal.style.display = "flex";
+        let done = false;
+        const finish = () => { if (done) return; done = true; modal.style.display = "none"; resolve(); };
+        btn.onclick = finish;
+        if (autoMode) setTimeout(finish, (char.dead ? 2500 : 1600) * timeScale);
+      });
+    }
+
+    // ----- 회고 -----
+    function askReflection() {
+      return new Promise(resolve => {
+        document.getElementById("refl-title").innerText = `${char.age}세의 ${char.name}`;
+        const input = document.getElementById("refl-input");
+        input.value = "";
+        const modal = document.getElementById("reflection-modal");
+        modal.style.display = "flex";
+        const done = save => {
+          const t = cleanInputText(input.value, 60);
+          if (save && t) char.reflections.push({ age: char.age, text: t });
+          modal.style.display = "none";
+          resolve();
+        };
+        document.getElementById("refl-save").onclick = () => done(true);
+        document.getElementById("refl-skip").onclick = () => done(false);
+      });
+    }
+
+    // ----- 자동 진행 -----
+    function toggleAuto() {
+      autoMode = !autoMode;
+      if (autoMode) setMinigameEnabledTemp(false); else setMinigameEnabledTemp(null);
+      updateUI();
+      if (autoMode && !yearBusy && !char.dead) passYear();
+    }
+
+    let savedMinigame = null;
+    function setMinigameEnabledTemp(v) {
+      if (v === false) { if (savedMinigame === null) savedMinigame = minigameEnabled; minigameEnabled = false; }
+      else if (savedMinigame !== null) { minigameEnabled = savedMinigame; savedMinigame = null; }
+    }
+
+    function cycleSpeed() {
+      timeScale = timeScale === 1 ? 0.5 : timeScale === 0.5 ? 0.25 : 1;
+      updateUI();
+    }
+
+    // 운명에 맡기기: 사건 선택, 돌파, 문파·전포를 알아서 처리
+    function autoPickChoice(ev) {
+      const path = getPath() === "neutral" ? (char.faction === "neutral" ? null : char.faction) : getPath();
+      const matching = ev.choices.filter(c => c.path === path);
+      if (matching.length && Math.random() < 0.7) return pick(matching);
+      return pick(ev.choices);
+    }
+
+    async function autoManage() {
+      // 폐관 돌파
+      const nextRank = ranks[char.rankIdx + 1];
+      if (nextRank && nextRank.needsBreakthrough && char.rankIdx >= 5 && !char.hasBreakthroughThisYear && getCombatPower() >= nextRank.minStat * 0.9) {
+        openBreakthroughModal();
+        if (document.getElementById("breakthrough-modal").style.display === "flex") {
+          executeBreakthrough();
+          await sleep(1200);
+          closeBreakthroughResultModal();
+          if (char.dead) return;
+        }
+      }
+      // 전포
+      shopItems.forEach(it => { if (char.money >= it.price * 1.5 && !char.ownedItems.includes(it.name)) buyShopItem(it.name, it.price, it.bonus); });
+      closeGachaResultModal();
+      // 문파
+      if (!sect() && canFoundSect() && char.money >= SECT_FOUND_COST * 2) {
+        selectedIdeal = { orthodox: "chivalry", unorthodox: "profit", demonic: "might", neutral: "freedom" }[getPath()];
+        document.getElementById("sect-found-name").value = "";
+        openSectFoundModal();
+        confirmFoundSect();
+        closeSectModal();
+      }
+      if (sect()) {
+        const s = sect();
+        [...s.applicants].sort((a, b) => (b.talent + b.wit) - (a.talent + a.wit)).forEach(a => acceptApplicant(a.id));
+        const h = getHeir(); if (h && !s.taughtThisYear) teachDisciple(h.id);
+        for (const k of ["hall", "library", "palace", "pharmacy", "special"]) {
+          const b = k === "special" ? SPECIAL_BUILDINGS[s.special] : BUILDINGS[k];
+          const lv = s.buildings[k];
+          if (lv < 3 && char.money >= b.costs[lv] * 2) upgradeBuilding(k);
+        }
+        closeSectModal();
+      }
+      closeRankUpModal();
+      updateUI();
+    }
+
+    // ----- 생의 마감 -----
+    function finishLife() {
+      autoMode = false;
+      setMinigameEnabledTemp(null);
+      addStory(`${char.deathCause}. 향년 ${char.age}세.`);
+      showFinalEnding();
+      saveLifeToArchive();
+      updateUI();
+    }
+
+    // 내가 먼저 떠나도 동기들의 남은 생을 끝까지 흘려 보고 결말을 정함
+    function projectPeer(p) {
+      if (!p.alive) return { ...p };
+      const q = { ...p };
+      let peak = q.power;
+      for (let age = char.age + 1; age <= q.life; age++) {
+        q.power = Math.round(getBenchmarkPower(age) * q.talent * peerShape(q, age));
+        peak = Math.max(peak, q.power);
+        const risk = (q.path === "demonic" || q.path === "unorthodox") ? 0.012 : 0.006;
+        if (Math.random() < risk) { q.deathAge = age; q.deathCause = "강호의 풍파 속에"; q.power = peak; return q; }
+      }
+      q.deathAge = q.life; q.deathCause = "천수를 누리고"; q.power = peak;
+      return q;
+    }
+
+    function getPeerFates() {
+      if (char.peerFates) return char.peerFates;
+      char.peerFates = char.peers.map(p => {
+        const q = projectPeer(p);
+        const list = ENDINGS[q.path];
+        const e = list.find(x => q.power >= x.min) || list[list.length - 1];
+        let fate = e.title.split(" - ")[0];
+        if (q.path === "demonic" && e.min === 0) fate = "이름 없는 마도의 무인";
+        if (q.deathCause !== "천수를 누리고" && q.deathAge < 45) fate = "요절한 기재";
+        return `${p.name} (${FACTIONS[p.faction].label}) — ${fate} · ${q.deathCause} 향년 ${q.deathAge}세 · 최고 무력 ${q.power}`;
+      });
+      return char.peerFates;
+    }
+
+    function renderEndingExtra() {
+      const box = document.getElementById("ending-extra");
+      const story = char.story.slice(-14).map(s => `<div class="flex gap-2"><span class="shrink-0 text-amber-400 font-bold">${s.age}세</span><span>${escapeHtml(s.text)}</span></div>`).join("");
+      const peers = getPeerFates().map(t => `<div>· ${escapeHtml(t)}</div>`).join("");
+      const refl = char.reflections.map(r => `<div><span class="text-amber-400 font-bold">${r.age}세의 내가 남긴 말</span> "${escapeHtml(r.text)}"</div>`).join("");
+      box.innerHTML = `
+        <div class="space-y-1"><div class="text-[11px] font-brush text-amber-300">인생 이야기</div><div class="space-y-0.5 text-[11px] text-stone-300">${story}</div></div>
+        <div class="space-y-1 pt-2 border-t border-stone-800"><div class="text-[11px] font-brush text-amber-300">동기들의 결말</div><div class="space-y-0.5 text-[11px] text-stone-400">${peers}</div></div>
+        ${refl ? `<div class="space-y-1 pt-2 border-t border-stone-800"><div class="text-[11px] font-brush text-amber-300">그 시절 남긴 말</div><div class="space-y-0.5 text-[11px] text-stone-300">${refl}</div></div>` : ""}`;
+      document.getElementById("end-death-line").innerText = char.hasAscended
+        ? `${char.age}세, 구천현뢰를 뚫고 승천하다`
+        : `향년 ${char.age}세 · ${char.deathCause || "은퇴"}${char.spouse ? ` · 반려 ${char.spouse}` : ""}`;
+    }
+
+    // ----- 강호 열전 (지난 인생 보관) -----
+    function loadArchive() {
+      try { return JSON.parse(localStorage.getItem("gangho_lives") || "[]"); } catch (e) { return []; }
+    }
+
+    function saveLifeToArchive() {
+      try {
+        const list = loadArchive();
+        const info = getEndingInfo();
+        list.unshift({
+          date: new Date().toISOString().slice(0, 10), name: char.name, sect: char.sect, faction: char.originFaction,
+          path: info.path, title: info.title, power: getCombatPower(), age: char.age,
+          cause: char.hasAscended ? "우화등선" : char.deathCause, avatarId: char.avatarId,
+          story: char.story.slice(-10), peers: getPeerFates()
+        });
+        localStorage.setItem("gangho_lives", JSON.stringify(list.slice(0, 30)));
+      } catch (e) {}
+      renderArchiveButton();
+    }
+
+    function renderArchiveButton() {
+      const btn = document.getElementById("btn-archive");
+      if (btn) btn.innerText = `📜 강호 열전 · 지난 인생 ${loadArchive().length}`;
+    }
+
+    function openArchiveModal() {
+      const list = loadArchive();
+      const box = document.getElementById("archive-list");
+      box.innerHTML = list.length ? "" : `<p class="text-center text-stone-500 py-8 text-xs">아직 기록된 인생이 없습니다.</p>`;
+      list.forEach(l => {
+        const info = PATH_INFO[l.path] || PATH_INFO.neutral;
+        const d = document.createElement("details");
+        d.className = "p-2.5 rounded-xl bg-stone-950/80 border border-stone-800 text-xs";
+        d.innerHTML = `
+          <summary class="cursor-pointer flex items-center gap-2 list-none">
+            <span class="w-8 h-8 shrink-0 rounded-lg bg-stone-900 border border-stone-700 p-0.5">${getAvatarSvg(l.avatarId)}</span>
+            <span class="min-w-0 flex-1"><span class="block font-bold text-stone-100 truncate">${escapeHtml(l.name)} <span class="px-1 rounded border text-[9px] ${info.chip}">${info.short}</span> <span class="text-[10px] text-stone-500">${escapeHtml(l.date)}</span></span>
+            <span class="block text-[10px] text-amber-300 truncate">${escapeHtml(l.title)}</span></span>
+            <span class="text-right shrink-0 text-[10px] text-stone-400">향년 ${Number(l.age)}<br>무력 ${Number(l.power)}</span>
+          </summary>
+          <div class="mt-2 pt-2 border-t border-stone-800 space-y-1 text-[11px] text-stone-300">
+            <div class="text-stone-400">${escapeHtml(l.sect)} · ${escapeHtml(l.cause || "")}</div>
+            ${(l.story || []).map(s => `<div><span class="text-amber-400">${Number(s.age)}세</span> ${escapeHtml(s.text)}</div>`).join("")}
+            <div class="pt-1 text-stone-500">${(l.peers || []).map(escapeHtml).join("<br>")}</div>
+          </div>`;
+        box.appendChild(d);
+      });
+      document.getElementById("archive-modal").style.display = "flex";
+    }
+
+    function closeArchiveModal() {
+      document.getElementById("archive-modal").style.display = "none";
+    }
+
+    // ----- 연대기 -----
+    function openChronicleModal() {
+      const box = document.getElementById("chronicle-list");
+      const rows = [...char.history].reverse();
+      box.innerHTML = rows.length ? rows.map(h => `
+        <div class="p-2 rounded-lg bg-stone-950/70 border border-stone-800 text-[11px] flex gap-2">
+          <span class="shrink-0 w-9 text-amber-400 font-bold">${h.age}세</span>
+          <span class="shrink-0 w-14 text-stone-400">${FOCUS[h.focus].icon} ${FOCUS[h.focus].short}</span>
+          <span class="flex-1 min-w-0 text-stone-300 truncate">${escapeHtml(h.note || "-")}</span>
+          <span class="shrink-0 text-right text-stone-400">${escapeHtml(h.rank)}<br><strong class="text-amber-300">${h.power}</strong></span>
+        </div>`).join("") : `<p class="text-center text-stone-500 py-8 text-xs">아직 한 해도 보내지 않았습니다.</p>`;
+      document.getElementById("chronicle-modal").style.display = "flex";
+    }
+
+    function closeChronicleModal() {
+      document.getElementById("chronicle-modal").style.display = "none";
+    }
+
+    // ----- 올해의 방향 UI -----
+    function setFocus(key) {
+      if (yearBusy) return;
+      char.focus = key;
+      updateUI();
+    }
+
+    function renderFocusUI() {
+      const grid = document.getElementById("focus-grid");
+      if (!grid) return;
+      grid.innerHTML = "";
+      Object.entries(FOCUS).forEach(([key, f]) => {
+        const on = key === char.focus;
+        const b = document.createElement("button");
+        b.type = "button";
+        b.className = `py-2 rounded-xl border text-center transition ${on ? "border-amber-400 bg-amber-950/60 text-amber-200 shadow" : "border-stone-800 bg-stone-950/60 text-stone-400 hover:text-stone-200"} ${yearBusy ? "opacity-60" : "cursor-pointer"}`;
+        b.innerHTML = `<div class="text-lg leading-none">${f.icon}</div><div class="text-[10px] font-bold mt-1 leading-tight">${f.label.replace("·", "<br>")}</div>`;
+        b.onclick = () => setFocus(key);
+        grid.appendChild(b);
+      });
+      document.getElementById("focus-desc").innerText = lifeFocus().desc;
+      document.getElementById("focus-age").innerText = char.age;
+      const inj = document.getElementById("injury-badge");
+      if (char.injury) { inj.classList.remove("hidden"); inj.innerText = `🩹 ${char.injury.name} (${char.injury.years}년)`; }
+      else inj.classList.add("hidden");
+
+      const pass = document.getElementById("btn-pass-year");
+      const over = char.dead || char.hasAscended;
+      pass.disabled = yearBusy || over;
+      pass.className = `w-full py-3.5 font-brush text-lg rounded-xl transition shadow-xl ${pass.disabled ? "bg-stone-800 text-stone-500 cursor-not-allowed" : "bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 hover:brightness-110 text-stone-950 cursor-pointer"}`;
+      pass.innerText = over ? "생을 마쳤습니다" : yearBusy ? "한 해가 흘러가는 중…" : `▶ ${char.age}세의 한 해 보내기`;
+
+      const auto = document.getElementById("btn-auto");
+      auto.className = `flex-1 py-2 rounded-xl border font-bold text-xs transition ${autoMode ? "bg-cyan-900/60 border-cyan-400 text-cyan-200" : "bg-stone-900 border-stone-700 text-stone-300 hover:bg-stone-800"} ${over ? "opacity-50" : "cursor-pointer"}`;
+      auto.innerText = autoMode ? "⏸ 운명에 맡기는 중 (누르면 멈춤)" : "⏩ 운명에 맡기기 (자동 진행)";
+      auto.disabled = over;
+      document.getElementById("btn-speed").innerText = `${Math.round(1 / timeScale)}x`;
+    }
+
 
     function checkRankUp() {
       const totalPower = getCombatPower();
@@ -3751,6 +4562,7 @@
         if (totalPower >= nextRank.minStat) {
           char.rankIdx += 1;
           addLog(char.age, `★ [경지 돌파] '${nextRank.name}' 반열 등극! (녹봉 ${getSalaryForRank(char.rankIdx)}냥으로 상승)`, "text-amber-300 font-brush text-sm");
+          if (char.story && char.rankIdx >= 2) addStory(`${nextRank.name.split(" ")[0]}의 경지에 올랐다.`);
           showRankUpPopup(nextRank);
         }
       }
@@ -3873,45 +4685,7 @@
       renderMultiTierBar(char.agi, "bg-gradient-to-r from-cyan-600 to-cyan-400", "tier-agi", "bar-agi-bg", "bar-agi-fill");
       renderMultiTierBar(char.fame, "bg-gradient-to-r from-emerald-600 to-emerald-400", "tier-fame", "bar-fame-bg", "bar-fame-fill");
 
-      const btnTrain = document.getElementById("btn-train");
-      const trainStatus = document.getElementById("train-status");
-      if (char.hasTrainedThisYear) {
-        btnTrain.disabled = true;
-        btnTrain.className = "py-2.5 px-2 bg-stone-950 border border-stone-800 text-stone-600 rounded-xl flex flex-col items-center justify-center cursor-not-allowed";
-        trainStatus.innerText = "(완료)";
-      } else {
-        btnTrain.disabled = false;
-        btnTrain.className = "py-2.5 px-2 bg-stone-900 hover:bg-stone-800 text-stone-100 border border-stone-700/80 rounded-xl transition flex flex-col items-center justify-center cursor-pointer shadow";
-        trainStatus.innerText = "(연 1회)";
-      }
-
-      const btnDuel = document.getElementById("btn-duel");
-      const duelLabel = document.getElementById("duel-label");
-      const duelStatus = document.getElementById("duel-status");
-
-      if (char.hasDueledThisYear) {
-        btnDuel.disabled = true;
-        btnDuel.className = "py-2.5 px-2 bg-stone-950 border border-stone-800 text-stone-600 rounded-xl flex flex-col items-center justify-center cursor-not-allowed";
-        duelStatus.innerText = "(완료)";
-        duelStatus.className = "text-[10px] text-stone-600 font-medium";
-        duelLabel.innerText = isMajorYear(char.age) ? "👑 비무제 출전" : "⚔️ 강호 비무";
-        duelLabel.className = "text-stone-600 font-brush text-base";
-      } else {
-        btnDuel.disabled = false;
-        if (isMajorYear(char.age)) {
-          btnDuel.className = "py-2.5 px-2 bg-gradient-to-r from-amber-600 via-yellow-500 to-amber-600 hover:brightness-110 text-stone-950 border border-yellow-400 rounded-xl transition flex flex-col items-center justify-center cursor-pointer shadow-lg animate-pulse";
-          duelLabel.innerText = "👑 천하비무제 출전";
-          duelLabel.className = "text-stone-950 font-brush text-base";
-          duelStatus.innerText = "(메이저 제전)";
-          duelStatus.className = "text-[10px] text-stone-900 font-bold";
-        } else {
-          btnDuel.className = "py-2.5 px-2 bg-stone-900 hover:bg-stone-800 text-stone-100 border border-stone-700/80 rounded-xl transition flex flex-col items-center justify-center cursor-pointer shadow";
-          duelLabel.innerText = "⚔️ 강호 비무";
-          duelLabel.className = "text-rose-400 font-brush text-base";
-          duelStatus.innerText = "(은자 파밍)";
-          duelStatus.className = "text-[10px] text-stone-400 font-medium";
-        }
-      }
+      renderFocusUI();
 
       const btnBreakthrough = document.getElementById("btn-breakthrough");
       if (char.rankIdx >= 5 && char.rankIdx < ranks.length - 1) {
@@ -3978,6 +4752,10 @@
           closeDuelSelectModal();
         } else if (document.getElementById("market-modal").style.display === "flex") {
           closeMarketModal();
+        } else if (document.getElementById("archive-modal").style.display === "flex") {
+          closeArchiveModal();
+        } else if (document.getElementById("chronicle-modal").style.display === "flex") {
+          closeChronicleModal();
         } else if (document.getElementById("sect-found-modal").style.display === "flex") {
           closeSectFoundModal();
         } else if (document.getElementById("sect-modal").style.display === "flex") {
@@ -3996,6 +4774,7 @@
       rollInitialStats();
       renderAvatarSelector();
       renderFactionSelector();
+      renderArchiveButton();
       updateUI();
     };
   </script>
