@@ -3937,7 +3937,9 @@
       char.deathCause = "";
       char.growthRevealed = false;
       char.peers = makePeers();
-      addStory(`${FACTIONS[char.faction].label} ${char.sect}에 입문하여 강호에 첫발을 내디뎠다.`);
+      addStory(char.faction === "neutral"
+        ? (/세가|가문|世家/.test(char.sect) ? `${char.sect}의 자손으로 강호에 첫발을 내디뎠다.` : "어디에도 속하지 않은 낭인으로 강호에 첫발을 내디뎠다.")
+        : `${FACTIONS[char.faction].label} ${char.sect}에 입문하여 강호에 첫발을 내디뎠다.`);
     }
 
     function makePeers() {
@@ -4117,7 +4119,7 @@
       const salaryMult = getTemper().incomeBonus || 1;
       const salary = Math.round(getCurrentSalary() * salaryMult);
       char.money += salary;
-      rec.lines.push({ t: `${sect() ? "강호 위명 수입" : "문파 녹봉"} ${salary}냥을 받았다.`, c: "text-emerald-400" });
+      rec.lines.push({ t: `${{ own: "강호 위명 수입", sect: "문파 녹봉", clan: "가문 지원금", ronin: "강호에 쌓은 이름값으로 들어온 수입" }[affiliation()]} ${salary}냥을 받았다.`, c: "text-emerald-400" });
       processSectYear(getTemper().incomeBonus || 1);
 
       const gt = GROWTH_TYPES[char.growthType];
@@ -4348,7 +4350,7 @@
       box.innerHTML = rows.length ? rows.map(h => `
         <div class="p-2 rounded-lg bg-stone-950/70 border border-stone-800 text-[11px] flex gap-2">
           <span class="shrink-0 w-9 text-amber-400 font-bold">${h.age}세</span>
-          <span class="shrink-0 w-14 text-stone-400">${FOCUS[h.focus].icon} ${FOCUS[h.focus].short}</span>
+          <span class="shrink-0 w-16 text-stone-400 truncate">${h.flabel || FOCUS[h.focus].icon + " " + FOCUS[h.focus].short}</span>
           <span class="flex-1 min-w-0 text-stone-300 truncate">${escapeHtml(h.note || "-")}</span>
           <span class="shrink-0 text-right text-stone-400">${escapeHtml(h.rank)}<br><strong class="text-amber-300">${h.power}</strong></span>
         </div>`).join("") : `<p class="text-center text-stone-500 py-8 text-xs">아직 한 해도 보내지 않았습니다.</p>`;
@@ -4723,6 +4725,18 @@
     const EP_INJURY = { seclusion: 0.01, wander: 0.04, duel: 0.06, sect: 0.01, rest: 0 };
     const SEASONS = ["봄", "여름", "가을"];
 
+    // 소속 문파가 없는 세가·낭인용 구분
+    function affiliation() {
+      if (sect()) return "own";
+      if (char.faction !== "neutral") return "sect";
+      return /세가|가문|世家/.test(char.sect) ? "clan" : "ronin";
+    }
+
+    function episodeLabel(key) {
+      if (key !== "sect") return `${FOCUS[key].icon} ${FOCUS[key].label}`;
+      return { own: "🏯 문파 경영", sect: "🏯 사문 일", clan: "🏠 가문 일", ronin: "💰 강호 의뢰" }[affiliation()];
+    }
+
     function planYear() {
       const t = getTemper();
       const w = { ...t.w };
@@ -4884,7 +4898,13 @@
         await rec.out(`${sect().name}의 현판을 닦으며 제자가 찾아오기를 기다렸다. ${STAT_TXT(g)}`);
       } else {
         const m = Math.round(scaled(20) * (getTemper().incomeBonus || 1)); char.money += m;
-        await rec.out(`사문의 크고 작은 일을 도맡았다. (수당 +${m}냥) ${STAT_TXT(g)}`);
+        const aff = affiliation();
+        const line = aff === "clan"
+          ? pick(["가문의 대소사를 돌보며 어린 친척들에게 가전무공을 가르쳤다.", "가문의 상단을 이끌고 먼 길을 다녀왔다.", "가주의 명을 받아 이웃 세가와의 혼담 자리에 다녀왔다."])
+          : aff === "ronin"
+            ? pick(["표국의 호위 일을 맡아 한 철 내내 짐마차를 지켰다.", "현상금이 붙은 좀도둑을 잡아 관아에 넘겼다.", "부잣집 도련님의 호위로 한 철을 보냈다.", "객잔 주인의 부탁으로 행패 부리는 왈패들을 쫓아냈다."])
+            : "사문의 크고 작은 일을 도맡았다.";
+        await rec.out(`${line} (${aff === "ronin" ? "의뢰비" : "수당"} +${m}냥) ${STAT_TXT(g)}`);
       }
     }
 
@@ -4941,7 +4961,7 @@
         if (i === 1) { addAlign(2, 0, 0); st.stage = 9; await rec.out("사부의 빈자리를 지키며 수련에 매진했다. 사부는 끝내 돌아오지 않았다.", "text-stone-400"); addStory("사부가 서찰 한 장을 남기고 떠났다."); return; }
         st.stage = 2; st.next = char.age + ri(1, 2);
         addStory("사라진 사부를 찾아 나섰다.");
-        await rec.out("사부의 낡은 검집을 등에 메고 산문을 나섰다.", "text-amber-200");
+        await rec.out("사부의 낡은 검집을 등에 메고 길을 나섰다.", "text-amber-200");
         return;
       }
       if (st.stage === 2) {
@@ -5035,13 +5055,14 @@
 
       try {
         await storyHeader(`${startAge}세`);
-        await say(pick(SEASON_OPEN), "text-stone-400 italic", 250);
+        const openers = ["sect", "own"].includes(affiliation()) ? SEASON_OPEN : SEASON_OPEN.filter(t => !/산문|연무장/.test(t));
+        await say(pick(openers), "text-stone-400 italic", 250);
         if (char.injury) await say(`몸에는 아직 ${char.injury.name}의 흔적이 남아 있다. (${char.injury.years}년)`, "text-rose-300", 200);
         const plan = planYear();
         rec.focus = plan[0];
         char.focus = plan.includes("seclusion") ? "seclusion" : plan[0];
         for (let i = 0; i < plan.length; i++) {
-          await storyHeader(`${SEASONS[i]} · ${FOCUS[plan[i]].icon} ${FOCUS[plan[i]].label}`);
+          await storyHeader(`${SEASONS[i]} · ${episodeLabel(plan[i])}`);
           await runEpisode(plan[i], rec);
         }
 
@@ -5079,7 +5100,7 @@
         storyChips(diff);
 
         const note = (rec.lines.find(l => /font-bold|text-cyan|text-rose/.test(l.c || "")) || rec.lines[0] || { t: "" }).t;
-        char.history.push({ age: startAge, focus: rec.focus, rank: ranks[char.rankIdx].name.split(" ")[0], power: getCombatPower(), money: char.money, note: note.replace(/\s*\(.*?\)\s*$/, "") });
+        char.history.push({ age: startAge, focus: rec.focus, flabel: episodeLabel(rec.focus), rank: ranks[char.rankIdx].name.split(" ")[0], power: getCombatPower(), money: char.money, note: note.replace(/\s*\(.*?\)\s*$/, "") });
         updateUI();
 
         if (char.dead) { await finishLifeStory(); return; }
@@ -5117,7 +5138,11 @@
       updateUI();
       storyBox().innerHTML = "";
       await storyHeader("입문");
-      await say(`열여섯의 봄, ${char.name}${josa(char.name, "은", "는")} ${char.sect}의 산문을 두드렸다.`, "text-stone-200", 350);
+      const nm = char.name + josa(char.name, "은", "는");
+      const intro = char.faction !== "neutral" ? `열여섯의 봄, ${nm} ${char.sect}의 산문을 두드렸다.`
+        : /세가|가문|世家/.test(char.sect) ? `열여섯의 봄, ${char.sect}의 자손인 ${nm} 가문의 검을 등에 메고 처음 강호로 나섰다.`
+        : `열여섯의 봄, ${nm} 낡은 검 한 자루만 들고 홀로 강호에 발을 내디뎠다. 이끌어 줄 사문도, 돌아갈 곳도 없었다.`;
+      await say(intro, "text-stone-200", 350);
       await say(`타고난 기질은 ${getTemper().label}. ${getTemper().desc}였다.`, "text-amber-200", 350);
       await say(`같은 해 강호에 발을 들인 이들이 있었다. ${char.peers.map(p => `${p.name}(${FACTIONS[p.faction].label})`).join(", ")}.`, "text-stone-400", 350);
       await say("언젠가 그들과 다시 마주치게 될 것이다.", "text-stone-400 italic", 300);
