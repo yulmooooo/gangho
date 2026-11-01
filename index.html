@@ -500,32 +500,32 @@
       <p class="text-[11px] text-stone-300">올해 한 해를 보내면 천하비무대회 초청장이 도착합니다!</p>
     </div>
 
-    <!-- 행동 패널: 올해의 방향 + 한 해 보내기 -->
-    <section class="hanji-card rounded-2xl p-3 gold-border border space-y-2.5">
-      <div class="flex items-center justify-between">
-        <span class="text-sm font-brush text-amber-300">올해의 방향 <span class="text-[11px] text-stone-400">(<span id="focus-age">16</span>세)</span></span>
-        <span id="injury-badge" class="hidden text-[10px] font-bold px-1.5 py-0.5 rounded bg-rose-950 text-rose-300 border border-rose-600/60"></span>
+    <!-- 이야기 화면 (메인) -->
+    <section id="story-panel" class="hanji-card rounded-2xl gold-border border flex flex-col h-[78vh] min-h-[460px] sm:h-[620px] overflow-hidden scroll-mt-2">
+      <div class="flex items-center justify-between px-3.5 pt-3 pb-2 border-b border-stone-800">
+        <div class="flex items-center gap-2">
+          <h3 class="text-base font-brush text-amber-300 tracking-wide">강호록 (江湖錄)</h3>
+          <span id="injury-badge" class="hidden text-[10px] font-bold px-1.5 py-0.5 rounded bg-rose-950 text-rose-300 border border-rose-600/60"></span>
+        </div>
+        <div class="flex items-center gap-1">
+          <button id="btn-auto" onclick="toggleAuto()" class="px-2.5 py-1 rounded-lg border font-bold text-[11px]">⏩ 운명에 맡기기</button>
+          <button id="btn-speed" onclick="cycleSpeed()" class="px-2 py-1 rounded-lg border border-stone-700 bg-stone-900 text-stone-300 font-bold text-[11px] cursor-pointer">1x</button>
+        </div>
       </div>
-      <div id="focus-grid" class="grid grid-cols-5 gap-1"></div>
-      <p id="focus-desc" class="text-[10px] text-stone-400 text-center leading-snug min-h-[26px]"></p>
-
-      <button id="btn-pass-year" onclick="passYear()" class="w-full py-3.5 bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 hover:brightness-110 text-stone-950 font-brush text-lg rounded-xl transition shadow-xl cursor-pointer">
-        ▶ 한 해 보내기
-      </button>
-
-      <div class="flex items-center gap-1.5">
-        <button id="btn-auto" onclick="toggleAuto()" class="flex-1 py-2 rounded-xl border font-bold text-xs">⏩ 운명에 맡기기 (자동 진행)</button>
-        <button id="btn-speed" onclick="cycleSpeed()" class="w-12 py-2 rounded-xl border border-stone-700 bg-stone-900 text-stone-300 font-bold text-xs cursor-pointer">1x</button>
+      <div id="log-list" onclick="storySkip()" class="flex-1 overflow-y-auto px-3.5 py-3 space-y-2 text-[13px]"></div>
+      <div class="p-2.5 border-t border-stone-800 bg-stone-950/60">
+        <button id="btn-pass-year" onclick="passYear()" class="w-full py-3 font-brush text-lg rounded-xl">▶ 한 해를 시작하다</button>
       </div>
+    </section>
 
+    <!-- 보조 메뉴 -->
+    <section class="space-y-2">
       <button id="btn-breakthrough" onclick="openBreakthroughModal()" class="w-full py-2.5 bg-gradient-to-r from-red-950 via-stone-900 to-red-950 border-2 border-red-600/70 text-red-300 breakthrough-pulse rounded-xl font-brush text-base flex items-center justify-center gap-1.5 cursor-pointer shadow hidden">
         <span>⚡ 생사 폐관 돌파 (경지 초월 시도)</span>
       </button>
-
       <button id="btn-ascension" onclick="executeAscensionTrial()" class="w-full py-3 bg-gradient-to-r from-sky-950 via-cyan-900 to-amber-950 border-2 border-cyan-400 text-cyan-200 immortal-card rounded-xl font-brush text-base flex items-center justify-center gap-1.5 cursor-pointer shadow-xl hidden">
         <span>⚡ 우화등선(羽化登仙): 구천현뢰 천겁 돌파</span>
       </button>
-
       <div class="grid grid-cols-3 gap-1.5">
         <button id="btn-sect" onclick="handleSectButton()" class="py-2 bg-stone-900 hover:bg-stone-800 text-amber-200 border border-amber-600/40 rounded-xl font-brush text-sm flex flex-col items-center justify-center cursor-pointer shadow">
           <span id="sect-btn-label">🏯 문파 창건</span>
@@ -538,16 +538,6 @@
           <span>📜 연대기</span>
         </button>
       </div>
-    </section>
-
-    <!-- 강호록 타임라인 피드 -->
-    <section class="hanji-card rounded-2xl p-4 gold-border border flex-1 flex flex-col h-[380px]">
-      <div class="flex items-center justify-between pb-2 border-b border-stone-800 mb-2">
-        <h3 class="text-base font-brush text-amber-300 tracking-wide">강호록 (江湖錄)</h3>
-        <span class="text-[11px] font-bold text-stone-500">연도별 행적</span>
-      </div>
-
-      <div id="log-list" class="flex-1 overflow-y-auto space-y-2 pr-1 text-xs"></div>
     </section>
 
   </main>
@@ -583,43 +573,6 @@
         <button onclick="closeBreakthroughModal()" class="py-3 bg-stone-800 text-stone-300 font-brush text-sm rounded-xl cursor-pointer">
           마음을 가다듬고 물러남
         </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- 연말 결과 화면 -->
-  <div id="year-result-modal" style="display: none;" class="fixed inset-0 bg-black/90 items-center justify-center p-3 z-[55]">
-    <div class="hanji-card border-2 gold-border w-full max-w-sm p-4 rounded-3xl shadow-2xl space-y-3 max-h-[92vh] flex flex-col">
-      <div class="text-center space-y-1">
-        <span id="yr-focus" class="text-[10px] font-bold tracking-widest px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40"></span>
-        <h3 id="yr-title" class="text-2xl font-brush text-amber-300"></h3>
-      </div>
-      <div id="yr-chips" class="flex flex-wrap justify-center gap-1.5 text-[11px] font-bold"></div>
-      <div class="flex-1 overflow-y-auto space-y-2 pr-1">
-        <div class="p-3 bg-stone-950/90 rounded-2xl border border-stone-800 space-y-1.5 text-xs">
-          <div class="text-[10px] font-bold text-amber-500 tracking-widest">강호록</div>
-          <div id="yr-lines" class="space-y-1.5"></div>
-        </div>
-        <div class="p-3 bg-stone-950/90 rounded-2xl border border-stone-800 space-y-1.5 text-xs">
-          <div class="text-[10px] font-bold text-amber-500 tracking-widest">강호 풍문</div>
-          <div id="yr-rumors" class="space-y-1.5"></div>
-        </div>
-      </div>
-      <button id="yr-next" class="w-full py-3 bg-gradient-to-r from-amber-600 to-amber-500 hover:brightness-110 text-stone-950 font-brush text-base rounded-xl cursor-pointer shadow"></button>
-    </div>
-  </div>
-
-  <!-- 회고 -->
-  <div id="reflection-modal" style="display: none;" class="fixed inset-0 bg-black/95 items-center justify-center p-3 z-[60]">
-    <div class="hanji-card border-2 gold-border w-full max-w-sm p-5 rounded-3xl shadow-2xl space-y-3 text-center">
-      <span class="text-[10px] font-bold tracking-widest px-2 py-0.5 rounded bg-stone-800 text-stone-300 border border-stone-600">A MOMENT OF REFLECTION</span>
-      <h3 id="refl-title" class="text-2xl font-brush text-amber-300"></h3>
-      <p class="text-xs text-stone-300 leading-relaxed">잠시 걸음을 멈추고 지나온 길을 돌아봅니다.<br>훗날의 나에게 한마디를 남기겠습니까?</p>
-      <input id="refl-input" type="text" maxlength="60" placeholder="예) 아직은 검이 무겁다" class="w-full bg-stone-900 border border-stone-700 rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:border-amber-500">
-      <p class="text-[10px] text-stone-500">남긴 말은 생을 마칠 때 다시 보여드립니다.</p>
-      <div class="grid grid-cols-2 gap-2">
-        <button id="refl-save" class="py-3 bg-gradient-to-r from-amber-600 to-amber-500 text-stone-950 font-brush text-sm rounded-xl cursor-pointer">마음에 새기다</button>
-        <button id="refl-skip" class="py-3 bg-stone-800 text-stone-300 font-brush text-sm rounded-xl cursor-pointer">말없이 지나가다</button>
       </div>
     </div>
   </div>
@@ -1363,9 +1316,8 @@
       document.getElementById("start-modal").style.display = "none";
       updateUI();
       initLife();
-      addLog(char.age, `[${f.label}] ${char.sect}의 문하생으로 강호에 입문했습니다. (초기 자금 ${char.money}냥 수령)`, "text-amber-300 font-bold");
-      addLog(char.age, `같은 해 입문한 동기: ${char.peers.map(p => `${p.name}(${FACTIONS[p.faction].label})`).join(", ")}`, "text-stone-400");
       updateUI();
+      storyPrologue();
     }
 
     function doTrain() {
@@ -1405,6 +1357,10 @@
     }
 
     function showRankUpPopup(rank) {
+      if (document.getElementById("log-list")) {
+        sayHTML(`<div class="my-1 p-3 rounded-xl border-2 border-amber-400/80 bg-amber-950/30 text-center flash-gold"><div class="text-[10px] font-bold tracking-widest text-amber-500">BREAKTHROUGH REALM</div><div class="font-brush text-yellow-300 text-lg">★ ${rank.name} ★</div><div class="text-[11px] text-emerald-400">연간 녹봉 ${getSalaryForRank(ranks.indexOf(rank))}냥</div></div>`);
+        return;
+      }
       document.getElementById("rankup-new-title").innerText = rank.name;
       document.getElementById("rankup-new-salary").innerText = getSalaryForRank(ranks.indexOf(rank));
       document.getElementById("rankup-modal").style.display = "flex";
@@ -2878,6 +2834,7 @@
     const PATH_CHIP_TEXT = { orthodox: "정", unorthodox: "사", demonic: "마", neutral: "중" };
 
     function openEventModal(ev) {
+      if (yearBusy) { activeStoryEvent = storyEvent(ev); return; }
       document.getElementById("event-tag").innerText = ev.tag || "JIANGHU INCIDENT";
       document.getElementById("event-title").innerText = ev.title;
       document.getElementById("event-desc").innerText = ev.desc;
@@ -2904,12 +2861,6 @@
 
       document.getElementById("event-modal").style.display = "flex";
 
-      if (autoMode) {
-        setTimeout(() => {
-          resolveEventChoice(ev, autoPickChoice(ev));
-          setTimeout(closeEventModal, 1100 * timeScale);
-        }, 700 * timeScale);
-      }
     }
 
     function resolveEventChoice(ev, ch) {
@@ -4002,13 +3953,13 @@
       const f = char.focus;
       if (f === "seclusion") {
         const g = applyTraining(FOCUS.seclusion.train);
-        rec.lines.push({ t: pick(["깊은 동굴에서 홀로 운기조식하며 한 해를 보냈다.", "폭포 아래에서 사계절 내내 검을 휘둘렀다.", "문을 걸어 잠그고 비급 한 권을 천 번 읽었다.", "설산 꼭대기에서 찬 기운을 견디며 내공을 다졌다."]) + ` (내공 +${g.dQi}, 외공 +${g.dExt}, 신법 +${g.dAgi})` });
+        await rec.out(pick(["깊은 동굴에서 홀로 운기조식하며 한 해를 보냈다.", "폭포 아래에서 사계절 내내 검을 휘둘렀다.", "문을 걸어 잠그고 비급 한 권을 천 번 읽었다.", "설산 꼭대기에서 찬 기운을 견디며 내공을 다졌다."]) + ` (내공 +${g.dQi}, 외공 +${g.dExt}, 신법 +${g.dAgi})`);
       }
       if (f === "wander") {
         const g = applyTraining(FOCUS.wander.train);
         const p1 = pick(PLACES); let p2 = pick(PLACES); if (p2 === p1) p2 = pick(PLACES);
         gainFame(ri(3, 6));
-        rec.lines.push({ t: `${p1}에서 ${p2}까지 발길 닿는 대로 떠돌았다. (내공 +${g.dQi}, 외공 +${g.dExt}, 신법 +${g.dAgi})` });
+        await rec.out(`${p1}에서 ${p2}까지 발길 닿는 대로 떠돌았다. (내공 +${g.dQi}, 외공 +${g.dExt}, 신법 +${g.dAgi})`);
         if (Math.random() < 0.3) {
           const boon = pick([
             { t: "산삼 캐는 노인에게 백년 묵은 산삼을 얻었다.", f: () => gainStats(8, 0, 0), c: "내공 +8" },
@@ -4017,46 +3968,34 @@
             { t: "강가에서 주인 잃은 전낭을 발견했다.", f: () => { char.money += scaled(40); }, c: `은자 +${scaled(40)}` }
           ]);
           boon.f();
-          rec.lines.push({ t: `✦ 기연: ${boon.t} (${boon.c})`, c: "text-cyan-300 font-bold" });
+          await rec.out(`✦ 기연: ${boon.t} (${boon.c})`, "text-cyan-300 font-bold");
         }
       }
       if (f === "duel") {
-        applyTraining(FOCUS.duel.train);
-        // 1) 맞수와의 한판
-        const res = await new Promise(resolve => { duelResolver = resolve; openDuelSelectModal(); });
-        if (res && !res.skipped) {
-          rec.lines.push({ t: `⚔ 맞수 ${res.opponent.name}과의 한판: ${res.won ? "승리!" : "패배"}`, c: res.won ? "text-amber-300 font-bold" : "text-stone-400" });
-          if (res.won) pendingTurns.push(() => showPostDuelChoice(res.opponent));
-        }
-        // 2) 연이은 비무
-        const n = ri(2, 3);
-        let wins = 0, earned = 0;
-        for (let i = 0; i < n; i++) {
-          const ratio = pick([0.65, 1.0, 1.0, 1.35]);
-          const r = autoDuel(ratio);
-          if (r.won) { wins++; const m = Math.round(20 * ratio * getPrizeMult()); earned += m; char.money += m; gainFame(Math.round(3 * ratio)); }
-        }
-        rec.lines.push({ t: `떠돌며 ${n}번 더 겨뤄 ${wins}승 ${n - wins}패. (상금 +${earned}냥)` });
+        const g = applyTraining(FOCUS.duel.train);
+        await rec.out(pick(["검 한 자루를 등에 메고 고수들을 찾아 길을 나섰다.", "비무첩을 품에 넣고 이름난 도장들을 돌았다."]) + ` (내공 +${g.dQi}, 외공 +${g.dExt}, 신법 +${g.dAgi})`);
+        await storyDuel(rec);
       }
       if (f === "sect") {
         const g = applyTraining(FOCUS.sect.train);
         if (sect() && sect().disciples.length) {
           const s = sect();
           s.disciples.forEach(d => { const gg = Math.round(discipleGrowth(d, true) * 0.6); d.power += gg; d.loyalty = Math.min(100, d.loyalty + 3); });
-          rec.lines.push({ t: `${s.name}의 제자 ${s.disciples.length}명을 고루 가르쳤다. (내공 +${g.dQi}, 외공 +${g.dExt})` });
+          await rec.out(`${s.name}의 제자 ${s.disciples.length}명을 고루 가르쳤다. (내공 +${g.dQi}, 외공 +${g.dExt})`);
         } else {
           const m = scaled(25); char.money += m;
-          rec.lines.push({ t: `사문의 크고 작은 일을 도맡았다. (수당 +${m}냥, 내공 +${g.dQi})` });
+          await rec.out(`사문의 크고 작은 일을 도맡았다. (수당 +${m}냥, 내공 +${g.dQi})`);
         }
       }
       if (f === "rest") {
         applyTraining(FOCUS.rest.train);
         char.lifeBonus += 1;
-        if (char.injury) { rec.lines.push({ t: `약초를 달여 먹으며 ${char.injury.name}을(를) 다스렸다.`, c: "text-emerald-300" }); char.injury = null; }
-        else rec.lines.push({ t: pick(["고향 마을에서 느긋하게 차를 마시며 한 해를 보냈다.", "명산의 절에 머물며 마음을 비웠다.", "옛 벗들을 찾아다니며 술잔을 기울였다."]) + " (수명 +1)" });
+        if (char.injury) { await rec.out(`약초를 달여 먹으며 ${char.injury.name}을(를) 다스렸다.`, "text-emerald-300"); char.injury = null; }
+        else await rec.out(pick(["고향 마을에서 느긋하게 차를 마시며 한 해를 보냈다.", "명산의 절에 머물며 마음을 비웠다.", "옛 벗들을 찾아다니며 술잔을 기울였다."]) + " (수명 +1)");
         if (!char.spouse && char.age >= 20 && char.age <= 50 && Math.random() < 0.4) pendingTurns.push(() => openEventModal(buildRomanceEvent()));
       }
       rollInjury(lifeFocus().injury, rec);
+      if (rec.lines.length && rec.lines[rec.lines.length - 1].c === "text-rose-400 font-bold" && !rec.lines[rec.lines.length - 1].shown) await say(rec.lines[rec.lines.length - 1].t, "text-rose-400 font-bold");
     }
 
     function buildRomanceEvent() {
@@ -4190,141 +4129,6 @@
       return "seclusion";
     }
 
-    async function passYear() {
-      if (yearBusy || char.dead || char.hasAscended) return;
-      if (autoMode) char.focus = autoChooseFocus();
-      yearBusy = true;
-      updateUI();
-      const before = { qi: char.qi, ext: char.ext, agi: char.agi, money: char.money, fame: char.fame, r: char.align.righteous, e: char.align.evil, d: char.align.demonic };
-      const startAge = char.age;
-      const rec = { age: startAge, focus: char.focus, lines: [], rumors: [] };
-      pendingTurns = [];
-      yearGains = { qi: 0, ext: 0, agi: 0, fame: 0 };
-      alignGains.righteous = 0; alignGains.evil = 0; alignGains.demonic = 0;
-
-      try {
-        await runFocus(rec);
-
-        if (isMajorYear(startAge)) {
-          tourResult = null;
-          const go = await askTournament();
-          if (go) {
-            startMajorTournament();
-            if (autoMode) await autoRunTournament(); else await waitHidden("tournament-modal");
-            if (tourResult) {
-              rec.lines.push({ t: `👑 천하비무대회: ${tourResult.text}`, c: tourResult.win ? "text-yellow-300 font-bold" : "text-stone-300" });
-              if (tourResult.win || tourResult.stage >= 1) addStory(`천하비무대회에서 ${tourResult.text}`);
-            }
-          } else rec.lines.push({ t: "천하비무대회에 나가지 않았다." });
-        }
-
-        simulatePeers(rec);
-        rumorAboutMe(rec);
-        yearEnd(rec);
-
-        const diff = {
-          qi: char.qi - before.qi, ext: char.ext - before.ext, agi: char.agi - before.agi,
-          money: char.money - before.money, fame: char.fame - before.fame,
-          r: char.align.righteous - before.r, e: char.align.evil - before.e, d: char.align.demonic - before.d
-        };
-        char.history.push({ age: startAge, focus: rec.focus, rank: ranks[char.rankIdx].name.split(" ")[0], power: getCombatPower(), money: char.money, note: (rec.lines.find(l => /font-bold|text-cyan|text-rose/.test(l.c || "")) || rec.lines[0] || { t: "" }).t.replace(/\s*\(.*?\)\s*$/, "") });
-        updateUI();
-        await showYearResult(rec, diff);
-        if (autoMode) closeRankUpModal();
-
-        if (char.dead) { finishLife(); return; }
-
-        for (const turn of pendingTurns) { turn(); await waitHidden("event-modal"); }
-        if (!char.dead) maybeTriggerYearEvent(lifeFocus().eventChance);
-        await waitHidden("event-modal");
-        if (autoMode) { closeRankUpModal(); closeGachaResultModal(); }
-        await waitHidden("rankup-modal");
-        if ([20, 30, 40, 50].includes(char.age) && !autoMode) await askReflection();
-        if (autoMode) await autoManage();
-      } finally {
-        yearBusy = false;
-        updateUI();
-      }
-      if (autoMode && !char.dead && !char.hasAscended) setTimeout(passYear, 500 * timeScale);
-    }
-
-    function askTournament() {
-      return new Promise(resolve => {
-        const heir = getHeir();
-        openEventModal({
-          tag: "TEN-YEAR MAJOR FESTIVAL", title: "천하비무대회 초청장",
-          desc: `십 년에 한 번 열리는 천하비무대회의 초청장이 도착했습니다. 천하의 고수들이 모여듭니다.${heir ? ` (대제자 ${heir.name}을(를) 대신 내보낼 수도 있습니다)` : ""}`,
-          choices: [
-            { path: "neutral", label: "출전한다", hint: "8강부터 결승까지 세 판", apply: () => { resolve(true); return { text: "대회장으로 향합니다.", chips: [] }; } },
-            { path: "neutral", label: "이번에는 나가지 않는다", hint: "변화 없음", apply: () => { resolve(false); return { text: "초청장을 접어 품에 넣었습니다.", chips: [] }; } }
-          ]
-        });
-      }).then(async go => { await waitHidden("event-modal"); return go; });
-    }
-
-    async function autoRunTournament() {
-      const prev = minigameEnabled;
-      minigameEnabled = false;
-      const heir = getHeir();
-      if (heir && heir.power > getCombatPower()) setTourEntrant("heir");
-      for (let guard = 0; guard < 20; guard++) {
-        while (tournamentState.isFighting || document.getElementById("btn-tour-action").disabled) await sleep(100);
-        const mode = tournamentState.buttonMode;
-        await sleep(300);
-        onTourActionButtonClick();
-        if (mode === "CLOSE") break;
-      }
-      minigameEnabled = prev;
-    }
-
-    // ----- 연말 결과 화면 -----
-    function showYearResult(rec, diff) {
-      return new Promise(resolve => {
-        document.getElementById("yr-title").innerText = `${rec.age}세의 한 해`;
-        const f = FOCUS[rec.focus];
-        document.getElementById("yr-focus").innerText = `${f.icon} ${f.label}`;
-        const chips = [
-          ["무력", diff.qi + diff.ext + diff.agi, "text-amber-300"], ["내공", diff.qi, "text-amber-300"], ["외공", diff.ext, "text-red-400"], ["신법", diff.agi, "text-cyan-400"],
-          ["은자", diff.money, "text-yellow-400"], ["명성", diff.fame, "text-emerald-400"],
-          ["협의", diff.r, "text-sky-300"], ["악명", diff.e, "text-rose-300"], ["마성", diff.d, "text-purple-300"]
-        ].filter(([, v], i) => i < 6 || v !== 0);
-        document.getElementById("yr-chips").innerHTML = chips.map(([l, v, c]) =>
-          `<span class="px-2 py-1 rounded-lg bg-stone-900 border border-stone-800 ${v < 0 ? "text-rose-400" : c}">${l} <strong>${v > 0 ? "+" : ""}${v}</strong></span>`).join("");
-        document.getElementById("yr-lines").innerHTML = rec.lines.map(l => `<div class="${l.c || "text-stone-300"} leading-relaxed">${escapeHtml(l.t)}</div>`).join("");
-        const rum = document.getElementById("yr-rumors");
-        rum.innerHTML = rec.rumors.length
-          ? rec.rumors.map(r => `<div class="${(r.c) || "text-stone-300"} leading-relaxed">💬 ${escapeHtml(r.t || r)}</div>`).join("")
-          : `<div class="text-stone-500">올해는 조용히 지나갔다.</div>`;
-        const btn = document.getElementById("yr-next");
-        btn.innerText = char.dead ? "생을 마치다…" : `${char.age}세를 맞이하다 ➔`;
-        const modal = document.getElementById("year-result-modal");
-        modal.style.display = "flex";
-        let done = false;
-        const finish = () => { if (done) return; done = true; modal.style.display = "none"; resolve(); };
-        btn.onclick = finish;
-        if (autoMode) setTimeout(finish, (char.dead ? 2500 : 1600) * timeScale);
-      });
-    }
-
-    // ----- 회고 -----
-    function askReflection() {
-      return new Promise(resolve => {
-        document.getElementById("refl-title").innerText = `${char.age}세의 ${char.name}`;
-        const input = document.getElementById("refl-input");
-        input.value = "";
-        const modal = document.getElementById("reflection-modal");
-        modal.style.display = "flex";
-        const done = save => {
-          const t = cleanInputText(input.value, 60);
-          if (save && t) char.reflections.push({ age: char.age, text: t });
-          modal.style.display = "none";
-          resolve();
-        };
-        document.getElementById("refl-save").onclick = () => done(true);
-        document.getElementById("refl-skip").onclick = () => done(false);
-      });
-    }
-
     // ----- 자동 진행 -----
     function toggleAuto() {
       autoMode = !autoMode;
@@ -4392,6 +4196,7 @@
 
     // ----- 생의 마감 -----
     function finishLife() {
+      if (document.getElementById("ending-modal").style.display === "flex") return;
       autoMode = false;
       setMinigameEnabledTemp(null);
       addStory(`${char.deathCause}. 향년 ${char.age}세.`);
@@ -4515,41 +4320,436 @@
       document.getElementById("chronicle-modal").style.display = "none";
     }
 
-    // ----- 올해의 방향 UI -----
-    function setFocus(key) {
-      if (yearBusy) return;
-      char.focus = key;
-      updateUI();
+
+
+
+    // ==========================================
+    // [이야기 화면] 한 줄씩 써지는 글 · 그 자리에서 고르는 선택지
+    // ==========================================
+    let storySkipping = false;
+    let activeStoryEvent = null;
+    let storyUid = 0;
+
+    const storyBox = () => document.getElementById("log-list");
+
+    function storyScroll() {
+      const b = storyBox();
+      b.scrollTop = b.scrollHeight;
     }
 
-    function renderFocusUI() {
-      const grid = document.getElementById("focus-grid");
-      if (!grid) return;
-      grid.innerHTML = "";
-      Object.entries(FOCUS).forEach(([key, f]) => {
-        const on = key === char.focus;
-        const b = document.createElement("button");
-        b.type = "button";
-        b.className = `py-2 rounded-xl border text-center transition ${on ? "border-amber-400 bg-amber-950/60 text-amber-200 shadow" : "border-stone-800 bg-stone-950/60 text-stone-400 hover:text-stone-200"} ${yearBusy ? "opacity-60" : "cursor-pointer"}`;
-        b.innerHTML = `<div class="text-lg leading-none">${f.icon}</div><div class="text-[10px] font-bold mt-1 leading-tight">${f.label.replace("·", "<br>")}</div>`;
-        b.onclick = () => setFocus(key);
-        grid.appendChild(b);
+    // 이야기 화면을 누르면 지금 진행 중인 글을 빨리 넘김 (선택지가 나오면 다시 원래 속도)
+    function storySkip() {
+      if (yearBusy) storySkipping = true;
+    }
+
+    function storyPause(ms) {
+      return storySkipping ? Promise.resolve() : sleep(ms);
+    }
+
+    function storyAppend(el) {
+      const box = storyBox();
+      box.appendChild(el);
+      while (box.children.length > 600) box.firstElementChild.remove();
+      storyScroll();
+      return el;
+    }
+
+    async function say(text, cls = "text-stone-200", pause = 420) {
+      const div = document.createElement("div");
+      div.className = `${cls} leading-relaxed story-line`;
+      storyAppend(div);
+      const fast = storySkipping || timeScale < 0.3;
+      if (fast) {
+        div.textContent = text;
+      } else {
+        const step = Math.max(1, Math.ceil(text.length / 40));
+        for (let i = step; i < text.length + step; i += step) {
+          if (storySkipping) break;
+          div.textContent = text.slice(0, i);
+          storyScroll();
+          await sleep(22);
+        }
+        div.textContent = text;
+      }
+      storyScroll();
+      await storyPause(pause);
+      return div;
+    }
+
+    function sayHTML(html, cls = "") {
+      const div = document.createElement("div");
+      div.className = `story-line ${cls}`;
+      div.innerHTML = html;
+      return storyAppend(div);
+    }
+
+    async function storyHeader(text) {
+      sayHTML(`<div class="flex items-center gap-2 pt-3 pb-1"><span class="flex-1 h-px bg-amber-700/50"></span><span class="font-brush text-amber-300 text-base whitespace-nowrap">${escapeHtml(text)}</span><span class="flex-1 h-px bg-amber-700/50"></span></div>`);
+      await storyPause(350);
+    }
+
+    // 선택지: options = [{ label, hint, chip, chipClass, disabled }]
+    function choose(options, autoIndex) {
+      storySkipping = false;
+      return new Promise(resolve => {
+        const wrap = document.createElement("div");
+        wrap.className = "story-choice space-y-1.5 py-1";
+        options.forEach((o, i) => {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.disabled = !!o.disabled;
+          btn.className = `w-full p-2.5 rounded-xl border text-left transition flex items-start gap-2 ${o.disabled ? "border-stone-800 bg-stone-950/40 opacity-50 cursor-not-allowed" : "border-amber-600/50 bg-stone-900/90 hover:border-amber-400 hover:bg-stone-800 cursor-pointer"}`;
+          btn.innerHTML = `
+            ${o.chip ? `<span class="shrink-0 min-w-[24px] h-6 px-1 rounded-lg border text-xs font-brush flex items-center justify-center ${o.chipClass || "bg-stone-800 text-stone-200 border-stone-600"}">${o.chip}</span>` : ""}
+            <span class="min-w-0"><span class="block text-[13px] font-bold text-stone-100 leading-snug">${o.label}</span>
+            ${o.hint ? `<span class="block text-[11px] text-amber-300/80 font-medium mt-0.5">${o.hint}</span>` : ""}</span>`;
+          btn.onclick = (e) => {
+            e.stopPropagation();
+            [...wrap.children].forEach((b, j) => {
+              b.disabled = true;
+              b.onclick = null;
+              b.classList.remove("hover:border-amber-400", "hover:bg-stone-800", "cursor-pointer");
+              if (j === i) b.className = b.className.replace("border-amber-600/50", "border-amber-400 ring-1 ring-amber-400/60");
+              else b.classList.add("opacity-30");
+            });
+            setTimeout(() => { if (wrap.isConnected) [...wrap.children].forEach((b, j) => { if (j !== i) b.remove(); }); }, 400);
+            resolve(i);
+          };
+          wrap.appendChild(btn);
+        });
+        storyAppend(wrap);
+        if (autoMode) {
+          const idx = typeof autoIndex === "number" ? autoIndex : 0;
+          setTimeout(() => wrap.children[idx] && wrap.children[idx].click(), 650 * timeScale);
+        }
       });
-      document.getElementById("focus-desc").innerText = lifeFocus().desc;
-      document.getElementById("focus-age").innerText = char.age;
+    }
+
+    function storyChips(chips) {
+      if (!chips || !chips.length) return;
+      sayHTML(`<div class="flex flex-wrap gap-1.5 text-[11px] font-bold">${chips.map(([l, v, c]) =>
+        `<span class="px-2 py-0.5 rounded-lg bg-stone-900 border border-stone-800 ${String(v).startsWith("-") ? "text-rose-400" : (c || "text-emerald-300")}">${escapeHtml(l)} <strong>${escapeHtml(String(v))}</strong></span>`).join("")}</div>`);
+    }
+
+    // 사건(선택형 이벤트)을 이야기 안에서 진행
+    async function storyEvent(ev) {
+      await say(`【${ev.title}】`, "text-amber-300 font-brush text-base", 200);
+      await say(ev.desc, "text-stone-300", 300);
+      const pickIdx = autoMode ? ev.choices.indexOf(autoPickChoice(ev)) : undefined;
+      const idx = await choose(ev.choices.map(c => {
+        const info = PATH_INFO[c.path] || PATH_INFO.neutral;
+        return { label: c.label, hint: c.hint, chip: PATH_CHIP_TEXT[c.path] || "중", chipClass: info.chip };
+      }), pickIdx);
+      const ch = ev.choices[idx];
+      const res = ch.apply() || { text: "", chips: [] };
+      const chipText = (res.chips || []).map(([l, v]) => `${l} ${v}`).join(", ");
+      if (res.text) await say(res.text, "text-stone-200", 250);
+      storyChips(res.chips);
+      char.eventLog = (char.eventLog || 0) + 1;
+      if (chipText) char.lastEventNote = `${ev.title}: ${ch.label}`;
+      checkRankUp();
+      updateUI();
+      await storyPause(400);
+    }
+
+    // 입력창 (회고)
+    function storyInput(placeholder) {
+      storySkipping = false;
+      return new Promise(resolve => {
+        const id = `si-${++storyUid}`;
+        const wrap = sayHTML(`
+          <div class="space-y-1.5 py-1">
+            <input id="${id}" type="text" maxlength="60" placeholder="${escapeHtml(placeholder)}" class="w-full bg-stone-900 border border-amber-600/50 rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:border-amber-400">
+            <div class="grid grid-cols-2 gap-1.5">
+              <button type="button" data-k="save" class="py-2 bg-gradient-to-r from-amber-600 to-amber-500 text-stone-950 font-brush text-sm rounded-xl cursor-pointer">마음에 새기다</button>
+              <button type="button" data-k="skip" class="py-2 bg-stone-800 text-stone-300 font-brush text-sm rounded-xl cursor-pointer">말없이 지나가다</button>
+            </div>
+          </div>`);
+        const input = wrap.querySelector("input");
+        const done = (save) => {
+          const t = save ? cleanInputText(input.value, 60) : "";
+          wrap.innerHTML = t ? `<div class="text-amber-200 italic">"${escapeHtml(t)}"</div>` : `<div class="text-stone-500 italic">…말없이 지나갔다.</div>`;
+          resolve(t);
+        };
+        wrap.querySelector('[data-k="save"]').onclick = (e) => { e.stopPropagation(); done(true); };
+        wrap.querySelector('[data-k="skip"]').onclick = (e) => { e.stopPropagation(); done(false); };
+        input.onclick = e => e.stopPropagation();
+        input.onkeydown = e => { if (e.key === "Enter") done(true); };
+        if (autoMode) setTimeout(() => done(false), 300 * timeScale);
+        else setTimeout(() => input.focus(), 50);
+      });
+    }
+
+    // 미니게임 칸을 이야기 안에 만들어 줌
+    function storyStrikeSlot() {
+      const id = `strike-${++storyUid}`;
+      sayHTML(`<div id="${id}" onclick="event.stopPropagation()"></div>`);
+      return id;
+    }
+
+    // ----- 이야기 속 비무 (미니게임도 이야기 안에서) -----
+    const DUEL_ROUNDS = [
+      { round: "1합", msgWin: "신법으로 상대의 빈틈을 파고들어 강타했다!", msgLose: "상대의 묵직한 초식에 한 걸음 밀렸다." },
+      { round: "2합", msgWin: "검 끝에 실린 내기로 상대의 기세를 꺾었다!", msgLose: "거친 패도에 검이 튕겨 나갈 뻔했다." },
+      { round: "3합", msgWin: "비기를 작렬시켜 상대의 무기를 날려 버렸다!", msgLose: "기습적인 연환격에 허를 찔렸다." }
+    ];
+
+    async function storyFight(myName, myPower, oppName, oppPower) {
+      await say(`▶ ${myName}(무력 ${myPower})  vs  ${oppName}(무력 ${oppPower})`, "text-stone-400 font-bold text-xs", 250);
+      let w = 0, l = 0;
+      const ratio = oppPower / Math.max(1, myPower);
+      for (const r of DUEL_ROUNDS) {
+        let strike = "AUTO";
+        if (minigameEnabled && !autoMode) {
+          storySkipping = false;
+          const slot = storyStrikeSlot();
+          storyScroll();
+          strike = await playStrikeMinigame(slot, ratio, r.round);
+          document.getElementById(slot)?.remove();
+        }
+        const p = Math.min(0.95, Math.max(0.05, myPower / (myPower + oppPower) + STRIKE_BONUS[strike]));
+        const win = Math.random() < p;
+        win ? w++ : l++;
+        const tag = { PERFECT: "【절초】 ", GOOD: "【적중】 ", MISS: "【헛손질】 ", AUTO: "" }[strike];
+        await say(`[${r.round}] ${tag}${win ? r.msgWin : r.msgLose}`, win ? "text-cyan-300" : "text-rose-400", 300);
+        if (w === 2 || l === 2) break;
+      }
+      return w > l;
+    }
+
+    function getDuelOptions() {
+      const bench = getBenchmarkPower();
+      const pm = getPrizeMult();
+      const prize = (n) => Math.round(n * pm);
+      return [
+        { tag: "쉬움", chipClass: "text-emerald-300 border-emerald-500/50 bg-emerald-950/60", name: "하급 무뢰배", ratio: 0.65, win: prize(10), lose: prize(2), reward: "명성 +2",
+          onWin: () => gainFame(2) },
+        { tag: "호각", chipClass: "text-blue-300 border-blue-500/50 bg-blue-950/60", name: "표국의 표사", ratio: 1.0, win: prize(25), lose: prize(5), reward: "명성 +5, 외공 +1",
+          onWin: () => { gainFame(5); gainStats(0, 1, 0); } },
+        { tag: "도전", chipClass: "text-rose-300 border-rose-500/50 bg-rose-950/60", name: "인근 문파의 수제자", ratio: 1.35, win: prize(50), lose: prize(10), reward: "명성 +12, 외공 +2, 신법 +1",
+          onWin: () => { gainFame(12); gainStats(0, 2, 1); } },
+        { tag: "???", chipClass: "text-purple-300 border-purple-500/50 bg-purple-950/60", name: "의문의 복면인", ratio: 0.5 + Math.random() * 1.4, blind: true, win: prize(ri(20, 90)), lose: prize(5), reward: "미지의 보상",
+          onWin: () => { gainFame(10); gainStats(3, 0, 0); } }
+      ].map(o => ({ ...o, oppPower: Math.max(15, Math.round(bench * o.ratio)) }));
+    }
+
+    async function storyDuel(rec) {
+      await rec.out("어떤 상대에게 비무를 청할 것인가?", "text-amber-200");
+      const my = getCombatPower();
+      const opts = getDuelOptions();
+      const idx = await choose(opts.map(o => {
+        const r = my / o.oppPower;
+        const edge = o.blind ? "실력을 알 수 없다" : r >= 1.3 ? "압도" : r >= 1.0 ? "우세" : r >= 0.8 ? "열세" : "위험";
+        return { label: `${o.name} — 무력 ${o.blind ? "???" : o.oppPower}`, hint: `${edge} · 승리 시 ${o.blind ? "???" : o.win}냥, ${o.reward}`, chip: o.tag, chipClass: o.chipClass };
+      }), 1);
+      const o = opts[idx];
+      const won = await storyFight(char.name, Math.round(my * (char.injury ? 0.85 : 1)), o.name, o.oppPower);
+      if (won) {
+        char.money += o.win; o.onWin();
+        await rec.out(`★ 승리! 상금 ${o.win}냥을 거머쥐었다.`, "text-yellow-300 font-bold");
+        pendingTurns.push(() => showPostDuelChoice({ name: o.name, winPrize: o.win }));
+      } else {
+        char.money += o.lose;
+        await rec.out(`✕ 패배… 위로금 ${o.lose}냥을 받았다.`, "text-stone-400");
+      }
+      const n = ri(1, 2);
+      let wins = 0, earned = 0;
+      for (let i = 0; i < n; i++) {
+        const ratio = pick([0.65, 1.0, 1.0, 1.35]);
+        const r = autoDuel(ratio);
+        if (r.won) { wins++; const m = Math.round(20 * ratio * getPrizeMult()); earned += m; char.money += m; gainFame(Math.round(3 * ratio)); }
+      }
+      await rec.out(`그 뒤로도 ${n}번을 더 겨뤄 ${wins}승 ${n - wins}패를 거두었다.${earned ? ` (상금 +${earned}냥)` : ""}`);
+    }
+
+    // ----- 이야기 속 천하비무대회 -----
+    async function storyTournament(rec) {
+      const base = getBenchmarkPower();
+      const rival = (char.peers || []).filter(p => p.alive && p.power >= base * 0.8).sort((a, b) => b.power - a.power)[0];
+      const opps = [
+        { round: "본선 8강", name: "종남파 수제자 배도운", power: Math.max(20, Math.round(base * 0.95)), desc: "검로가 바르고 탄탄한 청년 고수다." },
+        rival
+          ? { round: "준결승 4강", name: `동기 ${rival.name}`, power: Math.max(30, rival.power), desc: `같은 해 강호에 입문한 동기 ${rival.name}! 운명의 맞수와 마주쳤다.` }
+          : { round: "준결승 4강", name: "혈랑도 단목량", power: Math.max(30, Math.round(base * 1.2)), desc: "수많은 비무로 피를 묻힌 실전파 칼잡이다." },
+        { round: "천하 결승", name: "전대 챔피언 천검존자", power: Math.max(45, Math.round(base * 1.5)), desc: "대회 2연패를 노리는 당대 천하제일 후보다." }
+      ];
+      let heirFights = false;
+      const heir = getHeir();
+      if (heir) {
+        await say("누가 대회에 나설 것인가?", "text-amber-200", 100);
+        const i = await choose([
+          { label: `내가 직접 나선다 (무력 ${getCombatPower()})`, chip: "나" },
+          { label: `대제자 ${heir.name}을(를) 내보낸다 (무력 ${heir.power})`, chip: "제자" }
+        ], heir.power > getCombatPower() ? 1 : 0);
+        heirFights = i === 1;
+      }
+      const fighterName = heirFights ? `대제자 ${heir.name}` : char.name;
+      const pm = getPrizeMult();
+      for (let stage = 0; stage < 3; stage++) {
+        const opp = opps[stage];
+        await storyHeader(opp.round);
+        await say(opp.desc, "text-stone-300", 250);
+        const myPower = heirFights ? heir.power : Math.round(getCombatPower() * (char.injury ? 0.85 : 1));
+        const won = await storyFight(fighterName, myPower, opp.name, opp.power);
+        if (!won) {
+          const prize = Math.round((stage === 0 ? 30 : 60) * pm);
+          char.money += prize; gainFame(10);
+          tourResult = { win: false, stage, text: `${heirFights ? "대제자가 " : ""}${["8강", "4강", "결승"][stage]}에서 ${opp.name}에게 패했다.` };
+          await rec.out(`✕ ${opp.name}의 벽을 넘지 못했다. (상금 ${prize}냥)`, "text-rose-300");
+          if (rival && stage === 1) rival.tourWins++;
+          return;
+        }
+        await say(`★ ${fighterName}의 승리!`, "text-yellow-300 font-bold", 300);
+      }
+      const grand = Math.round(250 * pm);
+      char.money += grand;
+      if (heirFights) {
+        heir.power += 30; heir.title = "천하제일(天下第一)"; heir.wins++; heir.loyalty = Math.min(100, heir.loyalty + 20);
+        sect().tourWins++; gainFame(40); checkSectLevelUp();
+        tourResult = { win: true, stage: 3, text: `대제자 ${heir.name}이(가) 우승했다!` };
+      } else {
+        gainFame(70); gainStats(6, 6, 6); char.title = "천하제일(天下第一)";
+        tourResult = { win: true, stage: 3, text: "우승하여 천하제일의 칭호를 얻었다!" };
+      }
+      sayHTML(`<div class="my-1 p-3 rounded-xl border-2 border-yellow-400/80 bg-yellow-950/30 text-center flash-gold"><div class="font-brush text-yellow-300 text-lg">🏆 천하제일 🏆</div><div class="text-xs text-stone-200">${escapeHtml(tourResult.text)} 상금 ${grand}냥</div></div>`);
+      await storyPause(700);
+    }
+
+    // ----- 한 해 보내기 (이야기 진행) -----
+    const SEASON_OPEN = [
+      "봄바람에 매화 향이 실려 온다.", "얼음이 녹은 계곡물 소리가 들려온다.", "새벽 안개가 산문을 감싸고 있다.", "제비가 처마 밑으로 돌아왔다."
+    ];
+
+    async function passYear() {
+      if (yearBusy || char.dead || char.hasAscended) return;
+      yearBusy = true;
+      storySkipping = false;
+      updateUI();
+      const panel = document.getElementById("story-panel");
+      const rect = panel.getBoundingClientRect();
+      if (rect.top < -40 || rect.top > window.innerHeight * 0.4) panel.scrollIntoView({ behavior: "smooth", block: "start" });
+
+      const before = { qi: char.qi, ext: char.ext, agi: char.agi, money: char.money, fame: char.fame, r: char.align.righteous, e: char.align.evil, d: char.align.demonic };
+      const startAge = char.age;
+      const rec = { age: startAge, focus: char.focus, lines: [], rumors: [] };
+      rec.out = async (t, c) => { rec.lines.push({ t, c }); await say(t, c || "text-stone-200"); };
+      pendingTurns = [];
+      yearGains = { qi: 0, ext: 0, agi: 0, fame: 0 };
+      alignGains.righteous = 0; alignGains.evil = 0; alignGains.demonic = 0;
+      char.lastEventNote = "";
+
+      try {
+        await storyHeader(`${startAge}세`);
+        await say(pick(SEASON_OPEN), "text-stone-400 italic", 250);
+        if (char.injury) await say(`몸에는 아직 ${char.injury.name}의 흔적이 남아 있다. (${char.injury.years}년)`, "text-rose-300", 200);
+        await say("올해는 무엇을 하며 보낼까?", "text-amber-200", 100);
+        const keys = Object.keys(FOCUS);
+        const autoKey = autoChooseFocus();
+        const fi = await choose(keys.map(k => ({ label: `${FOCUS[k].icon} ${FOCUS[k].label}`, hint: FOCUS[k].desc })), keys.indexOf(autoKey));
+        char.focus = keys[fi];
+        rec.focus = char.focus;
+
+        await runFocus(rec);
+
+        if (isMajorYear(startAge)) {
+          tourResult = null;
+          await storyHeader("가을 · 천하비무대회");
+          await say("십 년에 한 번 열리는 천하비무대회의 초청장이 도착했다. 천하의 고수들이 모여든다.", "text-yellow-200", 200);
+          const go = await choose([{ label: "출전한다", hint: "8강부터 결승까지 세 판", chip: "출전" }, { label: "이번에는 나가지 않는다", chip: "불참" }], 0);
+          if (go === 0) {
+            await storyTournament(rec);
+            if (tourResult && (tourResult.win || tourResult.stage >= 1)) addStory(`천하비무대회에서 ${tourResult.text}`);
+            if (tourResult) rec.lines.push({ t: `👑 천하비무대회: ${tourResult.text}`, c: "text-yellow-300 font-bold" });
+          } else await rec.out("초청장을 접어 품에 넣었다.", "text-stone-400");
+        }
+
+        simulatePeers(rec);
+        rumorAboutMe(rec);
+        if (rec.rumors.length) {
+          await storyHeader("강호 풍문");
+          for (const r of rec.rumors) await say(`💬 ${r.t || r}`, (r.c) || "text-stone-400", 300);
+        }
+
+        await storyHeader("겨울");
+        const mark = rec.lines.length;
+        yearEnd(rec);
+        for (const l of rec.lines.slice(mark)) await say(l.t, l.c || "text-stone-300", 280);
+
+        const diff = [
+          ["무력", (char.qi - before.qi) + (char.ext - before.ext) + (char.agi - before.agi), "text-amber-300"],
+          ["은자", char.money - before.money, "text-yellow-400"], ["명성", char.fame - before.fame, "text-emerald-300"],
+          ["협의", char.align.righteous - before.r, "text-sky-300"], ["악명", char.align.evil - before.e, "text-rose-300"], ["마성", char.align.demonic - before.d, "text-purple-300"]
+        ].filter(([, v], i) => i < 2 || v !== 0).map(([l, v, c]) => [l, (v > 0 ? "+" : "") + v, c]);
+        storyChips(diff);
+
+        const note = (rec.lines.find(l => /font-bold|text-cyan|text-rose/.test(l.c || "")) || rec.lines[0] || { t: "" }).t;
+        char.history.push({ age: startAge, focus: rec.focus, rank: ranks[char.rankIdx].name.split(" ")[0], power: getCombatPower(), money: char.money, note: note.replace(/\s*\(.*?\)\s*$/, "") });
+        updateUI();
+
+        if (char.dead) { await finishLifeStory(); return; }
+
+        for (const turn of pendingTurns) {
+          turn();
+          if (activeStoryEvent) { await activeStoryEvent; activeStoryEvent = null; }
+        }
+        maybeTriggerYearEvent(lifeFocus().eventChance);
+        if (activeStoryEvent) { await activeStoryEvent; activeStoryEvent = null; }
+
+        if ([20, 30, 40, 50].includes(char.age) && !autoMode) {
+          await storyHeader("회고");
+          await say(`${char.age}세가 되었다. 잠시 걸음을 멈추고 지나온 길을 돌아본다. 훗날의 나에게 한마디를 남길까?`, "text-amber-200", 100);
+          const t = await storyInput("예) 아직은 검이 무겁다");
+          if (t) char.reflections.push({ age: char.age, text: t });
+        }
+        if (autoMode) await autoManage();
+        if (char.dead) { await finishLifeStory(); return; }
+        await say(`— ${char.age}세의 봄이 기다린다 —`, "text-stone-500 text-xs text-center", 0);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        yearBusy = false;
+        storySkipping = false;
+        updateUI();
+      }
+      if (autoMode && !char.dead && !char.hasAscended) setTimeout(passYear, 400 * timeScale);
+    }
+
+    async function finishLifeStory() {
+      await storyHeader("생의 끝");
+      await say(`${char.name}, ${char.deathCause}. 향년 ${char.age}세.`, "text-stone-200 font-brush text-base", 900);
+      yearBusy = false;
+      finishLife();
+    }
+
+    // 강호에 첫발 (프롤로그)
+    async function storyPrologue() {
+      yearBusy = true;
+      updateUI();
+      storyBox().innerHTML = "";
+      await storyHeader("입문");
+      await say(`열여섯의 봄, ${char.name}은(는) ${char.sect}의 산문을 두드렸다.`, "text-stone-200", 350);
+      await say(`같은 해 강호에 발을 들인 이들이 있었다. ${char.peers.map(p => `${p.name}(${FACTIONS[p.faction].label})`).join(", ")}.`, "text-stone-400", 350);
+      await say("언젠가 그들과 다시 마주치게 될 것이다.", "text-stone-400 italic", 300);
+      yearBusy = false;
+      updateUI();
+      if (autoMode) passYear();
+    }
+
+    // ----- 하단 버튼 상태 -----
+    function renderFocusUI() {
+      const pass = document.getElementById("btn-pass-year");
+      if (!pass) return;
+      const over = char.dead || char.hasAscended;
       const inj = document.getElementById("injury-badge");
       if (char.injury) { inj.classList.remove("hidden"); inj.innerText = `🩹 ${char.injury.name} (${char.injury.years}년)`; }
       else inj.classList.add("hidden");
-
-      const pass = document.getElementById("btn-pass-year");
-      const over = char.dead || char.hasAscended;
       pass.disabled = yearBusy || over;
-      pass.className = `w-full py-3.5 font-brush text-lg rounded-xl transition shadow-xl ${pass.disabled ? "bg-stone-800 text-stone-500 cursor-not-allowed" : "bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 hover:brightness-110 text-stone-950 cursor-pointer"}`;
-      pass.innerText = over ? "생을 마쳤습니다" : yearBusy ? "한 해가 흘러가는 중…" : `▶ ${char.age}세의 한 해 보내기`;
-
+      pass.className = `w-full py-3 font-brush text-lg rounded-xl transition shadow-xl ${over ? "bg-stone-800 text-stone-500 cursor-not-allowed" : yearBusy ? "bg-stone-900 text-amber-200/70 border border-amber-700/40 cursor-default" : "bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 hover:brightness-110 text-stone-950 cursor-pointer"}`;
+      pass.innerText = over ? "생을 마쳤습니다" : yearBusy ? (autoMode ? "운명이 흘러가는 중…" : "이야기 진행 중 · 화면을 누르면 빨리 넘김") : `▶ ${char.age}세의 한 해를 시작하다`;
+      if (yearBusy && !over) pass.className += " text-sm";
       const auto = document.getElementById("btn-auto");
-      auto.className = `flex-1 py-2 rounded-xl border font-bold text-xs transition ${autoMode ? "bg-cyan-900/60 border-cyan-400 text-cyan-200" : "bg-stone-900 border-stone-700 text-stone-300 hover:bg-stone-800"} ${over ? "opacity-50" : "cursor-pointer"}`;
-      auto.innerText = autoMode ? "⏸ 운명에 맡기는 중 (누르면 멈춤)" : "⏩ 운명에 맡기기 (자동 진행)";
+      auto.className = `px-2.5 py-1 rounded-lg border font-bold text-[11px] transition ${autoMode ? "bg-cyan-900/60 border-cyan-400 text-cyan-200" : "bg-stone-900 border-stone-700 text-stone-300 hover:bg-stone-800"} ${over ? "opacity-50" : "cursor-pointer"}`;
+      auto.innerText = autoMode ? "⏸ 멈춤" : "⏩ 운명에 맡기기";
       auto.disabled = over;
       document.getElementById("btn-speed").innerText = `${Math.round(1 / timeScale)}x`;
     }
@@ -4561,7 +4761,6 @@
         const nextRank = ranks[char.rankIdx + 1];
         if (totalPower >= nextRank.minStat) {
           char.rankIdx += 1;
-          addLog(char.age, `★ [경지 돌파] '${nextRank.name}' 반열 등극! (녹봉 ${getSalaryForRank(char.rankIdx)}냥으로 상승)`, "text-amber-300 font-brush text-sm");
           if (char.story && char.rankIdx >= 2) addStory(`${nextRank.name.split(" ")[0]}의 경지에 올랐다.`);
           showRankUpPopup(nextRank);
         }
@@ -4571,12 +4770,10 @@
     function addLog(age, text, colorClass = "text-stone-300") {
       const list = document.getElementById("log-list");
       const item = document.createElement("div");
-      item.className = "p-2 rounded-xl bg-stone-950/70 border border-stone-800/80 flex items-start gap-2";
-      item.innerHTML = `
-        <span class="text-[10px] font-bold text-amber-400 bg-amber-950/60 border border-amber-800/50 px-1.5 py-0.5 rounded shrink-0">${age}세</span>
-        <span class="${colorClass} leading-snug">${text}</span>
-      `;
-      list.prepend(item);
+      item.className = "story-line flex items-start gap-1.5 text-[11px]";
+      item.innerHTML = `<span class="shrink-0 text-[9px] font-bold text-amber-500/80 bg-amber-950/40 border border-amber-900/50 px-1 rounded">${age}세</span><span class="${colorClass} leading-snug">${text}</span>`;
+      list.appendChild(item);
+      list.scrollTop = list.scrollHeight;
     }
 
     function renderMultiTierBar(val, baseFillClass, tierId, bgId, fillId) {
