@@ -515,7 +515,6 @@
         </div>
         <div class="flex items-center gap-1">
           <button id="btn-auto" onclick="toggleAuto()" class="px-2.5 py-1 rounded-lg border font-bold text-[11px]">⏩ 운명에 맡기기</button>
-          <button id="btn-minigame" onclick="setMinigameEnabled(!minigameEnabled); updateUI();" class="px-2 py-1 rounded-lg border font-bold text-[11px] cursor-pointer"></button>
           <button id="btn-speed" onclick="cycleSpeed()" class="px-2 py-1 rounded-lg border border-stone-700 bg-stone-900 text-stone-300 font-bold text-[11px] cursor-pointer">1x</button>
         </div>
       </div>
@@ -734,11 +733,6 @@
 
       <div id="strike-area-tour"></div>
 
-      <label class="flex items-center justify-center gap-1.5 text-[11px] text-stone-400 font-bold cursor-pointer select-none">
-        <input type="checkbox" class="minigame-toggle accent-amber-500" onchange="setMinigameEnabled(this.checked)" checked>
-        🎮 직접 조작 (타이밍 미니게임)
-      </label>
-
       <button id="btn-tour-action" onclick="onTourActionButtonClick()" class="w-full py-3 bg-gradient-to-r from-amber-600 to-amber-500 hover:brightness-110 text-stone-950 font-brush text-base rounded-xl transition cursor-pointer shadow-lg">
         비무 개시
       </button>
@@ -758,10 +752,6 @@
 
       <div class="flex items-center justify-between text-[11px] font-bold px-1">
         <span class="text-stone-400">올해 강호 평균 무력: <strong id="duel-benchmark" class="text-amber-300"></strong></span>
-        <label class="flex items-center gap-1 text-stone-400 cursor-pointer select-none">
-          <input type="checkbox" class="minigame-toggle accent-amber-500" onchange="setMinigameEnabled(this.checked)" checked>
-          🎮 직접 조작
-        </label>
       </div>
 
       <div id="duel-candidates" class="space-y-2"></div>
@@ -1061,8 +1051,7 @@
     // ==========================================
     // [미니게임] 타이밍 출수
     // ==========================================
-    let minigameEnabled = true;
-    try { minigameEnabled = localStorage.getItem("gangho_minigame") !== "off"; } catch (e) {}
+    let minigameEnabled = false; // 미니게임은 삭제됨 (비무는 이야기로 자동 판정)
 
     function setMinigameEnabled(on) {
       minigameEnabled = !!on;
@@ -1078,88 +1067,6 @@
       AUTO: ""
     };
 
-    // ratio = 상대 무력 / 내 무력. 강한 상대일수록 판정 구간이 좁고 바늘이 빠름
-    function playStrikeMinigame(containerId, ratio, roundLabel) {
-      return new Promise(resolve => {
-        const box = document.getElementById(containerId);
-        const d = Math.min(2, Math.max(0.5, ratio));
-        const goodW = Math.min(38, Math.max(14, 30 - (d - 1) * 16));
-        const perfectW = Math.max(4, goodW * 0.3);
-        const center = 25 + Math.random() * 50;
-        const goodL = center - goodW / 2;
-        const perfectL = center - perfectW / 2;
-        const sweepsPerSec = 0.7 + (d - 0.5) * 0.45;
-        const TIME_LIMIT = 4000;
-
-        box.innerHTML = `
-          <div class="p-2.5 rounded-xl bg-stone-950 border border-amber-600/50 space-y-2 text-left">
-            <div class="flex justify-between text-[11px] font-bold">
-              <span class="text-amber-300">[${roundLabel}] 바늘이 급소에 닿을 때 출수!</span>
-              <span class="strike-timer text-stone-400">4.0초</span>
-            </div>
-            <div class="relative h-7 rounded-lg bg-stone-900 border border-stone-700 overflow-hidden">
-              <div class="absolute top-0 bottom-0 bg-emerald-600/45" style="left:${goodL}%;width:${goodW}%"></div>
-              <div class="absolute top-0 bottom-0 bg-yellow-400/80" style="left:${perfectL}%;width:${perfectW}%"></div>
-              <div class="strike-needle absolute top-0 bottom-0 w-1.5 -ml-[3px] bg-white rounded shadow-[0_0_8px_rgba(255,255,255,0.9)]" style="left:0%"></div>
-            </div>
-            <button type="button" class="strike-btn w-full py-3 bg-gradient-to-r from-rose-600 to-red-500 active:scale-[0.98] text-white font-brush text-base rounded-xl cursor-pointer shadow select-none">
-              ⚔️ 출수! (터치 · 스페이스)
-            </button>
-          </div>`;
-
-        const needle = box.querySelector(".strike-needle");
-        const timer = box.querySelector(".strike-timer");
-        const btn = box.querySelector(".strike-btn");
-        const start = performance.now();
-        let pos = 0;
-        let done = false;
-        let rafId = 0;
-
-        const finish = (result) => {
-          if (done) return;
-          done = true;
-          cancelAnimationFrame(rafId);
-          window.removeEventListener("keydown", onKey, true);
-          const color = result === "PERFECT" ? "text-yellow-300" : result === "GOOD" ? "text-emerald-300" : "text-stone-500";
-          const text = result === "PERFECT" ? "절초 작렬!" : result === "GOOD" ? "적중!" : "헛손질...";
-          btn.disabled = true;
-          btn.className = `w-full py-3 bg-stone-900 border border-stone-700 ${color} font-brush text-base rounded-xl`;
-          btn.innerText = text;
-          setTimeout(() => { box.innerHTML = ""; resolve(result); }, 450);
-        };
-
-        const judge = () => {
-          if (pos >= perfectL && pos <= perfectL + perfectW) return finish("PERFECT");
-          if (pos >= goodL && pos <= goodL + goodW) return finish("GOOD");
-          finish("MISS");
-        };
-
-        const onKey = (e) => {
-          if (e.code === "Space" || e.key === " " || e.key === "Enter") {
-            e.preventDefault();
-            e.stopPropagation();
-            judge();
-          }
-        };
-
-        const tick = (now) => {
-          if (done) return;
-          const elapsed = now - start;
-          const phase = (elapsed / 1000) * sweepsPerSec * 2;
-          const tri = phase % 2;
-          pos = (tri <= 1 ? tri : 2 - tri) * 100;
-          needle.style.left = pos + "%";
-          timer.innerText = `${Math.max(0, (TIME_LIMIT - elapsed) / 1000).toFixed(1)}초`;
-          if (elapsed >= TIME_LIMIT) return finish("MISS");
-          rafId = requestAnimationFrame(tick);
-        };
-
-        btn.addEventListener("pointerdown", (e) => { e.preventDefault(); judge(); });
-        window.addEventListener("keydown", onKey, true);
-        rafId = requestAnimationFrame(tick);
-      });
-    }
-
     // 3합 승부 (일반 비무·대회 공용)
     async function fightThreeRounds({ myPower, oppPower, rounds, log, strikeContainerId }) {
       let myWins = 0, oppWins = 0;
@@ -1167,12 +1074,7 @@
       for (let i = 0; i < rounds.length; i++) {
         const r = rounds[i];
         let strike = "AUTO";
-        if (minigameEnabled) {
-          await sleep(250);
-          strike = await playStrikeMinigame(strikeContainerId, ratio, r.round);
-        } else {
-          await sleep(650);
-        }
+        await sleep(650);
         const baseProb = myPower / (myPower + oppPower);
         const winProb = Math.min(0.95, Math.max(0.05, baseProb + STRIKE_BONUS[strike]));
         if (Math.random() < winProb) {
@@ -3159,6 +3061,134 @@
                 return { text: "노인과 밤새 술잔을 기울였습니다. 깨어 보니 몸이 가볍습니다.", chips: [["신법", "+3"]] }; } }
           ]
         })
+      },
+      {
+        id: "caravan",
+        build: () => ({
+          title: "습격당한 상단",
+          desc: "피투성이가 된 상단 호위무사가 쓰러지며 말합니다. \"마두 셋이… 짐마차와 아이들을…\" 멀리 연기가 피어오릅니다.",
+          choices: [
+            { path: "orthodox", label: "연기가 오르는 곳으로 달려간다", hint: "협의 +6 · 명성 +6 · 승리 시 기연",
+              apply: () => { addAlign(6, 0, 0); gainFame(6); const r = autoDuel(1.15);
+                if (r.won) { gainStats(3, 3, 2); return { text: "마두들을 쓰러뜨리고 아이들을 구했습니다. 상단주가 감사의 표시로 가보를 건넵니다.", chips: [["협의", "+6"], ["명성", "+6"], ["무력", "+8"]] }; }
+                char.injury = { ...INJURIES[1] }; return { text: "아이들은 구했지만 마두의 칼에 크게 다쳤습니다.", chips: [["협의", "+6"], ["명성", "+6"], ["부상", INJURIES[1].name]] }; } },
+            { path: "unorthodox", label: "마두들이 떠난 뒤 남은 짐을 챙긴다", hint: `악명 +5 · 은자 +${scaled(55)}`,
+              apply: () => { const g = scaled(55); addAlign(0, 5, 0); char.money += g;
+                return { text: "불탄 마차 사이에서 쓸 만한 물건들을 챙겼습니다.", chips: [["악명", "+5"], ["은자", `+${g}냥`]] }; } },
+            { path: "neutral", label: "호위무사의 상처만 싸매 주고 떠난다", hint: "협의 +1",
+              apply: () => { addAlign(1, 0, 0); return { text: "그가 살아남기를 빌며 발걸음을 옮겼습니다.", chips: [["협의", "+1"]] }; } }
+          ]
+        })
+      },
+      {
+        id: "monk",
+        build: () => ({
+          title: "산사의 노승",
+          desc: "비를 피해 들어간 낡은 산사에서 눈먼 노승이 차를 내옵니다. \"그대의 검에는 무엇이 실려 있소?\"",
+          choices: [
+            { path: "orthodox", label: "\"지켜야 할 사람들입니다.\"", hint: "협의 +3 · 내공 +6",
+              apply: () => { addAlign(3, 0, 0); gainStats(6, 0, 0); return { text: "노승이 고개를 끄덕이며 호흡법 하나를 일러 주었습니다.", chips: [["협의", "+3"], ["내공", "+6년"]] }; } },
+            { path: "demonic", label: "\"이기고 싶다는 마음뿐입니다.\"", hint: "마성 +3 · 외공 +6",
+              apply: () => { addAlign(0, 0, 3); gainStats(0, 6, 0); return { text: "노승은 한숨을 쉬더니, 그래도 검을 쥐는 법 하나를 고쳐 주었습니다.", chips: [["마성", "+3"], ["외공", "+6"]] }; } },
+            { path: "neutral", label: "\"아직 모르겠습니다.\"", hint: "신법 +4 · 수명 +1",
+              apply: () => { gainStats(0, 0, 4); char.lifeBonus = Math.min(5, char.lifeBonus + 1); return { text: "\"모른다는 것을 아는 것이 시작이오.\" 마음이 한결 가벼워졌습니다.", chips: [["신법", "+4"], ["수명", "+1"]] }; } }
+          ]
+        })
+      },
+      {
+        id: "tomb",
+        build: () => ({
+          title: "고수의 무덤",
+          desc: "도굴꾼들이 이름 높던 옛 대협의 무덤을 파헤치고 있습니다. 관 속에서 검집 하나가 빛을 발합니다.",
+          choices: [
+            { path: "orthodox", label: "도굴꾼을 쫓아내고 무덤을 다시 덮는다", hint: "협의 +5 · 명성 +3",
+              apply: () => { addAlign(5, 0, 0); gainFame(3); return { text: "흙을 덮고 술 한 잔을 올렸습니다. 어디선가 바람이 불어와 등을 밀어 주는 듯했습니다.", chips: [["협의", "+5"], ["명성", "+3"]] }; } },
+            { path: "unorthodox", label: "도굴꾼을 쫓아내고 검은 내가 갖는다", hint: "악명 +4 · 외공 +9",
+              apply: () => { addAlign(0, 4, 0); gainStats(0, 9, 0); return { text: "검집에서 뽑은 검이 서늘하게 울었습니다.", chips: [["악명", "+4"], ["외공", "+9"]] }; } }
+          ]
+        })
+      },
+      {
+        id: "fleeing_girl",
+        build: () => ({
+          title: "쫓기는 소녀",
+          desc: "숲길에서 피투성이 소녀가 품속 보따리를 꼭 안고 달려옵니다. 뒤로 흑의인 다섯이 쫓아오고 있습니다. \"살려 주세요!\"",
+          choices: [
+            { path: "orthodox", label: "소녀를 등 뒤로 숨기고 흑의인을 막아선다", hint: "협의 +5 · 승리 시 비급",
+              apply: () => { addAlign(5, 0, 0); const r = autoDuel(1.2);
+                if (r.won) { gainStats(7, 2, 3); addStory("쫓기던 소녀를 구하고 멸문한 가문의 비급을 받았다."); return { text: "흑의인을 물리치자 소녀가 보따리를 풀었습니다. 멸문한 가문의 비급이었습니다. \"은인께서 익혀 주세요.\"", chips: [["협의", "+5"], ["내공", "+7년"], ["외공", "+2"], ["신법", "+3"]] }; }
+                char.injury = { ...INJURIES[0] }; return { text: "소녀를 데리고 간신히 몸을 피했습니다. 소녀는 감사를 남기고 사라졌습니다.", chips: [["협의", "+5"], ["부상", INJURIES[0].name]] }; } },
+            { path: "unorthodox", label: "흑의인에게 소녀를 넘기고 사례를 받는다", hint: `악명 +8 · 은자 +${scaled(60)}`,
+              apply: () => { const g = scaled(60); addAlign(0, 8, 0); char.money += g; return { text: "흑의인이 던진 전낭을 받았습니다. 소녀의 눈빛이 오래 잊히지 않았습니다.", chips: [["악명", "+8"], ["은자", `+${g}냥`]] }; } },
+            { path: "neutral", label: "못 본 척 길을 비켜 준다", hint: "변화 없음",
+              apply: () => ({ text: "비명이 숲 너머로 멀어졌습니다.", chips: [] }) }
+          ]
+        })
+      },
+      {
+        id: "tang_contract",
+        build: () => ({
+          title: "당가의 은밀한 의뢰",
+          desc: "사천 당가의 사자가 독침이 든 함을 내밀었습니다. \"정파의 장로 하나를 조용히 처리해 주시오. 값은 넉넉히 치르겠소.\"",
+          choices: [
+            { path: "unorthodox", label: "의뢰를 받아들인다", hint: `악명 +9 · 은자 +${scaled(110)}`,
+              apply: () => { const g = scaled(110); addAlign(0, 9, 0); char.money += g; return { text: "일은 깔끔하게 끝났습니다. 그날 이후 밤길에서 자주 뒤를 돌아보게 되었습니다.", chips: [["악명", "+9"], ["은자", `+${g}냥`]] }; } },
+            { path: "orthodox", label: "함을 내던지고 장로에게 경고한다", hint: "협의 +6 · 명성 +5",
+              apply: () => { addAlign(6, 0, 0); gainFame(5); return { text: "장로는 목숨을 건졌고, 당가는 당신의 이름을 기억하게 되었습니다.", chips: [["협의", "+6"], ["명성", "+5"]] }; } },
+            { path: "demonic", label: "독침을 내 무공에 쓰겠다며 함만 빼앗는다", hint: "마성 +5 · 외공 +5",
+              apply: () => { addAlign(0, 0, 5); gainStats(0, 5, 0); return { text: "독기를 머금은 침을 다루는 법을 홀로 익혔습니다.", chips: [["마성", "+5"], ["외공", "+5"]] }; } }
+          ]
+        })
+      },
+      {
+        id: "auction",
+        build: () => {
+          const price = scaled(70);
+          return {
+            title: "암시장의 검보 경매",
+            desc: `낙양 지하 경매장에 '천하삼십육검'의 잔본이 나왔습니다. 호가는 ${price}냥부터. 흑도 거물들이 눈을 번뜩입니다.`,
+            choices: [
+              { path: "neutral", label: `은자 ${price}냥을 내고 낙찰받는다`, hint: char.money >= price ? "외공 +6 · 신법 +6" : "은자가 부족하다",
+                apply: () => { if (char.money < price) return { text: "주머니가 가벼워 손을 들지 못했습니다.", chips: [] };
+                  char.money -= price; gainStats(0, 6, 6); return { text: "잔본이지만 한 초식만으로도 값어치를 했습니다.", chips: [["은자", `-${price}냥`], ["외공", "+6"], ["신법", "+6"]] }; } },
+              { path: "unorthodox", label: "낙찰자를 뒤쫓아 검보를 빼앗는다", hint: "악명 +6 · 성공하면 공짜",
+                apply: () => { addAlign(0, 6, 0); if (autoDuel(1.0).won) { gainStats(0, 6, 6); return { text: "어두운 골목에서 검보를 손에 넣었습니다.", chips: [["악명", "+6"], ["외공", "+6"], ["신법", "+6"]] }; }
+                  return { text: "낙찰자의 호위에게 쫓겨 빈손으로 돌아왔습니다.", chips: [["악명", "+6"]] }; } },
+              { path: "orthodox", label: "구경만 하고 나온다", hint: "변화 없음",
+                apply: () => ({ text: "검보는 결국 흑도 거물의 손에 들어갔습니다.", chips: [] }) }
+            ]
+          };
+        }
+      },
+      {
+        id: "challenge_letter",
+        build: () => ({
+          title: "도전장",
+          desc: "객잔 탁자에 비수가 꽂혀 있고, 비수에 도전장이 매달려 있습니다. '보름 뒤 달 밝은 밤, 낙화대에서 기다리겠다. — 혈검(血劍)'",
+          choices: [
+            { path: "neutral", label: "낙화대로 간다", hint: "한 수 위 고수와의 결투 · 이기면 명성 크게 ↑",
+              apply: () => { const r = autoDuel(1.3);
+                if (r.won) { gainFame(15); gainStats(4, 4, 4); addStory("혈검과의 결투에서 이겼다."); return { text: "달빛 아래 혈검의 검이 부러졌습니다. 이튿날 강호에 당신의 이름이 퍼졌습니다.", chips: [["명성", "+15"], ["무력", "+12"]] }; }
+                char.injury = { ...INJURIES[2] }; gainFame(3); return { text: "혈검의 검이 어깨를 꿰뚫었습니다. 목숨은 건졌지만 오래 누워 있어야 했습니다.", chips: [["명성", "+3"], ["부상", INJURIES[2].name]] }; } },
+            { path: "orthodox", label: "무의미한 피는 흘리지 않겠다며 거절한다", hint: "협의 +2 · 명성 -3",
+              apply: () => { addAlign(2, 0, 0); gainFame(-3); return { text: "겁쟁이라는 소문이 돌았지만 개의치 않았습니다.", chips: [["협의", "+2"], ["명성", "-3"]] }; } }
+          ]
+        })
+      },
+      {
+        id: "orphan_disciple",
+        build: () => ({
+          title: "길 위의 아이",
+          desc: "눈 내리는 다리 밑에서 굶주린 아이가 나뭇가지로 검술 흉내를 내고 있습니다. 동작 하나하나가 범상치 않습니다.",
+          choices: [
+            { path: "orthodox", label: "아이를 데려가 기본기를 가르친다", hint: "협의 +3 · 문파가 있으면 재능 있는 제자 입문",
+              apply: () => { addAlign(3, 0, 0);
+                if (sect()) { const a = makeApplicant(); a.talent = Math.max(4, a.talent); a.wit = Math.max(4, a.wit); sect().applicants.push(a); return { text: `아이의 이름은 ${a.name}. 문파의 입문 지원자 명단에 이름을 올렸습니다.`, chips: [["협의", "+3"], ["지원자", a.name]] }; }
+                gainStats(2, 2, 2); return { text: "한 해 동안 아이에게 기본기를 가르쳤습니다. 가르치며 오히려 배운 것이 많았습니다.", chips: [["협의", "+3"], ["무력", "+6"]] }; } },
+            { path: "neutral", label: "따뜻한 국밥 한 그릇과 은자를 쥐여 준다", hint: "은자 -10 · 협의 +1",
+              apply: () => { char.money = Math.max(0, char.money - 10); addAlign(1, 0, 0); return { text: "아이는 국밥을 허겁지겁 먹고는 크게 절을 했습니다.", chips: [["은자", "-10냥"], ["협의", "+1"]] }; } }
+          ]
+        })
       }
     ];
 
@@ -4491,41 +4521,92 @@
       });
     }
 
-    // 미니게임 칸을 이야기 안에 만들어 줌
-    function storyStrikeSlot() {
-      const id = `strike-${++storyUid}`;
-      sayHTML(`<div id="${id}" onclick="event.stopPropagation()"></div>`);
-      return id;
+    // ----- 이야기로 펼쳐지는 비무 (미니게임 없음) -----
+    const FIGHT_OPEN = [
+      "{o}{i} 자세를 낮추며 검끝을 겨눈다.", "두 사람의 기세가 맞부딪치자 주변의 공기가 무거워졌다.",
+      "{o}의 눈빛이 매섭게 번뜩였다.", "구경꾼들이 숨을 죽였다. 바람 한 점 없는 고요가 흘렀다.",
+      "먼저 움직인 쪽은 {o}였다.", "낙엽 하나가 두 사람 사이로 떨어지는 순간, 승부가 시작됐다."
+    ];
+    const FIGHT_WIN = [
+      "신법으로 빈틈을 파고들어 어깨를 베었다.", "검 끝에 실린 내기가 상대의 기세를 꺾었다.",
+      "상대의 초식을 한 발 먼저 읽고 흘려 냈다.", "허초에 속은 상대의 옆구리가 훤히 비었다.",
+      "내공을 실은 장력이 상대를 세 걸음이나 밀어냈다.", "검과 검이 엉킨 순간, 손목을 비틀어 주도권을 빼앗았다.",
+      "발밑을 쓸어 상대의 중심을 무너뜨렸다.", "단전에서 끌어올린 기운이 검신을 타고 울렸다."
+    ];
+    const FIGHT_LOSE = [
+      "상대의 묵직한 일격에 팔이 저려 왔다.", "생각지 못한 각도에서 날아든 검이 옷깃을 갈랐다.",
+      "연환격에 밀려 등이 나무에 닿았다.", "호흡이 흐트러진 틈을 상대는 놓치지 않았다.",
+      "막아 낸 검 위로 상대의 내력이 밀려들었다.", "발이 미끄러지며 한쪽 무릎이 꺾였다.",
+      "상대의 허초에 속아 크게 헛손질했다.", "가슴팍을 스친 장풍에 숨이 턱 막혔다."
+    ];
+    const FIGHT_FINISH_WIN = [
+      "마지막 일격이 {o}의 무기를 허공으로 날려 보냈다.", "{o}{i} 무릎을 꿇으며 손을 들었다. \"졌소.\"",
+      "검 끝이 {o}의 목젖 앞에서 멈췄다.", "{o}{i} 비틀거리다 끝내 주저앉았다."
+    ];
+    const FIGHT_FINISH_LOSE = [
+      "{o}의 검이 내 목 앞에서 멈췄다. 승부는 끝났다.", "손에서 검이 미끄러져 바닥에 떨어졌다.",
+      "몸이 허공에 떴다가 바닥에 내동댕이쳐졌다.", "더 버틸 힘이 남아 있지 않았다."
+    ];
+    const fillO = (t, o) => t.replace(/\{o\}/g, o).replace(/\{i\}/g, josa(o, "이", "가"));
+
+    async function storyFight(myName, myPower, oppName, oppPower, opts = {}) {
+      await say(`▶ ${myName}(무력 ${myPower})  vs  ${oppName}(무력 ${oppPower})`, "text-stone-400 font-bold text-xs", 200);
+      await say(fillO(pick(FIGHT_OPEN), oppName), "text-stone-300 italic", 300);
+      const winP = myPower / (myPower + oppPower);
+      let w = 0, l = 0;
+      const usedW = [], usedL = [];
+      for (let round = 1; round <= 3 && w < 2 && l < 2; round++) {
+        const win = Math.random() < winP;
+        win ? w++ : l++;
+        const pool = (win ? FIGHT_WIN : FIGHT_LOSE).filter(x => !(win ? usedW : usedL).includes(x));
+        const line = pick(pool); (win ? usedW : usedL).push(line);
+        await say(`[${round}합] ${line}`, win ? "text-cyan-300" : "text-rose-400", 320);
+      }
+      const won = w > l;
+      await say(fillO(pick(won ? FIGHT_FINISH_WIN : FIGHT_FINISH_LOSE), oppName), won ? "text-amber-200" : "text-stone-400", 300);
+      if (won && oppPower > myPower * 1.05) await upsetReward(oppName, myPower, oppPower, opts.heir);
+      return won;
     }
 
-    // ----- 이야기 속 비무 (미니게임도 이야기 안에서) -----
-    const DUEL_ROUNDS = [
-      { round: "1합", msgWin: "신법으로 상대의 빈틈을 파고들어 강타했다!", msgLose: "상대의 묵직한 초식에 한 걸음 밀렸다." },
-      { round: "2합", msgWin: "검 끝에 실린 내기로 상대의 기세를 꺾었다!", msgLose: "거친 패도에 검이 튕겨 나갈 뻔했다." },
-      { round: "3합", msgWin: "비기를 작렬시켜 상대의 무기를 날려 버렸다!", msgLose: "기습적인 연환격에 허를 찔렸다." }
-    ];
-
-    async function storyFight(myName, myPower, oppName, oppPower) {
-      await say(`▶ ${myName}(무력 ${myPower})  vs  ${oppName}(무력 ${oppPower})`, "text-stone-400 font-bold text-xs", 250);
-      let w = 0, l = 0;
+    // 나보다 강한 상대를 꺾으면 깨달음 또는 기연
+    async function upsetReward(oppName, myPower, oppPower, heir) {
       const ratio = oppPower / Math.max(1, myPower);
-      for (const r of DUEL_ROUNDS) {
-        let strike = "AUTO";
-        if (minigameEnabled && !autoMode) {
-          storySkipping = false;
-          const slot = storyStrikeSlot();
-          storyScroll();
-          strike = await playStrikeMinigame(slot, ratio, r.round);
-          document.getElementById(slot)?.remove();
-        }
-        const p = Math.min(0.95, Math.max(0.05, myPower / (myPower + oppPower) + STRIKE_BONUS[strike]));
-        const win = Math.random() < p;
-        win ? w++ : l++;
-        const tag = { PERFECT: "【절초】 ", GOOD: "【적중】 ", MISS: "【헛손질】 ", AUTO: "" }[strike];
-        await say(`[${r.round}] ${tag}${win ? r.msgWin : r.msgLose}`, win ? "text-cyan-300" : "text-rose-400", 300);
-        if (w === 2 || l === 2) break;
+      const chance = Math.min(0.95, 0.45 + (ratio - 1) * 1.6);
+      if (Math.random() > chance) return;
+      const base = Math.max(4, Math.min(30, Math.round((ratio - 1) * 40 + 4)));
+      const bigBoon = ratio >= 1.2 && Math.random() < 0.45;
+      if (heir) {
+        const gain = Math.round(base * (bigBoon ? 2.2 : 1.3));
+        heir.power += gain; heir.loyalty = Math.min(100, heir.loyalty + 5);
+        await say(`✦ 한 수 위의 ${oppName}${josa(oppName, "을", "를")} 꺾은 대제자 ${heir.name}의 눈빛이 달라졌다. (제자 무력 +${gain})`, "text-cyan-300 font-bold", 400);
+        return;
       }
-      return w > l;
+      if (bigBoon) {
+        const b = pick([
+          { t: `패배를 인정한 ${oppName}${josa(oppName, "이", "가")} 품에서 낡은 비급을 꺼내 건넸다. "그대 같은 자가 익혀야 하오."`, q: 1.0, e: 0.6, a: 0.6 },
+          { t: `${oppName}${josa(oppName, "은", "는")} 부러진 자신의 검 대신 평생 아껴 온 명검을 내밀었다.`, q: 0.4, e: 1.2, a: 0.4 },
+          { t: `${oppName}${josa(oppName, "이", "가")} 내 손목을 잡더니 자신의 내력 일부를 흘려보냈다. "강자에게 바치는 예요."`, q: 1.5, e: 0.2, a: 0.3 },
+          { t: `${oppName}의 마지막 초식이 머릿속에서 떠나지 않았다. 사흘 밤낮을 매달려 그것을 내 것으로 만들었다.`, q: 0.6, e: 0.7, a: 0.7 }
+        ]);
+        const dq = Math.round(base * 1.4 * b.q), de = Math.round(base * 1.4 * b.e), da = Math.round(base * 1.4 * b.a);
+        gainStats(dq, de, da); gainFame(Math.round(base / 2));
+        await say("✦✦ 기연(奇緣)!", "text-cyan-200 font-brush text-base", 150);
+        await say(`${b.t} (내공 +${dq}, 외공 +${de}, 신법 +${da})`, "text-cyan-300 font-bold", 450);
+        addStory(`한 수 위의 고수 ${oppName}${josa(oppName, "을", "를")} 꺾고 기연을 얻었다.`);
+      } else {
+        const k = pick(["qi", "ext", "agi"]);
+        const d = { qi: [base, 0, 0], ext: [0, base, 0], agi: [0, 0, base] }[k];
+        gainStats(d[0], d[1], d[2]);
+        const nm = { qi: "내공", ext: "외공", agi: "신법" }[k];
+        await say("✦ 깨달음(悟)", "text-cyan-200 font-brush text-base", 150);
+        await say(pick([
+          "한 수 위의 검을 받아 내는 사이, 막혀 있던 무언가가 트였다.",
+          "벼랑 끝까지 몰렸던 그 순간, 몸이 먼저 길을 찾아냈다.",
+          `${oppName}의 검로를 되짚어 보다 새로운 이치를 깨우쳤다.`,
+          "이길 수 없을 것 같던 상대를 넘어서자, 스스로의 한계가 한 뼘 넓어졌다."
+        ]) + ` (${nm} +${base})`, "text-cyan-300 font-bold", 450);
+        if (ratio >= 1.25) addStory(`한 수 위의 ${oppName}${josa(oppName, "을", "를")} 꺾고 깨달음을 얻었다.`);
+      }
     }
 
     function getDuelOptions() {
@@ -4601,7 +4682,7 @@
         await storyHeader(opp.round);
         await say(opp.desc, "text-stone-300", 250);
         const myPower = heirFights ? heir.power : Math.round(getCombatPower() * (char.injury ? 0.85 : 1));
-        const won = await storyFight(fighterName, myPower, opp.name, opp.power);
+        const won = await storyFight(fighterName, myPower, opp.name, opp.power, { heir: heirFights ? heir : null });
         if (!won) {
           const prize = Math.round((stage === 0 ? 30 : 60) * pm);
           char.money += prize; gainFame(10);
@@ -4628,7 +4709,9 @@
 
     // ----- 한 해 보내기 (이야기 진행) -----
     const SEASON_OPEN = [
-      "봄바람에 매화 향이 실려 온다.", "얼음이 녹은 계곡물 소리가 들려온다.", "새벽 안개가 산문을 감싸고 있다.", "제비가 처마 밑으로 돌아왔다."
+      "봄바람에 매화 향이 실려 온다.", "얼음이 녹은 계곡물 소리가 들려온다.", "새벽 안개가 산문을 감싸고 있다.", "제비가 처마 밑으로 돌아왔다.",
+      "복사꽃 잎이 연무장 위로 흩날린다.", "밤새 내린 봄비에 산길이 촉촉하다.", "먼 산의 눈이 녹아 개울물이 불어났다.", "산문 앞 노송에 새순이 돋았다.",
+      "장터에서 올해 강호 판도를 두고 수군거리는 소리가 들린다.", "낡은 검을 숫돌에 갈며 새해를 맞았다."
     ];
 
     // ==========================================
@@ -4857,6 +4940,111 @@
       if (last && last.c === "text-rose-400 font-bold" && last.t.includes("입었다") && !last.shown) { last.shown = true; await say(last.t, last.c); }
     }
 
+    // ==========================================
+    // [연작] 여러 해에 걸쳐 이어지는 이야기
+    // ==========================================
+    async function runArcs(rec) {
+      char.arcs = char.arcs || {};
+      const A = char.arcs;
+      // 1) 사부의 행방
+      if (!A.master && char.age >= 21 && char.age <= 32 && Math.random() < 0.11) { A.master = { stage: 1, next: char.age }; }
+      if (A.master && A.master.stage > 0 && A.master.stage < 9 && char.age >= A.master.next) {
+        await storyHeader("연작 · 사부의 행방");
+        await arcMaster(A.master, rec);
+      }
+      // 2) 숙명의 맞수 (동기와의 생사결)
+      if (!A.rival && char.age >= 32 && char.age <= 55 && Math.random() < 0.15) {
+        const myPath = getPath();
+        const foe = (char.peers || []).filter(p => p.alive && p.path !== myPath && p.path !== "neutral").sort((a, b) => b.power - a.power)[0];
+        if (foe) { A.rival = { done: true }; await storyHeader("연작 · 숙명의 맞수"); await arcRival(foe, rec); }
+      }
+    }
+
+    async function arcMaster(st, rec) {
+      if (st.stage === 1) {
+        await say("어느 새벽, 사부의 방이 비어 있었다. 탁자 위에는 서찰 한 장이 놓여 있었다.", "text-stone-200", 300);
+        await say("'옛 빚을 갚으러 간다. 찾지 마라.'", "text-amber-100 italic", 300);
+        const i = await choose([
+          { label: "사부를 찾아 길을 나선다", hint: "연작이 이어진다", chip: "추적" },
+          { label: "사부의 뜻을 따라 기다린다", hint: "협의 +2 · 이야기 끝", chip: "기다림" }
+        ], 0);
+        if (i === 1) { addAlign(2, 0, 0); st.stage = 9; await rec.out("사부의 빈자리를 지키며 수련에 매진했다. 사부는 끝내 돌아오지 않았다.", "text-stone-400"); addStory("사부가 서찰 한 장을 남기고 떠났다."); return; }
+        st.stage = 2; st.next = char.age + ri(1, 2);
+        addStory("사라진 사부를 찾아 나섰다.");
+        await rec.out("사부의 낡은 검집을 등에 메고 산문을 나섰다.", "text-amber-200");
+        return;
+      }
+      if (st.stage === 2) {
+        await say("사부의 행적을 쫓아 서역 길목의 객잔에 이르렀다. 혈수귀(血手鬼)라는 마두가 사부를 쫓고 있다는 소문이 들려온다.", "text-stone-200", 300);
+        const cost = Math.min(char.money, scaled(40));
+        const i = await choose([
+          { label: "무림맹 지부를 찾아 도움을 청한다", hint: "협의 +3 · 동행 무사의 도움", chip: "정", chipClass: PATH_INFO.orthodox.chip },
+          { label: `흑도 정보상에게 은자를 쥐여 준다`, hint: `은자 -${cost} · 정확한 위치`, chip: "사", chipClass: PATH_INFO.unorthodox.chip },
+          { label: "홀로 혈수귀의 흔적을 쫓는다", hint: "신법 +4 · 부상 위험", chip: "중", chipClass: PATH_INFO.neutral.chip }
+        ], 0);
+        if (i === 0) { addAlign(3, 0, 0); st.help = 1.15; await rec.out("무림맹 무사 둘이 동행하기로 했다.", "text-sky-300"); }
+        if (i === 1) { char.money -= cost; addAlign(0, 2, 0); st.help = 1.05; await rec.out(`정보상이 혈수귀의 은신처를 짚어 주었다. (은자 -${cost})`, "text-rose-300"); }
+        if (i === 2) { gainStats(0, 0, 4); st.help = 1.0; await rec.out("사흘 밤낮을 쫓은 끝에 혈흔을 찾아냈다. (신법 +4)"); rollInjury(0.3, rec); }
+        st.stage = 3; st.next = char.age + ri(1, 2);
+        return;
+      }
+      if (st.stage === 3) {
+        await say("폐허가 된 사당. 마침내 사부를 찾았다. 백발이 성성한 사부가 혈수귀와 마주 서 있었다.", "text-stone-200", 300);
+        await say("\"오지 말라 하지 않았느냐…\" 사부의 입가에 피가 맺혀 있다.", "text-amber-100 italic", 300);
+        const i = await choose([
+          { label: "사부 앞을 막아서며 혈수귀와 맞선다", hint: "한 수 위 마두와의 생사결 · 이기면 사부의 절기 전수", chip: "결전", chipClass: "bg-rose-950 text-rose-300 border-rose-500/60" },
+          { label: "사부와 등을 맞대고 함께 싸운다", hint: "승산 ↑ · 보상 보통", chip: "협공" },
+          { label: "사부의 뜻대로 물러난다", hint: "이야기의 끝", chip: "물러남" }
+        ], 0);
+        const foePower = Math.round(getBenchmarkPower() * 1.4);
+        if (i === 2) { st.stage = 9; await rec.out("뒤돌아선 등 뒤로 검 부딪치는 소리가 오래 이어졌다. 사부의 소식은 그 뒤로 끊겼다.", "text-stone-400"); addStory("사부의 마지막 싸움을 지켜보지 못했다."); return; }
+        const my = Math.round(getCombatPower() * (st.help || 1) * (i === 1 ? 1.35 : 1));
+        const won = await storyFight(i === 1 ? `${char.name}${josa(char.name, "과", "와")} 사부` : char.name, my, "혈수귀", foePower);
+        st.stage = 9;
+        if (won) {
+          if (i === 0) {
+            gainStats(15, 10, 8); gainFame(20);
+            await rec.out("혈수귀가 쓰러지자, 사부가 떨리는 손으로 독문절기의 구결을 귀에 속삭였다. \"이제 네 것이다.\" (내공 +15, 외공 +10, 신법 +8)", "text-cyan-300 font-bold");
+            addStory("사부를 구하고 혈수귀를 베어 사부의 독문절기를 이어받았다.");
+          } else {
+            gainStats(7, 5, 4); gainFame(10);
+            await rec.out("사제가 함께 혈수귀를 물리쳤다. 사부는 껄껄 웃으며 고향으로 돌아갔다. (내공 +7, 외공 +5, 신법 +4)", "text-cyan-300 font-bold");
+            addStory("사부와 함께 혈수귀를 물리쳤다.");
+          }
+        } else {
+          char.injury = { ...INJURIES[2] };
+          await rec.out("혈수귀의 손이 가슴을 꿰뚫기 직전, 사부가 몸을 날렸다. 사부는 웃으며 눈을 감았다.", "text-rose-300 font-bold");
+          addStory("혈수귀와의 싸움에서 사부를 잃었다.");
+          addAlign(0, 0, 4);
+        }
+      }
+    }
+
+    async function arcRival(foe, rec) {
+      const fn = foe.name;
+      await say(`붉은 봉인이 찍힌 서찰이 도착했다. 보낸 이는 동기 ${fn}. 이제는 ${PATH_INFO[foe.path].label.replace(" 성향", "")}의 거물이 되어 있었다.`, "text-stone-200", 300);
+      await say(`'같은 해 강호에 들어선 우리 중 하나만 살아남는다. 단풍 지는 날, 낙안봉에서.'`, "text-amber-100 italic", 300);
+      const i = await choose([
+        { label: "생사결에 응한다", hint: `동기 ${fn}(무력 ${foe.power})와 목숨을 건 결투`, chip: "응함", chipClass: "bg-rose-950 text-rose-300 border-rose-500/60" },
+        { label: "옛정을 생각해 편지를 태운다", hint: "명성 -5 · 협의 +3", chip: "거절" }
+      ], 0);
+      if (i === 1) { gainFame(-5); addAlign(3, 0, 0); await rec.out("타오르는 서찰을 바라보며 입문하던 봄날을 떠올렸다.", "text-stone-400"); return; }
+      const won = await storyFight(char.name, getCombatPower(), `동기 ${fn}`, Math.max(30, foe.power));
+      if (won) {
+        const j = await choose([
+          { label: `${fn}의 숨통을 끊는다`, hint: "악명 +6 · 명성 +15", chip: "결착", chipClass: PATH_INFO.unorthodox.chip },
+          { label: `${fn}${josa(fn, "을", "를")} 살려 보낸다`, hint: "협의 +6 · 명성 +10", chip: "용서", chipClass: PATH_INFO.orthodox.chip }
+        ], getPath() === "orthodox" ? 1 : 0);
+        if (j === 0) { addAlign(0, 6, 0); gainFame(15); foe.alive = false; foe.deathAge = char.age; foe.deathCause = "숙명의 맞수에게 패해"; await rec.out(`${fn}${josa(fn, "은", "는")} 웃으며 쓰러졌다. "역시… 너였구나."`, "text-rose-300 font-bold"); addStory(`숙명의 맞수 동기 ${fn}${josa(fn, "을", "를")} 생사결에서 베었다.`); }
+        else { addAlign(6, 0, 0); gainFame(10); foe.path = "neutral"; await rec.out(`${fn}${josa(fn, "은", "는")} 한참을 말없이 서 있다가 검을 꺾고 산을 내려갔다.`, "text-sky-300 font-bold"); addStory(`숙명의 맞수 동기 ${fn}${josa(fn, "을", "를")} 꺾고 살려 보냈다.`); }
+      } else {
+        char.injury = { ...INJURIES[3] };
+        gainStats(5, 5, 5);
+        await rec.out(`${fn}의 검이 단전을 스쳤다. "목숨은 남겨 두마. 다음엔 없다." (단전 손상 · 패배에서 배운 것: 무력 +15)`, "text-rose-300 font-bold");
+        addStory(`숙명의 맞수 동기 ${fn}에게 패했다.`);
+      }
+    }
+
     async function passYear() {
       if (yearBusy || char.dead || char.hasAscended) return;
       yearBusy = true;
@@ -4898,6 +5086,8 @@
             if (tourResult) rec.lines.push({ t: `👑 천하비무대회: ${tourResult.text}`, c: "text-yellow-300 font-bold" });
           } else await rec.out("초청장을 접어 품에 넣었다.", "text-stone-400");
         }
+
+        await runArcs(rec);
 
         simulatePeers(rec);
         rumorAboutMe(rec);
@@ -4989,10 +5179,6 @@
       auto.innerText = autoMode ? "⏸ 멈춤" : "⏩ 운명에 맡기기";
       auto.disabled = over;
       document.getElementById("btn-speed").innerText = `${Math.round(1 / timeScale)}x`;
-      const mg = document.getElementById("btn-minigame");
-      mg.innerText = minigameEnabled ? "🎮 조작" : "🎮 자동";
-      mg.title = minigameEnabled ? "비무 때 타이밍 미니게임을 직접 합니다 (누르면 자동 판정)" : "비무를 자동으로 판정합니다 (누르면 직접 조작)";
-      mg.className = `px-2 py-1 rounded-lg border font-bold text-[11px] cursor-pointer ${minigameEnabled ? "bg-amber-900/50 border-amber-500/70 text-amber-200" : "bg-stone-900 border-stone-700 text-stone-400"}`;
     }
 
 
