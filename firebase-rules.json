@@ -10,7 +10,7 @@
         "sect":      { ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 20 && !newData.val().matches(/[<>]/)" },
         "power":     { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 20000" },
         "rankName":  { ".validate": "newData.isString() && newData.val().length <= 20" },
-        "age":       { ".validate": "newData.isNumber() && newData.val() >= 16 && newData.val() <= 60" },
+        "age":       { ".validate": "newData.isNumber() && newData.val() >= 16 && newData.val() <= 150" },
         "avatarId":  { ".validate": "newData.isString() && newData.val().length <= 20" },
         "path":      { ".validate": "newData.isString() && (newData.val() === 'orthodox' || newData.val() === 'unorthodox' || newData.val() === 'demonic' || newData.val() === 'neutral')" },
         "dailyKey":  { ".validate": "newData.isString() && newData.val().length <= 12" },
