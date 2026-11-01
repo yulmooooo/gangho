@@ -4279,11 +4279,9 @@
       const box = document.getElementById("ending-extra");
       const story = char.story.slice(-14).map(s => `<div class="flex gap-2"><span class="shrink-0 text-amber-400 font-bold">${s.age}세</span><span>${escapeHtml(s.text)}</span></div>`).join("");
       const peers = getPeerFates().map(t => `<div>· ${escapeHtml(t)}</div>`).join("");
-      const refl = char.reflections.map(r => `<div><span class="text-amber-400 font-bold">${r.age}세의 내가 남긴 말</span> "${escapeHtml(r.text)}"</div>`).join("");
       box.innerHTML = `
         <div class="space-y-1"><div class="text-[11px] font-brush text-amber-300">인생 이야기</div><div class="space-y-0.5 text-[11px] text-stone-300">${story}</div></div>
-        <div class="space-y-1 pt-2 border-t border-stone-800"><div class="text-[11px] font-brush text-amber-300">동기들의 결말</div><div class="space-y-0.5 text-[11px] text-stone-400">${peers}</div></div>
-        ${refl ? `<div class="space-y-1 pt-2 border-t border-stone-800"><div class="text-[11px] font-brush text-amber-300">그 시절 남긴 말</div><div class="space-y-0.5 text-[11px] text-stone-300">${refl}</div></div>` : ""}`;
+        <div class="space-y-1 pt-2 border-t border-stone-800"><div class="text-[11px] font-brush text-amber-300">동기들의 결말</div><div class="space-y-0.5 text-[11px] text-stone-400">${peers}</div></div>`;
       document.getElementById("end-death-line").innerText = char.hasAscended
         ? `${char.age}세, 구천현뢰를 뚫고 승천하다`
         : `향년 ${char.age}세 · ${char.deathCause || "은퇴"}${char.spouse ? ` · 반려 ${char.spouse}` : ""}`;
@@ -4491,34 +4489,6 @@
       checkRankUp();
       updateUI();
       await storyPause(400);
-    }
-
-    // 입력창 (회고)
-    function storyInput(placeholder) {
-      storySkipping = false;
-      return new Promise(resolve => {
-        const id = `si-${++storyUid}`;
-        const wrap = sayHTML(`
-          <div class="space-y-1.5 py-1">
-            <input id="${id}" type="text" maxlength="60" placeholder="${escapeHtml(placeholder)}" class="w-full bg-stone-900 border border-amber-600/50 rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:border-amber-400">
-            <div class="grid grid-cols-2 gap-1.5">
-              <button type="button" data-k="save" class="py-2 bg-gradient-to-r from-amber-600 to-amber-500 text-stone-950 font-brush text-sm rounded-xl cursor-pointer">마음에 새기다</button>
-              <button type="button" data-k="skip" class="py-2 bg-stone-800 text-stone-300 font-brush text-sm rounded-xl cursor-pointer">말없이 지나가다</button>
-            </div>
-          </div>`);
-        const input = wrap.querySelector("input");
-        const done = (save) => {
-          const t = save ? cleanInputText(input.value, 60) : "";
-          wrap.innerHTML = t ? `<div class="text-amber-200 italic">"${escapeHtml(t)}"</div>` : `<div class="text-stone-500 italic">…말없이 지나갔다.</div>`;
-          resolve(t);
-        };
-        wrap.querySelector('[data-k="save"]').onclick = (e) => { e.stopPropagation(); done(true); };
-        wrap.querySelector('[data-k="skip"]').onclick = (e) => { e.stopPropagation(); done(false); };
-        input.onclick = e => e.stopPropagation();
-        input.onkeydown = e => { if (e.key === "Enter") done(true); };
-        if (autoMode) setTimeout(() => done(false), 300 * timeScale);
-        else setTimeout(() => input.focus(), 50);
-      });
     }
 
     // ----- 이야기로 펼쳐지는 비무 (미니게임 없음) -----
@@ -5121,12 +5091,6 @@
         maybeTriggerYearEvent(getTemper() === TEMPERS.chivalry ? 0.4 : 0.25);
         if (activeStoryEvent) { await activeStoryEvent; activeStoryEvent = null; }
 
-        if ([20, 30, 40, 50].includes(char.age) && !autoMode) {
-          await storyHeader("회고");
-          await say(`${char.age}세가 되었다. 잠시 걸음을 멈추고 지나온 길을 돌아본다. 훗날의 나에게 한마디를 남길까?`, "text-amber-200", 100);
-          const t = await storyInput("예) 아직은 검이 무겁다");
-          if (t) char.reflections.push({ age: char.age, text: t });
-        }
         if (autoMode) await autoManage();
         if (char.dead) { await finishLifeStory(); return; }
         await say(`— ${char.age}세의 봄이 기다린다 —`, "text-stone-500 text-xs text-center", 0);
