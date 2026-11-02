@@ -147,6 +147,8 @@
         </div>
       </div>
 
+      <p class="text-[10px] text-stone-500 text-center">생을 마치면 기록이 천하 서열록(랭킹)에 자동으로 올라갑니다.</p>
+
       <button id="btn-archive" onclick="openArchiveModal()" class="w-full py-2 bg-stone-900 border border-stone-700 hover:bg-stone-800 text-stone-300 font-bold text-xs rounded-xl cursor-pointer">📜 강호 열전</button>
 
       <button id="btn-start" onclick="startGame()" class="w-full py-3.5 bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 hover:brightness-110 text-stone-950 font-brush text-base rounded-xl transition duration-150 shadow-xl cursor-pointer">
@@ -1439,6 +1441,7 @@
         addStory("구천현뢰를 뚫고 우화등선하였다.");
         showFinalEnding("ASCENSION");
         saveLifeToArchive();
+        submitToLeaderboard(true);
         updateUI();
       } else {
         const lostQi = 45;
@@ -1784,8 +1787,8 @@
       return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
     }
 
-    function getPeriodKeys() {
-      const now = new Date();
+    function getPeriodKeys(at) {
+      const now = at ? new Date(at) : new Date();
       const yyyy = now.getFullYear();
       const mm = String(now.getMonth() + 1).padStart(2, '0');
       const dd = String(now.getDate()).padStart(2, '0');
@@ -1798,27 +1801,17 @@
       };
     }
 
-    async function submitToLeaderboard() {
-      if (hasSubmittedThisLife) {
-        showCustomAlert("이미 이번 생의 기록을 천하 서열록에 등록하셨습니다.");
-        return;
-      }
+    function rankingUrl() {
+      return `${FIREBASE_DB_URL.replace(/\/$/, '')}/rankings.json`;
+    }
 
-      if (!FIREBASE_DB_URL || FIREBASE_DB_URL.includes("내프로젝트")) {
-        showCustomAlert("Firebase Database URL이 아직 연결되지 않았습니다.");
-        return;
-      }
-
-      const submitBtn = document.getElementById("btn-submit-rank");
-      submitBtn.disabled = true;
-      submitBtn.innerText = "서열록에 헌액하는 중...";
-
-      const totalPower = getCombatPower();
+    // 지금 캐릭터의 랭킹 기록
+    function buildRankRecord() {
       const period = getPeriodKeys();
-      const record = {
+      return {
         name: char.name,
         sect: char.sect,
-        power: totalPower,
+        power: getCombatPower(),
         rankName: ranks[char.rankIdx].name.split(" ")[0],
         age: char.age,
         avatarId: char.avatarId,
@@ -1834,28 +1827,52 @@
         monthlyKey: period.monthly,
         createdAt: Date.now()
       };
+    }
+
+    async function postRankRecord(record) {
+      const res = await fetch(rankingUrl(), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(record)
+      });
+      return res.ok;
+    }
+
+    // 생을 마치면 자동으로 호출됨 (auto=true면 서열록 창을 띄우지 않음)
+    async function submitToLeaderboard(auto = false) {
+      if (hasSubmittedThisLife) {
+        if (!auto) showCustomAlert("이번 생의 기록은 이미 천하 서열록에 올라가 있습니다.");
+        return;
+      }
+
+      if (!FIREBASE_DB_URL || FIREBASE_DB_URL.includes("내프로젝트")) {
+        if (!auto) showCustomAlert("Firebase Database URL이 아직 연결되지 않았습니다.");
+        return;
+      }
+
+      const submitBtn = document.getElementById("btn-submit-rank");
+      submitBtn.disabled = true;
+      submitBtn.innerText = "천하 서열록에 기록을 올리는 중...";
+
+      const record = char.pendingRecord || buildRankRecord();
 
       try {
-        const url = `${FIREBASE_DB_URL.replace(/\/$/, '')}/rankings.json`;
-        const res = await fetch(url, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(record)
-        });
-
+        const ok = await postRankRecord(record);
+        const res = { ok };
         if (res.ok) {
           hasSubmittedThisLife = true;
-          submitBtn.innerText = "✓ 천하 서열록 등록 완료";
+          markArchiveSubmitted(char.archiveId);
+          submitBtn.innerText = auto ? "✓ 천하 서열록에 자동으로 올라갔습니다" : "✓ 천하 서열록 등록 완료";
           submitBtn.className = "w-full py-2.5 bg-stone-800 text-stone-500 font-brush text-xs rounded-xl cursor-not-allowed";
-          openLeaderboardModal();
+          if (!auto) openLeaderboardModal();
         } else {
-          throw new Error("HTTP " + res.status);
+          throw new Error("HTTP 오류");
         }
       } catch (err) {
         console.error("랭킹 등록 실패:", err);
-        showCustomAlert("서열록 등록에 실패했습니다. Firebase 데이터베이스 규칙을 확인해 주세요.");
+        if (!auto) showCustomAlert("서열록 등록에 실패했습니다. 다음에 접속할 때 자동으로 다시 시도합니다.");
         submitBtn.disabled = false;
-        submitBtn.innerText = "🏆 천하 서열록(랭킹)에 내 기록 헌액하기";
+        submitBtn.innerText = "🏆 서열록 등록 다시 시도 (실패 시 다음 접속 때 자동 재시도)";
       }
     }
 
@@ -4245,6 +4262,7 @@
       addStory(`${char.deathCause}. 향년 ${char.age}세.`);
       showFinalEnding();
       saveLifeToArchive();
+      submitToLeaderboard(true);
       updateUI();
     }
 
@@ -4298,8 +4316,11 @@
       try {
         const list = loadArchive();
         const info = getEndingInfo();
+        char.archiveId = "L" + Date.now();
+        char.pendingRecord = buildRankRecord();
         list.unshift({
-          date: new Date().toISOString().slice(0, 10), name: char.name, sect: char.sect, faction: char.originFaction,
+          id: char.archiveId, record: char.pendingRecord, submitted: false,
+          date: char.pendingRecord.dailyKey, name: char.name, sect: char.sect, faction: char.originFaction,
           path: info.path, title: info.title, power: getCombatPower(), age: char.age,
           cause: char.hasAscended ? "우화등선" : char.deathCause, avatarId: char.avatarId,
           story: char.story.slice(-10), peers: getPeerFates()
@@ -4307,6 +4328,56 @@
         localStorage.setItem("gangho_lives", JSON.stringify(list.slice(0, 30)));
       } catch (e) {}
       renderArchiveButton();
+    }
+
+    function markArchiveSubmitted(id) {
+      try {
+        const list = loadArchive();
+        const e = list.find(x => x.id === id);
+        if (e) { e.submitted = true; localStorage.setItem("gangho_lives", JSON.stringify(list)); }
+      } catch (err) {}
+    }
+
+    // 강호 열전에 남아 있지만 서열록에 올라가지 않은 기록을 찾아 올림 (접속할 때마다)
+    async function syncPendingRecords() {
+      if (!FIREBASE_DB_URL || FIREBASE_DB_URL.includes("내프로젝트")) return;
+      let list;
+      try { list = loadArchive(); } catch (e) { return; }
+      const pending = list.filter(e => !e.submitted && e.name);
+      if (!pending.length) return;
+      let changed = false;
+      for (const e of pending.slice(0, 10)) {
+        try {
+          let record = e.record;
+          if (!record) {
+            // 자동 등록이 생기기 전의 기록: 열전에 남은 정보로 다시 만들고, 이미 올라가 있으면 건너뜀
+            const when = new Date(`${e.date}T12:00:00`);
+            const pk = getPeriodKeys(when);
+            let rankIdx = 0; ranks.forEach((r, i) => { if (Number(e.power) >= r.minStat) rankIdx = i; });
+            record = {
+              name: String(e.name).slice(0, 12), sect: String(e.sect || "무명 낭인").slice(0, 20),
+              power: Number(e.power) || 0, rankName: ranks[rankIdx].name.split(" ")[0],
+              age: Math.min(150, Math.max(16, Number(e.age) || 16)), avatarId: e.avatarId || "huashan",
+              ...(PATH_INFO[e.path] ? { path: e.path } : {}),
+              dailyKey: pk.daily, weeklyKey: pk.weekly, monthlyKey: pk.monthly, createdAt: when.getTime()
+            };
+            const q = await fetch(`${rankingUrl()}?orderBy=${encodeURIComponent('"dailyKey"')}&equalTo=${encodeURIComponent('"' + pk.daily + '"')}`);
+            if (q.ok) {
+              const data = await q.json();
+              const dup = data && Object.values(data).some(x => x && x.name === record.name && Number(x.power) === record.power && Number(x.age) === record.age);
+              if (dup) { e.submitted = true; changed = true; continue; }
+            } else continue; // 중복 확인이 안 되면 다음 기회에
+          }
+          if (await postRankRecord(record)) { e.submitted = true; changed = true; }
+        } catch (err) {}
+      }
+      if (changed) {
+        try {
+          const fresh = loadArchive();
+          fresh.forEach(x => { const m = list.find(y => (y.id && y.id === x.id) || (!y.id && y.date === x.date && y.name === x.name && y.power === x.power)); if (m && m.submitted) x.submitted = true; });
+          localStorage.setItem("gangho_lives", JSON.stringify(fresh));
+        } catch (err) {}
+      }
     }
 
     function renderArchiveButton() {
@@ -5389,6 +5460,7 @@
       renderFactionSelector();
       renderTemperSelector();
       renderArchiveButton();
+      setTimeout(syncPendingRecords, 1500);
       updateUI();
     };
   </script>
