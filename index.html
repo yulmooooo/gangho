@@ -3333,7 +3333,7 @@
       if (Math.random() > chance) return;
 
       // 제자가 있으면 제자 사건도 섞임 (최근에 본 사건은 피함)
-      const all = [...RANDOM_EVENTS, ...DISCIPLE_EVENTS].filter(e => !e.cond || e.cond());
+      const all = RANDOM_EVENTS.filter(e => !e.cond || e.cond());
       let pool = all.filter(e => !char.seenEvents.slice(-4).includes(e.id));
       if (pool.length === 0) pool = all;
       const ev = pool[Math.floor(Math.random() * pool.length)];
@@ -3438,8 +3438,36 @@
         power: 15 + talent * 6 + wit * 3 + ri(0, 10),
         loyalty: 50 + ri(0, 20),
         avatar: ri(0, PIXEL_ASSETS.avatars.length - 1),
-        wins: 0, title: ""
+        wins: 0, title: "",
+        age: ri(14, 20), life: ri(62, 90)
       };
+    }
+
+    function ensureDiscAge(d) {
+      if (d.age == null) d.age = 17 + Math.max(0, char.age - (d.joinedAge ?? char.age));
+      if (d.life == null) d.life = Math.max(d.age + 5, ri(62, 90));
+    }
+
+    const DISC_DEATHS = [
+      "강호행 중 마주친 마두의 손에 쓰러졌다",
+      "흑도 무리와의 싸움에서 목숨을 잃었다",
+      "폐관 수련 중 주화입마로 숨을 거두었다",
+      "의뢰를 수행하다 매복에 당해 돌아오지 못했다",
+      "다른 문파 고수와의 생사결에서 패해 숨졌다"
+    ];
+
+    // 제자가 죽었을 때 (문파 명부에서 지우고 이야기로 남김)
+    function discipleDies(d, cause, natural) {
+      const s = sect(); if (!s) return "";
+      const wasHeir = d.id === s.heirId;
+      removeDisciple(d.id, !!natural);
+      s.fallen = s.fallen || [];
+      s.fallen.push({ name: d.name, age: d.age, cause, atAge: char.age });
+      if (!natural) s.disciples.forEach(x => { x.loyalty = Math.min(100, x.loyalty + 3); });
+      const who = `${wasHeir ? "대제자" : "제자"} ${d.name}`;
+      addLog(char.age, `✝ [제자 사망] ${who}이(가) ${cause}. (향년 ${d.age}세)`, natural ? "text-stone-400" : "text-rose-400 font-bold");
+      addStory(`${who}${josa(d.name, "을", "를")} ${natural ? "천수를 다해 떠나보냈다" : "강호에서 잃었다"}.`);
+      return `✝ ${who}${josa(d.name, "이", "가")} ${cause}. (향년 ${d.age}세)`;
     }
 
     function discipleGrowth(d, teaching) {
@@ -3616,7 +3644,7 @@
       const lvl = SECT_LEVELS[getSectLevelIdx()];
       const head = document.createElement("div");
       head.className = "text-[11px] font-bold text-stone-300 flex justify-between";
-      head.innerHTML = `<span>문하 제자 ${s.disciples.length} / ${lvl.maxDisc}명</span><span class="${s.taughtThisYear ? "text-stone-500" : "text-emerald-400"}">올해 지도 ${s.taughtThisYear ? "완료" : "가능 (1명)"}</span>`;
+      head.innerHTML = `<span>문하 제자 ${s.disciples.length} / ${lvl.maxDisc}명</span><span class="${s.taughtThisYear ? "text-stone-500" : "text-emerald-400"}">올해 지도 ${s.taughtThisYear ? "완료" : "가능 (1명 집중 · 나머지도 조금씩)"}</span>`;
       body.appendChild(head);
 
       if (s.disciples.length === 0) {
@@ -3721,8 +3749,10 @@
       const g = discipleGrowth(d, true);
       d.power += g;
       d.loyalty = Math.min(100, d.loyalty + 5);
+      let side = 0;
+      s.disciples.forEach(x => { if (x.id === d.id) return; const sg = Math.max(1, Math.round(discipleGrowth(x, true) * 0.3)); x.power += sg; x.loyalty = Math.min(100, x.loyalty + 1); side++; });
       s.taughtThisYear = true;
-      addLog(char.age, `[제자 지도] ${d.name}에게 무공을 전수했습니다. (무력 +${g}, 충성 +5)`, "text-emerald-300");
+      addLog(char.age, `[제자 지도] ${d.name}에게 무공을 전수했습니다. (무력 +${g}, 충성 +5)${side ? ` 곁에서 지켜본 제자 ${side}명도 조금씩 늘었습니다.` : ""}`, "text-emerald-300");
       renderSectModal();
       updateUI();
     }
@@ -3748,17 +3778,27 @@
         desc: `${d.name}(${d.persona} · 무력 ${d.power} · 충성 ${d.loyalty})을(를) 문하에서 내보내려 합니다. 자리가 비면 새 제자를 받을 수 있습니다.`,
         choices: [
           { path: "orthodox", label: "하산을 허락하고 축복하며 보낸다", hint: "협의 +2 · 충성이 높으면 훗날 보은하러 돌아옴",
-            apply: () => { addAlign(2, 0, 0); s.released.push({ name: d.name, power: d.power, loyalty: d.loyalty, kind: "release", age: char.age }); removeDisciple(id, true);
-              addLog(char.age, `[하산] ${d.name}이(가) 큰절을 올리고 산문을 나섰습니다.`, "text-emerald-300");
-              return { text: `${d.name}은(는) 눈시울을 붉히며 세 번 절하고 떠났습니다.`, chips: [["협의", "+2"], ["제자", "-1"]] }; } },
+            apply: () => releaseDisciple(d, "release") },
           { path: "unorthodox", label: "쓸모없다며 파문하고 쫓아낸다", hint: "악명 +2 · 충성이 낮으면 원한을 품고 돌아올 수 있음",
-            apply: () => { addAlign(0, 2, 0); s.released.push({ name: d.name, power: d.power, loyalty: d.loyalty, kind: "expel", age: char.age }); removeDisciple(id, true);
-              addLog(char.age, `[파문] ${d.name}을(를) 문하에서 쫓아냈습니다.`, "text-rose-300");
-              return { text: `${d.name}은(는) 이를 악물고 산문을 나섰습니다.`, chips: [["악명", "+2"], ["제자", "-1"]] }; } },
+            apply: () => releaseDisciple(d, "expel") },
           { path: "neutral", label: "다시 생각해 본다", hint: "취소",
             apply: () => ({ text: "제자는 아무것도 모른 채 수련을 이어갑니다.", chips: [] }) }
         ]
       });
+    }
+
+    function releaseDisciple(d, kind) {
+      const s = sect();
+      s.released.push({ name: d.name, power: d.power, loyalty: d.loyalty, kind, age: char.age });
+      removeDisciple(d.id, true);
+      if (kind === "release") {
+        addAlign(2, 0, 0);
+        addLog(char.age, `[하산] ${d.name}이(가) 큰절을 올리고 산문을 나섰습니다.`, "text-emerald-300");
+        return { text: `${d.name}${josa(d.name, "은", "는")} 눈시울을 붉히며 세 번 절하고 떠났습니다.`, chips: [["협의", "+2"], ["제자", "-1"]] };
+      }
+      addAlign(0, 2, 0);
+      addLog(char.age, `[파문] ${d.name}${josa(d.name, "을", "를")} 문하에서 쫓아냈습니다.`, "text-rose-300");
+      return { text: `${d.name}${josa(d.name, "은", "는")} 이를 악물고 산문을 나섰습니다.`, chips: [["악명", "+2"], ["제자", "-1"]] };
     }
 
     function removeDisciple(id, voluntary) {
@@ -3807,11 +3847,22 @@
       s.disciples.forEach(d => { d.power += discipleGrowth(d, false); });
       s.taughtThisYear = false;
 
+      // 제자도 나이를 먹고, 플레이어처럼 강호에서 죽을 수 있다
+      const notes = [];
+      [...s.disciples].forEach(d => {
+        ensureDiscAge(d);
+        d.age += 1;
+        if (d.age >= d.life) { notes.push(discipleDies(d, "천수를 누리고 눈을 감았다", true)); return; }
+        const risky = ["unorthodox", "demonic"].includes(PERSONAS[d.persona].path);
+        if (d.age >= 20 && Math.random() < 0.007 * (risky ? 1.6 : 1)) notes.push(discipleDies(d, pick(DISC_DEATHS), false));
+      });
+
       const count = Math.random() < 0.5 ? 1 : 2;
       s.applicants = Array.from({ length: count }, makeApplicant);
 
       addLog(char.age, `[${s.name}] ${parts.join(" · ")} · 입문 지원자 ${count}명`, "text-amber-200");
       checkSectLevelUp();
+      return notes;
     }
 
     // ----- 제자 사건 -----
@@ -3917,6 +3968,73 @@
     ];
 
     DISCIPLE_EVENTS.push(
+      {
+        id: "disc_challenge",
+        cond: () => sect() && sect().disciples.length >= 1,
+        build: () => {
+          const d = randomDisciple();
+          const foe = Math.max(20, Math.round(getBenchmarkPower() * (0.55 + Math.random() * 0.3)));
+          return {
+            tag: "DISCIPLE DUEL", title: "제자에게 온 도전장",
+            desc: `이웃 문파의 고수가 ${d.name}(무력 ${d.power})에게 생사를 건 비무를 청해 왔습니다. 상대의 무력은 ${foe} 정도로 보입니다.`,
+            choices: [
+              { path: "neutral", label: `${d.name}${josa(d.name, "을", "를")} 내보낸다`, hint: "이기면 제자 무력 +25 · 명성 +8 / 지면 제자가 죽을 수 있음",
+                apply: () => { let w = 0, l = 0; while (w < 2 && l < 2) { Math.random() < d.power / (d.power + foe) ? w++ : l++; }
+                  if (w > l) { d.power += 25; d.loyalty = Math.min(100, d.loyalty + 10); d.wins = (d.wins || 0) + 1; gainFame(8);
+                    return { text: `${d.name}${josa(d.name, "이", "가")} 상대를 꺾고 돌아왔습니다. 문파의 이름이 강호에 퍼졌습니다.`, chips: [["제자 무력", "+25"], ["명성", "+8"]] }; }
+                  if (Math.random() < 0.3) { ensureDiscAge(d); const t = discipleDies(d, "도전장의 생사결에서 패해 숨졌다", false); return { text: t, chips: [["제자", "-1"]] }; }
+                  d.power = Math.max(10, d.power - 8); return { text: `${d.name}${josa(d.name, "은", "는")} 크게 다쳐 업혀 돌아왔습니다.`, chips: [["제자 무력", "-8"]] }; } },
+              { path: "orthodox", label: "사부인 내가 대신 나선다", hint: "내 실력으로 겨룸 · 제자 충성 +10",
+                apply: () => { d.loyalty = Math.min(100, d.loyalty + 10); const r = autoDuel(0.9);
+                  if (r.won) { gainFame(6); return { text: "제자 앞에서 상대를 가볍게 물리쳤습니다.", chips: [["명성", "+6"], ["충성", "+10"]] }; }
+                  char.injury = { ...INJURIES[0] }; return { text: "간신히 비겼지만 내상을 입었습니다. 제자의 눈빛만은 뜨거웠습니다.", chips: [["부상", INJURIES[0].name], ["충성", "+10"]] }; } },
+              { path: "unorthodox", label: "도전장을 찢어 버린다", hint: "명성 -3 · 제자 충성 -5",
+                apply: () => { gainFame(-3); d.loyalty = Math.max(0, d.loyalty - 5); return { text: "문파가 겁을 먹었다는 소문이 돌았습니다.", chips: [["명성", "-3"], ["충성", "-5"]] }; } }
+            ]
+          };
+        }
+      },
+      {
+        id: "disc_love",
+        cond: () => sect() && sect().disciples.length >= 1,
+        build: () => {
+          const d = randomDisciple();
+          const gift = scaled(40);
+          return {
+            tag: "DISCIPLE LOVE", title: "제자의 정인",
+            desc: `${d.name}${josa(d.name, "이", "가")} 이웃 세가의 자제와 정을 나누고 있다는 사실이 알려졌습니다. ${d.name}${josa(d.name, "은", "는")} 무릎을 꿇고 혼인을 허락해 달라고 청합니다.`,
+            choices: [
+              { path: "orthodox", label: "기꺼이 허락하고 혼례를 치러 준다", hint: `제자 충성 +20 · 세가의 예물 은자 +${gift}`,
+                apply: () => { d.loyalty = Math.min(100, d.loyalty + 20); char.money += gift; addAlign(1, 0, 0);
+                  return { text: "산문에 오랜만에 웃음소리가 가득했습니다.", chips: [["충성", "+20"], ["은자", `+${gift}냥`]] }; } },
+              { path: "demonic", label: "무인은 정에 흔들리면 안 된다며 반대한다", hint: "제자 무력 +10 · 충성 -15 · 떠날 수도 있음",
+                apply: () => { d.power += 10; d.loyalty = Math.max(0, d.loyalty - 15); addAlign(0, 0, 1);
+                  if (d.loyalty < 35 && Math.random() < 0.5) { removeDisciple(d.id, false); return { text: `며칠 뒤 ${d.name}${josa(d.name, "은", "는")} 정인과 함께 밤중에 산문을 떠났습니다.`, chips: [["제자", "-1"]] }; }
+                  return { text: `${d.name}${josa(d.name, "은", "는")} 말없이 검만 휘둘렀습니다.`, chips: [["제자 무력", "+10"], ["충성", "-15"]] }; } }
+            ]
+          };
+        }
+      },
+      {
+        id: "disc_demon",
+        cond: () => sect() && sect().disciples.length >= 1,
+        build: () => {
+          const d = randomDisciple();
+          return {
+            tag: "FORBIDDEN ART", title: "금지된 마공",
+            desc: `${d.name}${josa(d.name, "이", "가")} 밤마다 몰래 마공 비급을 익히고 있습니다. 실력이 무섭게 늘고 있지만, 눈빛이 점점 탁해지고 있습니다.`,
+            choices: [
+              { path: "orthodox", label: "비급을 불태우고 바른 길로 이끈다", hint: "협의 +2 · 제자 충성 +5",
+                apply: () => { addAlign(2, 0, 0); d.loyalty = Math.min(100, d.loyalty + 5); return { text: `${d.name}${josa(d.name, "은", "는")} 고개를 숙이고 잘못을 빌었습니다.`, chips: [["협의", "+2"], ["충성", "+5"]] }; } },
+              { path: "demonic", label: "강해진다면 상관없다며 눈감는다", hint: "제자 무력 +40 · 마성 +3 · 주화입마 위험",
+                apply: () => { addAlign(0, 0, 3);
+                  if (Math.random() < 0.15) { ensureDiscAge(d); const t = discipleDies(d, "마공을 익히다 주화입마로 피를 토하고 숨졌다", false); return { text: t, chips: [["제자", "-1"]] }; }
+                  d.power += 40; d.persona = "냉혹"; d.loyalty = Math.max(0, d.loyalty - 10);
+                  return { text: `${d.name}의 기세가 몰라보게 사나워졌습니다.`, chips: [["제자 무력", "+40"], ["마성", "+3"]] }; } }
+            ]
+          };
+        }
+      },
       {
         id: "disc_return",
         cond: () => sect() && sect().released.some(r => r.kind === "release" && r.loyalty >= 60 && !r.done && char.age - r.age >= 3),
@@ -4255,7 +4373,8 @@
       const salary = Math.round(getCurrentSalary() * salaryMult);
       char.money += salary;
       rec.lines.push({ t: `${{ own: "강호 위명 수입", sect: "문파 녹봉", clan: "가문 지원금", ronin: "강호에 쌓은 이름값으로 들어온 수입" }[affiliation()]} ${salary}냥을 받았다.`, c: "text-emerald-400" });
-      processSectYear(getTemper().incomeBonus || 1);
+      const discNotes = processSectYear(getTemper().incomeBonus || 1) || [];
+      discNotes.forEach(t => rec.lines.push({ t, c: /천수/.test(t) ? "text-stone-400" : "text-rose-400 font-bold" }));
 
       const gt = GROWTH_TYPES[char.growthType];
       if (char.age >= gt.decline) {
@@ -5460,6 +5579,8 @@
 
         await runArcs(rec);
         if (char.dead) { await finishLifeStory(); return; }
+        await discipleChapter();
+        if (char.dead) { await finishLifeStory(); return; }
         await maybeAssassination(rec);
         if (char.dead) { await finishLifeStory(); return; }
 
@@ -5474,6 +5595,7 @@
         const mark = rec.lines.length;
         yearEnd(rec);
         for (const l of rec.lines.slice(mark)) await say(l.t, l.c || "text-stone-300", 280);
+        await discipleSwapOffer();
 
         const diff = [
           ["무력", (char.qi - before.qi) + (char.ext - before.ext) + (char.agi - before.agi), "text-amber-300"],
@@ -5507,6 +5629,46 @@
         updateUI();
       }
       if (autoMode && !char.dead && !char.hasAscended) setTimeout(passYear, 400 * timeScale);
+    }
+
+    async function discipleChapter() {
+      const s = sect(); if (!s || !s.disciples.length) return;
+      if (s.nextDiscEvent == null) { s.nextDiscEvent = char.age + ri(2, 3); return; }
+      if (char.age < s.nextDiscEvent) return;
+      s.nextDiscEvent = char.age + ri(3, 4);
+      const all = DISCIPLE_EVENTS.filter(e => !e.cond || e.cond());
+      if (!all.length) return;
+      let pool = all.filter(e => !char.seenEvents.slice(-6).includes(e.id));
+      if (!pool.length) pool = all;
+      const ev = pick(pool);
+      char.seenEvents.push(ev.id);
+      await storyHeader(`${s.name} · 제자의 일`);
+      await storyEvent(ev.build());
+    }
+
+    async function discipleSwapOffer() {
+      const s = sect(); if (!s || !s.applicants.length) return;
+      if (s.disciples.length < SECT_LEVELS[getSectLevelIdx()].maxDisc) return;
+      const best = [...s.applicants].sort((a, b) => (b.talent + b.wit) - (a.talent + a.wit))[0];
+      const weak = s.disciples.filter(d => d.id !== s.heirId).sort((a, b) => (a.talent + a.wit) - (b.talent + b.wit) || a.power - b.power)[0];
+      if (!weak || best.talent + best.wit < weak.talent + weak.wit + 2) return;
+      if (s.lastSwapAge != null && char.age - s.lastSwapAge < 3) return;
+      s.lastSwapAge = char.age;
+      await storyHeader(`${s.name} · 입문 지원자`);
+      await say(`근골 ${stars(best.talent)} · 오성 ${stars(best.wit)}의 ${best.name}${josa(best.name, "이", "가")} 입문을 청하러 왔다. 하지만 문하의 자리는 이미 가득 찼다.`, "text-amber-100", 250);
+      await say(`가장 자질이 떨어지는 제자는 ${weak.name}(근골 ${stars(weak.talent)} · 오성 ${stars(weak.wit)} · 무력 ${weak.power} · 충성 ${weak.loyalty})이다.`, "text-stone-400", 200);
+      const gap = (best.talent + best.wit) - (weak.talent + weak.wit);
+      const i = await choose([
+        { label: `${weak.name}의 하산을 허락하고 ${best.name}${josa(best.name, "을", "를")} 받는다`, hint: "협의 +2 · 좋게 보낸 제자는 훗날 보은하러 올 수 있음", chip: "하산", chipClass: PATH_INFO.orthodox.chip },
+        { label: `${weak.name}${josa(weak.name, "을", "를")} 파문하고 ${best.name}${josa(best.name, "을", "를")} 받는다`, hint: "악명 +2 · 쫓겨난 제자는 원한을 품고 돌아올 수 있음", chip: "파문", chipClass: PATH_INFO.unorthodox.chip },
+        { label: "지금의 제자들을 지킨다", hint: "아무 일도 없다", chip: "유지" }
+      ], gap >= 2 ? (getPath() === "orthodox" || weak.loyalty >= 50 ? 0 : 1) : 2);
+      if (i === 2) { await say(`${best.name}${josa(best.name, "은", "는")} 아쉬운 얼굴로 산을 내려갔다.`, "text-stone-400", 200); s.applicants = s.applicants.filter(a => a.id !== best.id); return; }
+      const res = releaseDisciple(weak, i === 0 ? "release" : "expel");
+      await say(res.text, "text-stone-200", 250);
+      acceptApplicant(best.id);
+      await say(`${best.name}${josa(best.name, "이", "가")} 새로 ${s.name}의 제자가 되었다.`, "text-emerald-300", 200);
+      storyChips([...res.chips, ["입문", best.name]]);
     }
 
     async function finishLifeStory() {
