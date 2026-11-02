@@ -1339,14 +1339,14 @@
 
       if (roll < prob) {
         char.rankIdx += 1;
-        char.qi += 20;
-        char.ext += 15;
-        char.agi += 15;
-        yearGains.qi += 20; yearGains.ext += 15; yearGains.agi += 15;
+        char.qi += 28;
+        char.ext += 20;
+        char.agi += 20;
+        yearGains.qi += 28; yearGains.ext += 20; yearGains.agi += 20;
 
         addLog(char.age, `★★★ [사경 돌파 대성공] 환골탈태! '${nextRank.name}' 등극!`, "text-yellow-300 font-brush text-sm");
         addStory(`생사 폐관 끝에 ${nextRank.name.split(" ")[0]}의 경지에 올랐다.`);
-        showBreakthroughResultPopup("SUCCESS", nextRank, 20, 15, 15);
+        showBreakthroughResultPopup("SUCCESS", nextRank, 28, 20, 20);
       } else if (roll < prob + 45) {
         char.qi += 5;
         yearGains.qi += 5;
@@ -3198,9 +3198,9 @@
           title: "도전장",
           desc: "객잔 탁자에 비수가 꽂혀 있고, 비수에 도전장이 매달려 있습니다. '보름 뒤 달 밝은 밤, 낙화대에서 기다리겠다. — 혈검(血劍)'",
           choices: [
-            { path: "neutral", label: "낙화대로 간다", hint: "한 수 위 고수와의 결투 · 이기면 명성 크게 ↑",
+            { path: "neutral", label: "낙화대로 간다", hint: "한 수 위 고수와의 생사결 · 이기면 명성·은자·깨달음",
               apply: () => { const r = autoDuel(1.3);
-                if (r.won) { gainFame(15); gainStats(4, 4, 4); addStory("혈검과의 결투에서 이겼다."); return { text: "달빛 아래 혈검의 검이 부러졌습니다. 이튿날 강호에 당신의 이름이 퍼졌습니다.", chips: [["명성", "+15"], ["무력", "+12"]] }; }
+                if (r.won) { const m = scaled(120); char.money += m; gainFame(25); gainStats(10, 10, 10); char.insights = (char.insights || 0) + 1; addStory("혈검과의 결투에서 이겼다."); return { text: "달빛 아래 혈검의 검이 부러졌습니다. 혈검이 남긴 검결에서 깨달음을 얻었고, 이튿날 강호에 당신의 이름이 퍼졌습니다.", chips: [["명성", "+25"], ["무력", "+30"], ["은자", `+${m}냥`], ["깨달음", "+1"]] }; }
                 if (Math.random() < 0.15) { char.dead = true; char.deathCause = "혈검과의 결투에서 쓰러졌다"; return { text: "혈검의 검이 달빛을 갈랐습니다. 그것이 마지막으로 본 풍경이었습니다…", chips: [] }; }
                 char.injury = { ...INJURIES[2] }; gainFame(3); return { text: "혈검의 검이 어깨를 꿰뚫었습니다. 목숨은 건졌지만 오래 누워 있어야 했습니다.", chips: [["명성", "+3"], ["부상", INJURIES[2].name]] }; } },
             { path: "orthodox", label: "무의미한 피는 흘리지 않겠다며 거절한다", hint: "협의 +2 · 명성 -3",
@@ -5033,9 +5033,9 @@
       const won = await storyFight(char.name, Math.round(getCombatPower() * (char.injury ? 0.85 : 1)), foe.n, oppPower, { lethal: 0.025 });
       if (char.dead) return;
       if (won) {
-        const m = Math.round(15 * ratio * getPrizeMult() * (t.prizeBonus || 1));
-        char.money += m; gainFame(Math.round(4 * ratio));
-        await rec.out(`★ ${foe.n}${josa(foe.n, "을", "를")} 꺾었다. 구경꾼들이 환호한다. (은자 +${m})`, "text-yellow-300 font-bold");
+        const m = Math.round(25 * ratio * getPrizeMult() * (t.prizeBonus || 1));
+        char.money += m; gainFame(Math.round(7 * ratio)); gainStats(1, 2, 2);
+        await rec.out(`★ ${foe.n}${josa(foe.n, "을", "를")} 꺾었다. 구경꾼들이 환호한다. (은자 +${m}, 무력 +5)`, "text-yellow-300 font-bold");
         if (!pendingTurns.length) pendingTurns.push(() => showPostDuelChoice({ name: foe.n, winPrize: m }));
       } else {
         await rec.out(`✕ ${foe.n}에게 밀려 물러났다.`, "text-stone-400");
@@ -5190,8 +5190,8 @@
         st.stage = 9;
         if (won) {
           if (i === 0) {
-            gainStats(15, 10, 8); gainFame(20);
-            await rec.out("혈수귀가 쓰러지자, 사부가 떨리는 손으로 독문절기의 구결을 귀에 속삭였다. \"이제 네 것이다.\" (내공 +15, 외공 +10, 신법 +8)", "text-cyan-300 font-bold");
+            gainStats(25, 18, 14); gainFame(30);
+            await rec.out("혈수귀가 쓰러지자, 사부가 떨리는 손으로 독문절기의 구결을 귀에 속삭였다. \"이제 네 것이다.\" (내공 +25, 외공 +18, 신법 +14, 깨달음 +1)", "text-cyan-300 font-bold");
             addStory("사부를 구하고 혈수귀를 베어 사부의 독문절기를 이어받았다.");
             char.insights = (char.insights || 0) + 1;
           } else {
@@ -5215,18 +5215,20 @@
       await say(`붉은 봉인이 찍힌 서찰이 도착했다. 보낸 이는 동기 ${fn}. 이제는 ${PATH_INFO[foe.path].label.replace(" 성향", "")}의 거물이 되어 있었다.`, "text-stone-200", 300);
       await say(`'같은 해 강호에 들어선 우리 중 하나만 살아남는다. 단풍 지는 날, 낙안봉에서.'`, "text-amber-100 italic", 300);
       const i = await choose([
-        { label: "생사결에 응한다", hint: `동기 ${fn}(무력 ${foe.power})와 목숨을 건 결투`, chip: "응함", chipClass: "bg-rose-950 text-rose-300 border-rose-500/60" },
+        { label: "생사결에 응한다", hint: `동기 ${fn}(무력 ${foe.power})와 목숨을 건 결투 · 이기면 큰 성장과 깨달음`, chip: "응함", chipClass: "bg-rose-950 text-rose-300 border-rose-500/60" },
         { label: "옛정을 생각해 편지를 태운다", hint: "명성 -5 · 협의 +3", chip: "거절" }
       ], 0);
       if (i === 1) { gainFame(-5); addAlign(3, 0, 0); await rec.out("타오르는 서찰을 바라보며 입문하던 봄날을 떠올렸다.", "text-stone-400"); return; }
       const won = await storyFight(char.name, getCombatPower(), `동기 ${fn}`, Math.max(30, foe.power));
       if (won) {
         const j = await choose([
-          { label: `${fn}의 숨통을 끊는다`, hint: "악명 +6 · 명성 +15", chip: "결착", chipClass: PATH_INFO.unorthodox.chip },
-          { label: `${fn}${josa(fn, "을", "를")} 살려 보낸다`, hint: "협의 +6 · 명성 +10", chip: "용서", chipClass: PATH_INFO.orthodox.chip }
+          { label: `${fn}의 숨통을 끊는다`, hint: "악명 +6 · 명성 +25", chip: "결착", chipClass: PATH_INFO.unorthodox.chip },
+          { label: `${fn}${josa(fn, "을", "를")} 살려 보낸다`, hint: "협의 +6 · 명성 +20", chip: "용서", chipClass: PATH_INFO.orthodox.chip }
         ], getPath() === "orthodox" ? 1 : 0);
-        if (j === 0) { addAlign(0, 6, 0); gainFame(15); foe.alive = false; foe.deathAge = char.age; foe.deathCause = "숙명의 맞수에게 패해"; await rec.out(`${fn}${josa(fn, "은", "는")} 웃으며 쓰러졌다. "역시… 너였구나."`, "text-rose-300 font-bold"); addStory(`숙명의 맞수 동기 ${fn}${josa(fn, "을", "를")} 생사결에서 베었다.`); }
-        else { addAlign(6, 0, 0); gainFame(10); foe.path = "neutral"; await rec.out(`${fn}${josa(fn, "은", "는")} 한참을 말없이 서 있다가 검을 꺾고 산을 내려갔다.`, "text-sky-300 font-bold"); addStory(`숙명의 맞수 동기 ${fn}${josa(fn, "을", "를")} 꺾고 살려 보냈다.`); }
+        gainStats(18, 15, 15); char.insights = (char.insights || 0) + 1;
+        await rec.out(`생사를 건 승부 끝에 벽 하나를 넘었다. (내공 +18, 외공 +15, 신법 +15, 깨달음 +1)`, "text-cyan-300 font-bold");
+        if (j === 0) { addAlign(0, 6, 0); gainFame(25); foe.alive = false; foe.deathAge = char.age; foe.deathCause = "숙명의 맞수에게 패해"; await rec.out(`${fn}${josa(fn, "은", "는")} 웃으며 쓰러졌다. "역시… 너였구나."`, "text-rose-300 font-bold"); addStory(`숙명의 맞수 동기 ${fn}${josa(fn, "을", "를")} 생사결에서 베었다.`); }
+        else { addAlign(6, 0, 0); gainFame(20); foe.path = "neutral"; await rec.out(`${fn}${josa(fn, "은", "는")} 한참을 말없이 서 있다가 검을 꺾고 산을 내려갔다.`, "text-sky-300 font-bold"); addStory(`숙명의 맞수 동기 ${fn}${josa(fn, "을", "를")} 꺾고 살려 보냈다.`); }
       } else if (Math.random() < 0.25) {
         await dieNow(`숙명의 맞수 동기 ${fn}의 검에 쓰러졌다`, `${fn}의 검이 심장을 꿰뚫었다. "미안하다… 이것이 강호다." 그의 목소리가 아득해진다…`);
       } else {
