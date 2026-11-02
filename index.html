@@ -685,7 +685,8 @@
         </div>
         <p class="text-[11px] text-stone-400 border-t border-stone-800 pt-1.5 leading-relaxed">
           ★ <strong>성공 시:</strong> 우화등선, 신화 엔딩.<br>
-          ✕ <strong>실패 시:</strong> 구천현뢰에 맞아 내공 -45년.
+          ✕ <strong>실패 시:</strong> 구천현뢰에 맞아 내공 -45년.<br>
+          ⏳ 육신이 버텨야 천겁을 견딥니다. 70세부터 해마다 성공 확률 -4%p.
         </p>
       </div>
       <div class="grid grid-cols-2 gap-2 pt-1">
@@ -788,6 +789,14 @@
           <span class="text-[10px] text-stone-400">보유:</span>
           <span id="market-my-money" class="text-sm font-brush text-yellow-400 ml-1">20</span><span class="text-[10px] text-stone-400"> 냥</span>
         </div>
+      </div>
+
+      <div class="space-y-1.5">
+        <div class="flex justify-between items-center">
+          <span class="text-xs font-brush text-cyan-300">✦ 올해의 진귀한 물건</span>
+          <span class="text-[10px] text-stone-500">해마다 3개 입고 · 1년에 하나만</span>
+        </div>
+        <div id="rare-shop" class="space-y-1.5"></div>
       </div>
 
       <div id="gacha-card" class="p-3.5 rounded-2xl transition border space-y-2">
@@ -1016,11 +1025,12 @@
     function getSalaryForRank(rankIdx) {
       const base = ranks[rankIdx].salary * getFaction().salaryMult;
       const righteousBonus = 1 + Math.min(0.3, char.align.righteous / 200);
-      return Math.round(base * righteousBonus);
+      const retire = char.age >= 70 ? 0.2 : char.age >= 60 ? 0.5 : 1;
+      return Math.round(base * righteousBonus * retire);
     }
 
     function getPrizeMult() {
-      const ageMult = 1 + Math.max(0, char.age - 16) / 15;
+      const ageMult = 1 + Math.max(0, Math.min(char.age, 50) - 16) / 15;
       const evilBonus = 1 + Math.min(0.5, char.align.evil / 150);
       return ageMult * getFaction().prizeMult * evilBonus;
     }
@@ -1413,12 +1423,14 @@
     }
 
     function getAscensionProb() {
-      return Math.min(80, 45 + Math.floor((getCombatPower() - 2200) / 15));
+      return Math.max(5, Math.min(80, 45 + Math.floor((getCombatPower() - 1600) / 15)) - ascensionAgePenalty());
     }
 
     function executeAscensionTrial() {
       if (char.hasAscended) return;
-      document.getElementById("ascension-prob-text").innerText = `약 ${getAscensionProb()}%`;
+      if (!ascensionReqs().every(r => r.ok)) return showCustomAlert("아직 천겁을 맞이할 그릇이 되지 못했습니다. 조건: " + ascensionReqs().map(r => `${r.ok ? "✓" : "✕"} ${r.label}`).join(" · "));
+      const pen = ascensionAgePenalty();
+      document.getElementById("ascension-prob-text").innerText = `약 ${getAscensionProb()}%${pen ? ` (노쇠 -${pen}%p)` : ""}`;
       document.getElementById("ascension-confirm-modal").style.display = "flex";
     }
 
@@ -2442,6 +2454,7 @@
 
     function renderMarketUI() {
       document.getElementById("market-my-money").innerText = char.money;
+      renderRareShop();
 
       const gachaCard = document.getElementById("gacha-card");
       const gachaBadge = document.getElementById("gacha-badge");
@@ -2834,7 +2847,7 @@
 
     // 사건 보상은 나이에 따라 커짐
     function scaled(n) {
-      return Math.round(n * (1 + Math.max(0, char.age - 16) / 15));
+      return Math.round(n * (1 + Math.max(0, Math.min(char.age, 50) - 16) / 15));
     }
 
     function switchFaction(newFaction, newSect) {
@@ -3206,6 +3219,104 @@
               apply: () => { char.money = Math.max(0, char.money - 10); addAlign(1, 0, 0); return { text: "아이는 국밥을 허겁지겁 먹고는 크게 절을 했습니다.", chips: [["은자", "-10냥"], ["협의", "+1"]] }; } }
           ]
         })
+      },
+      {
+        id: "hermit_price",
+        build: () => {
+          const cost = Math.max(scaled(80), Math.round(char.money * 0.3));
+          const gain = Math.max(6, Math.round(Math.sqrt(cost) * 0.7));
+          return {
+            title: "은거 고수의 값",
+            desc: `깊은 산중에서 만난 노고수가 말합니다. "내 비전을 원하는가? 공짜는 없네. 은자 ${cost}냥이면 가르쳐 주지."`,
+            choices: [
+              { path: "neutral", label: `은자 ${cost}냥을 바친다`, hint: char.money >= cost ? `내공·외공·신법 각 +${gain}` : "은자가 부족하다",
+                apply: () => { if (char.money < cost) return { text: "주머니를 털어 봐도 모자랐습니다. 노고수는 코웃음을 쳤습니다.", chips: [] };
+                  char.money -= cost; gainStats(gain, gain, gain); return { text: "석 달 동안 노고수 곁에서 비전을 익혔습니다.", chips: [["은자", `-${cost}냥`], ["무력", `+${gain * 3}`]] }; } },
+              { path: "orthodox", label: "무공을 돈으로 사지 않겠다며 돌아선다", hint: "협의 +2",
+                apply: () => { addAlign(2, 0, 0); return { text: "노고수는 \"고집 있는 놈이군\" 하며 껄껄 웃었습니다.", chips: [["협의", "+2"]] }; } }
+            ]
+          };
+        }
+      },
+      {
+        id: "relief_fund",
+        build: () => {
+          const cost = Math.max(scaled(60), Math.round(char.money * 0.35));
+          const fame = Math.max(8, Math.round(Math.sqrt(cost) * 0.9));
+          return {
+            title: "대홍수",
+            desc: `황하가 범람해 수만 명이 집을 잃었습니다. 구휼소 앞의 줄이 끝없이 이어집니다. 은자 ${cost}냥이면 한 고을을 살릴 수 있습니다.`,
+            choices: [
+              { path: "orthodox", label: `은자 ${cost}냥을 구휼에 내놓는다`, hint: char.money >= cost ? `협의 +10 · 명성 +${fame}` : "은자가 부족하다",
+                apply: () => { if (char.money < cost) { addAlign(2, 0, 0); return { text: "가진 만큼만 보탰습니다.", chips: [["협의", "+2"]] }; }
+                  char.money -= cost; addAlign(10, 0, 0); gainFame(fame); addStory(`대홍수 때 은자 ${cost}냥을 내놓아 한 고을을 살렸다.`);
+                  return { text: "그 고을 사람들은 당신의 이름을 사당에 모셨습니다.", chips: [["은자", `-${cost}냥`], ["협의", "+10"], ["명성", `+${fame}`]] }; } },
+              { path: "unorthodox", label: "곡식을 사재기해 비싸게 판다", hint: `악명 +8 · 은자 +${Math.round(cost * 0.5)}`,
+                apply: () => { const g = Math.round(cost * 0.5); char.money += g; addAlign(0, 8, 0); return { text: "곳간이 은자로 가득 찼습니다. 굶주린 자들의 원망도 함께.", chips: [["악명", "+8"], ["은자", `+${g}냥`]] }; } },
+              { path: "neutral", label: "지나간다", hint: "변화 없음", apply: () => ({ text: "물에 잠긴 마을을 뒤로하고 길을 재촉했습니다.", chips: [] }) }
+            ]
+          };
+        }
+      },
+      {
+        id: "bribe",
+        cond: () => char.align.evil >= 30,
+        build: () => {
+          const cost = Math.max(scaled(70), Math.round(char.money * 0.25));
+          return {
+            title: "관부의 수배령",
+            desc: `관아가 당신을 수배했습니다. 포쾌 두목이 은근히 말합니다. "은자 ${cost}냥이면 없던 일로 해 드리지요."`,
+            choices: [
+              { path: "unorthodox", label: `뇌물 ${cost}냥을 건넨다`, hint: char.money >= cost ? "아무 일도 없던 것으로" : "은자가 부족하다",
+                apply: () => { if (char.money < cost) { char.injury = { ...INJURIES[1] }; return { text: "돈이 모자라 포쾌들과 싸우다 다쳤습니다.", chips: [["부상", INJURIES[1].name]] }; }
+                  char.money -= cost; return { text: "수배서가 조용히 불쏘시개가 되었습니다.", chips: [["은자", `-${cost}냥`]] }; } },
+              { path: "neutral", label: "포쾌들을 때려눕히고 달아난다", hint: "악명 +5 · 부상 위험",
+                apply: () => { addAlign(0, 5, 0); if (autoDuel(1.0).won) return { text: "포쾌들을 쓰러뜨리고 유유히 사라졌습니다.", chips: [["악명", "+5"]] };
+                  char.injury = { ...INJURIES[2] }; return { text: "화살을 맞고 간신히 도망쳤습니다.", chips: [["악명", "+5"], ["부상", INJURIES[2].name]] }; } },
+              { path: "orthodox", label: "죄를 인정하고 옥살이를 한다", hint: "악명 -15 · 한 해 수련 손실",
+                apply: () => { addAlign(4, -15, 0); char.ext = Math.max(10, char.ext - 5); char.agi = Math.max(10, char.agi - 5); return { text: "옥중에서 지난날을 돌아보았습니다.", chips: [["악명", "-15"], ["외공", "-5"], ["신법", "-5"]] }; } }
+            ]
+          };
+        }
+      },
+      {
+        id: "smith",
+        build: () => {
+          const cost = Math.max(scaled(90), Math.round(char.money * 0.3));
+          const gain = Math.max(8, Math.round(Math.sqrt(cost) * 1.1));
+          return {
+            title: "천하제일 장인",
+            desc: `평생 단 열 자루의 검만 벼렸다는 노장인이 화로 앞에 앉아 있습니다. "그대만을 위한 검을 벼려 주지. 값은 ${cost}냥."`,
+            choices: [
+              { path: "neutral", label: `${cost}냥에 검을 맞춘다`, hint: char.money >= cost ? `외공 +${gain}` : "은자가 부족하다",
+                apply: () => { if (char.money < cost) return { text: "노장인은 \"돈을 모아 다시 오게\"라며 화로로 돌아섰습니다.", chips: [] };
+                  char.money -= cost; gainStats(0, gain, 0); addStory("천하제일 장인에게 나만의 검을 받았다.");
+                  return { text: "백 일 뒤, 손에 꼭 맞는 검이 완성되었습니다. 검이 손의 일부처럼 느껴집니다.", chips: [["은자", `-${cost}냥`], ["외공", `+${gain}`]] }; } },
+              { path: "orthodox", label: "지금 쓰는 검으로 충분하다", hint: "변화 없음", apply: () => ({ text: "낡은 검을 쓰다듬으며 웃었습니다.", chips: [] }) }
+            ]
+          };
+        }
+      },
+      {
+        id: "war_chest",
+        build: () => {
+          const cost = Math.max(scaled(80), Math.round(char.money * 0.3));
+          const align = getPath();
+          const camp = align === "unorthodox" ? "사파련" : align === "demonic" ? "천마신교" : "무림맹";
+          const fame = Math.max(10, Math.round(Math.sqrt(cost) * 1.0));
+          return {
+            title: `${camp}의 군자금`,
+            desc: `${camp}의 사자가 찾아왔습니다. "큰 싸움이 다가오오. 군자금 ${cost}냥을 보태 준다면 그대의 이름을 결코 잊지 않겠소."`,
+            choices: [
+              { path: align === "neutral" ? "orthodox" : align, label: `${cost}냥을 보탠다`, hint: char.money >= cost ? `명성 +${fame} · 성향 강화` : "은자가 부족하다",
+                apply: () => { if (char.money < cost) return { text: "사자는 실망한 기색으로 돌아갔습니다.", chips: [] };
+                  char.money -= cost; gainFame(fame);
+                  if (camp === "무림맹") addAlign(6, 0, 0); else if (camp === "사파련") addAlign(0, 6, 0); else addAlign(0, 0, 6);
+                  return { text: `${camp} 안에서 당신의 발언에 힘이 실리기 시작했습니다.`, chips: [["은자", `-${cost}냥`], ["명성", `+${fame}`]] }; } },
+              { path: "neutral", label: "어느 편에도 돈을 대지 않는다", hint: "변화 없음", apply: () => ({ text: "사자는 말없이 돌아갔습니다.", chips: [] }) }
+            ]
+          };
+        }
       }
     ];
 
@@ -3923,7 +4034,7 @@
     const josa = (word, a, b) => { const c = word.charCodeAt(word.length - 1); return (c >= 0xac00 && c <= 0xd7a3 && (c - 0xac00) % 28 > 0) ? a : b; };
 
     function getLifespan() {
-      return Math.min(110, Math.floor(char.baseLife + REALM_LIFE[char.rankIdx] + (GROWTH_TYPES[char.growthType].lifeBonus) + char.lifeBonus));
+      return Math.min(112, Math.floor(char.baseLife + REALM_LIFE[char.rankIdx] + (GROWTH_TYPES[char.growthType].lifeBonus) + char.lifeBonus + (char.elixirLife || 0)));
     }
 
     function addStory(text) {
@@ -4134,6 +4245,10 @@
     function yearEnd(rec) {
       char.age += 1;
       const salaryMult = getTemper().incomeBonus || 1;
+      if (char.age === 60) rec.lines.push({ t: "환갑을 맞았다. 강호의 일선에서 한발 물러나 녹봉이 절반으로 줄었다.", c: "text-stone-400" });
+      if (char.age === 70) rec.lines.push({ t: "고희를 넘겼다. 이제 녹봉은 예전의 다섯에 하나뿐이다.", c: "text-stone-400" });
+      rollRareStock();
+      if (char.rareStock && char.age >= 20) rec.lines.push({ t: `🏮 전포에 진귀한 물건이 새로 들어왔다: ${char.rareStock.map(id => RARE_ITEMS.find(x => x.id === id).name.split("(")[0]).join(", ")}`, c: "text-cyan-300/80" });
       const salary = Math.round(getCurrentSalary() * salaryMult);
       char.money += salary;
       rec.lines.push({ t: `${{ own: "강호 위명 수입", sect: "문파 녹봉", clan: "가문 지원금", ronin: "강호에 쌓은 이름값으로 들어온 수입" }[affiliation()]} ${salary}냥을 받았다.`, c: "text-emerald-400" });
@@ -4230,6 +4345,11 @@
       }
       // 전포
       shopItems.forEach(it => { if (char.money >= it.price * 1.5 && !char.ownedItems.includes(it.name)) buyShopItem(it.name, it.price, it.bonus); });
+      if (char.rareStock && !char.rareBought) {
+        const wants = char.rareStock.map(id => RARE_ITEMS.find(x => x.id === id)).filter(it => char.money >= it.price * 1.3)
+          .sort((x, y) => (y.id === "odo" ? 9e9 : y.price) - (x.id === "odo" ? 9e9 : x.price));
+        if (wants[0]) buyRareItem(wants[0].id);
+      }
       closeGachaResultModal();
       // 문파
       if (!sect() && canFoundSect() && char.money >= SECT_FOUND_COST * 2) {
@@ -4633,6 +4753,7 @@
         ]);
         const dq = Math.round(base * 1.4 * b.q), de = Math.round(base * 1.4 * b.e), da = Math.round(base * 1.4 * b.a);
         gainStats(dq, de, da); gainFame(Math.round(base / 2));
+        char.insights = (char.insights || 0) + 1;
         await say("✦✦ 기연(奇緣)!", "text-cyan-200 font-brush text-base", 150);
         await say(`${b.t} (내공 +${dq}, 외공 +${de}, 신법 +${da})`, "text-cyan-300 font-bold", 450);
         addStory(`한 수 위의 고수 ${oppName}${josa(oppName, "을", "를")} 꺾고 기연을 얻었다.`);
@@ -4641,6 +4762,7 @@
         const d = { qi: [base, 0, 0], ext: [0, base, 0], agi: [0, 0, base] }[k];
         gainStats(d[0], d[1], d[2]);
         const nm = { qi: "내공", ext: "외공", agi: "신법" }[k];
+        char.insights = (char.insights || 0) + 1;
         await say("✦ 깨달음(悟)", "text-cyan-200 font-brush text-base", 150);
         await say(pick([
           "한 수 위의 검을 받아 내는 사이, 막혀 있던 무언가가 트였다.",
@@ -4745,6 +4867,7 @@
       } else {
         gainFame(70); gainStats(6, 6, 6); char.title = "천하제일(天下第一)";
         tourResult = { win: true, stage: 3, text: "우승하여 천하제일의 칭호를 얻었다!" };
+        char.championships = (char.championships || 0) + 1;
       }
       sayHTML(`<div class="my-1 p-3 rounded-xl border-2 border-yellow-400/80 bg-yellow-950/30 text-center flash-gold"><div class="font-brush text-yellow-300 text-lg">🏆 천하제일 🏆</div><div class="text-xs text-stone-200">${escapeHtml(tourResult.text)} 상금 ${grand}냥</div></div>`);
       await storyPause(700);
@@ -5067,6 +5190,7 @@
             gainStats(15, 10, 8); gainFame(20);
             await rec.out("혈수귀가 쓰러지자, 사부가 떨리는 손으로 독문절기의 구결을 귀에 속삭였다. \"이제 네 것이다.\" (내공 +15, 외공 +10, 신법 +8)", "text-cyan-300 font-bold");
             addStory("사부를 구하고 혈수귀를 베어 사부의 독문절기를 이어받았다.");
+            char.insights = (char.insights || 0) + 1;
           } else {
             gainStats(7, 5, 4); gainFame(10);
             await rec.out("사제가 함께 혈수귀를 물리쳤다. 사부는 껄껄 웃으며 고향으로 돌아갔다. (내공 +7, 외공 +5, 신법 +4)", "text-cyan-300 font-bold");
@@ -5104,6 +5228,86 @@
         await rec.out(`${fn}의 검이 단전을 스쳤다. "목숨은 남겨 두마. 다음엔 없다." (단전 손상 · 패배에서 배운 것: 무력 +15)`, "text-rose-300 font-bold");
         addStory(`숙명의 맞수 동기 ${fn}에게 패했다.`);
       }
+    }
+
+    // ==========================================
+    // [진귀한 물건] 해마다 3개 입고 · 1년에 하나만 구매
+    // ==========================================
+    const RARE_ITEMS = [
+      { id: "sohwan", name: "소환단(小還丹)", icon: "💊", price: 250, desc: "내공 +12년", f: () => gainStats(12, 0, 0) },
+      { id: "heukok", name: "흑옥단속고(黑玉斷續膏)", icon: "🩹", price: 350, desc: "부상 즉시 치유 · 외공 +5", f: () => { char.injury = null; gainStats(0, 5, 0); } },
+      { id: "hyeoncheol", name: "현철 보검(玄鐵寶劍)", icon: "🗡️", price: 900, desc: "외공 +20", f: () => gainStats(0, 20, 0) },
+      { id: "maengpae", name: "무림맹 공로패", icon: "🎖️", price: 1000, desc: "명성 +40 · 협의 +5", f: () => { gainFame(40); addAlign(5, 0, 0); } },
+      { id: "unryong", name: "운룡대팔식 잔결", icon: "🐉", price: 1100, desc: "신법 +22 · 외공 +8", f: () => gainStats(0, 8, 22) },
+      { id: "seolsam", name: "천년설삼(千年雪蔘)", icon: "🌿", price: 1300, desc: "내공 +25년 · 수명 +1", f: () => { gainStats(25, 0, 0); char.elixirLife = Math.min(6, (char.elixirLife || 0) + 1); } },
+      { id: "daehwan", name: "대환단(大還丹)", icon: "🔴", price: 1600, desc: "내공 +40년", f: () => gainStats(40, 0, 0) },
+      { id: "cheonma", name: "천마혈경 사본", icon: "📕", price: 1700, desc: "내공 +20 · 외공 +20 · 마성 +8", f: () => { gainStats(20, 20, 0); addAlign(0, 0, 8); } },
+      { id: "neungpa", name: "능파미보 구결", icon: "🌊", price: 1900, desc: "신법 +40", f: () => gainStats(0, 0, 40) },
+      { id: "geumgang", name: "금강불괴 비전", icon: "🛡️", price: 2200, desc: "외공 +45", f: () => gainStats(0, 45, 0) },
+      { id: "gongcheong", name: "공청석유(空靑石乳)", icon: "💧", price: 2800, desc: "내공 +60년 · 수명 +2", f: () => { gainStats(60, 0, 0); char.elixirLife = Math.min(6, (char.elixirLife || 0) + 2); } },
+      { id: "odo", name: "오도석(悟道石)", icon: "🔮", price: 3200, desc: "깨달음 +1 (우화등선 조건에 포함)", f: () => { char.insights = (char.insights || 0) + 1; } },
+      { id: "hoechun", name: "회춘단(回春丹)", icon: "⏳", price: 3800, desc: "수명 +3 (영약 수명은 최대 +6)", f: () => { char.elixirLife = Math.min(6, (char.elixirLife || 0) + 3); } }
+    ];
+
+    function rollRareStock() {
+      const pool = [...RARE_ITEMS].sort(() => Math.random() - 0.5);
+      // 너무 비싼 것만 나오지 않도록 하나는 1,000냥 이하
+      const cheap = pool.find(x => x.price <= 1000);
+      const rest = pool.filter(x => x !== cheap).slice(0, 2);
+      char.rareStock = [cheap, ...rest].map(x => x.id);
+      char.rareBought = false;
+    }
+
+    function buyRareItem(id) {
+      const it = RARE_ITEMS.find(x => x.id === id);
+      if (!it || char.rareBought) return;
+      if (char.money < it.price) return showCustomAlert(`은자가 부족합니다! (${it.price}냥 필요)`);
+      char.money -= it.price;
+      char.rareBought = true;
+      it.f();
+      addLog(char.age, `[진귀한 물건] ${it.icon} ${it.name}을(를) ${it.price}냥에 손에 넣었다. (${it.desc})`, "text-cyan-300 font-bold");
+      if (it.price >= 2500) addStory(`${it.price}냥을 들여 ${it.name}을(를) 손에 넣었다.`);
+      checkRankUp();
+      updateUI();
+      renderMarketUI();
+    }
+
+    function renderRareShop() {
+      const box = document.getElementById("rare-shop");
+      if (!box) return;
+      if (!char.rareStock) rollRareStock();
+      box.innerHTML = "";
+      char.rareStock.forEach(id => {
+        const it = RARE_ITEMS.find(x => x.id === id);
+        const can = !char.rareBought && char.money >= it.price;
+        const row = document.createElement("div");
+        row.className = "p-2.5 rounded-xl bg-stone-950/80 border border-cyan-900/60 flex items-center justify-between gap-2";
+        row.innerHTML = `<div class="min-w-0"><div class="font-bold text-stone-100 text-xs">${it.icon} ${it.name}</div><div class="text-[10px] text-cyan-300">${it.desc}</div></div>`;
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = `shrink-0 px-2.5 py-2 rounded-lg text-[11px] font-bold ${can ? "bg-cyan-700 hover:bg-cyan-600 text-white cursor-pointer" : "bg-stone-900 border border-stone-800 text-stone-500 cursor-not-allowed"}`;
+        btn.innerText = char.rareBought ? "올해 구매 완료" : `${it.price.toLocaleString()}냥`;
+        btn.disabled = !can;
+        btn.onclick = () => buyRareItem(it.id);
+        row.appendChild(btn);
+        box.appendChild(row);
+      });
+    }
+
+    // ==========================================
+    // [우화등선 조건]
+    // ==========================================
+    function ascensionReqs() {
+      return [
+        { label: "생사경", ok: char.rankIdx === 7 },
+        { label: `무력 1600 (${getCombatPower()})`, ok: getCombatPower() >= 1600 },
+        { label: `깨달음·기연 ${Math.min(3, char.insights || 0)}/3`, ok: (char.insights || 0) >= 3 },
+        { label: "천하제일 우승", ok: (char.championships || 0) >= 1 }
+      ];
+    }
+
+    function ascensionAgePenalty() {
+      return Math.max(0, char.age - 70) * 4;
     }
 
     async function passYear() {
@@ -5411,8 +5615,14 @@
       }
 
       const btnAscension = document.getElementById("btn-ascension");
-      if (char.rankIdx === 7 && getCombatPower() >= 2200 && !char.hasAscended) {
+      if (char.rankIdx === 7 && !char.hasAscended && !char.dead) {
         btnAscension.classList.remove("hidden");
+        const reqs = ascensionReqs();
+        const ready = reqs.every(r => r.ok);
+        btnAscension.innerHTML = ready
+          ? `<span>⚡ 우화등선(羽化登仙): 구천현뢰 천겁 돌파 · 약 ${getAscensionProb()}%</span>`
+          : `<span class="text-xs leading-snug">⚡ 우화등선 조건 — ${reqs.map(r => `${r.ok ? "✓" : "✕"} ${r.label}`).join(" · ")}</span>`;
+        btnAscension.classList.toggle("opacity-60", !ready);
       } else {
         btnAscension.classList.add("hidden");
       }
