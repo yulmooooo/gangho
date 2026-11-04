@@ -2,15 +2,48 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>강호풍운록 - 삼류에서 천하제일인까지</title>
-  <meta name="description" content="삼류 무사에서 시작해 화경, 현경을 넘어 우화등선에 도전하는 텍스트 어드벤처 무협 웹게임 강호풍운록!">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>강호풍운록 - 삼류 무사에서 생사경까지, 내 무협 인생 한 생</title>
+  <meta name="description" content="무협명을 정하고 한 생을 굴려 보세요. 삼류 무사에서 생사경까지, 끝난 뒤 천하 서열록에 내 기록이 오르고 결과 그림도 바로 만들 수 있는 무료 무협 인생 시뮬레이션.">
   <meta name="keywords" content="강호풍운록, 무협게임, 텍스트게임, 웹게임, 인디게임, 인생시뮬레이션">
-  
-  <!-- 카카오톡/SNS 링크 공유 시 미리보기 카드 설정 -->
+  <link rel="canonical" href="https://yulmooooo.github.io/gangho/">
+  <meta name="theme-color" content="#08090b">
+  <link rel="icon" href="favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="manifest" href="manifest.webmanifest">
+
+  <!-- 링크 미리보기 (카카오톡·스레드·페이스북·X) -->
   <meta property="og:type" content="website">
-  <meta property="og:title" content="강호풍운록 (江湖風雲錄)">
-  <meta property="og:description" content="삼류무사에서 생사경의 전설까지! 나만의 무협 인생을 시뮬레이션해보세요.">
+  <meta property="og:site_name" content="강호풍운록">
+  <meta property="og:url" content="https://yulmooooo.github.io/gangho/">
+  <meta property="og:title" content="강호풍운록 - 삼류 무사에서 생사경까지, 내 무협 인생 한 생">
+  <meta property="og:description" content="무협명을 정하고 한 생을 굴려 보세요. 끝난 뒤 천하 서열록에 내 기록이 오르고, 결과 그림도 바로 만들 수 있어요.">
+  <meta property="og:image" content="https://yulmooooo.github.io/gangho/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="수묵화 속 절벽 위에서 검기를 뿜는 무사와 강호풍운록 붓글씨 로고">
+  <meta property="og:locale" content="ko_KR">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="강호풍운록 - 삼류 무사에서 생사경까지, 내 무협 인생 한 생">
+  <meta name="twitter:description" content="무협명을 정하고 한 생을 굴려 보세요. 끝난 뒤 천하 서열록에 내 기록이 올라요.">
+  <meta name="twitter:image" content="https://yulmooooo.github.io/gangho/assets/og.jpg">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "VideoGame",
+    "name": "강호풍운록 (江湖風雲錄)",
+    "url": "https://yulmooooo.github.io/gangho/",
+    "image": "https://yulmooooo.github.io/gangho/assets/og.jpg",
+    "description": "삼류 무사에서 생사경까지, 내 무협 인생 한 생을 굴려 보는 무료 무협 인생 시뮬레이션 웹게임",
+    "genre": ["무협", "인생 시뮬레이션", "텍스트 어드벤처"],
+    "inLanguage": "ko",
+    "gamePlatform": "Web browser",
+    "applicationCategory": "Game",
+    "operatingSystem": "Any",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "KRW" }
+  }
+  </script>
 
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -26,7 +59,10 @@
       background-size: 100% 100%, 20px 20px;
       color: #f3f0e6;
       -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
     }
+    input[type="text"] { font-size: 16px !important; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
     
     .font-brush {
       font-family: 'Do Hyeon', 'Noto Serif KR', serif;
@@ -82,13 +118,33 @@
 
   <!-- 시작 설정 모달 -->
   <div id="start-modal" style="display: flex;" class="fixed inset-0 bg-black/90 items-center justify-center p-3 z-50">
-    <div class="hanji-card border-2 gold-border w-full max-w-sm p-5 rounded-3xl shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto">
-      <div class="text-center space-y-0.5">
-        <span class="text-[10px] font-bold tracking-widest text-amber-500 uppercase">Wuxia Life Sim</span>
-        <h1 class="text-2xl font-brush text-amber-300 tracking-wide">강호풍운록 (江湖風雲錄)</h1>
-        <p class="text-[11px] text-stone-400 font-medium">삼류무사에서 생사경의 전설까지</p>
+    <div class="hanji-card border-2 gold-border w-full max-w-sm p-4 rounded-3xl shadow-2xl space-y-3 max-h-[94vh] overflow-y-auto">
+      <h1 class="sr-only">강호풍운록 (江湖風雲錄) - 삼류 무사에서 생사경까지, 내 무협 인생 한 생</h1>
+
+      <!-- 친구가 보낸 열전 링크로 들어왔을 때 -->
+      <div id="friend-intro" style="display: none;" class="space-y-2"></div>
+
+      <img id="start-hero" src="assets/hero.jpg" width="960" height="504" alt="강호풍운록 - 나의 무협 인생, 한계를 돌파하라" class="w-full rounded-2xl border border-amber-700/40 shadow-lg">
+
+      <div id="start-intro" class="space-y-2">
+        <p class="text-center text-[13px] font-bold text-stone-100 leading-snug">무협명을 정하고 <span class="text-amber-300">한 생</span>을 굴려 보는<br>무협 인생 시뮬레이션</p>
+        <div class="p-2.5 rounded-2xl bg-stone-950/80 border border-stone-800 text-[11px] leading-relaxed space-y-0.5">
+          <div class="flex gap-2"><span class="shrink-0 w-9 text-amber-400 font-bold text-right">16세</span><span class="text-stone-300">화산파의 산문을 두드리다</span></div>
+          <div class="flex gap-2"><span class="shrink-0 w-9 text-amber-400 font-bold text-right">28세</span><span class="text-stone-300">혈검과의 생사결에서 이겨 이름을 떨치다</span></div>
+          <div class="flex gap-2"><span class="shrink-0 w-9 text-amber-400 font-bold text-right">45세</span><span class="text-stone-300">정마대전의 선봉에서 혈천마제와 맞서다</span></div>
+          <div class="flex gap-2"><span class="shrink-0 w-9 text-amber-400 font-bold text-right">92세</span><span class="text-stone-300">제자들 곁에서 조용히 눈을 감다</span></div>
+        </div>
+        <p class="text-center text-[10px] text-stone-500">한 해는 이야기로 흘러가고, 갈림길에서만 선택합니다. 생을 마치면 천하 서열록에 기록이 오릅니다.</p>
       </div>
 
+      <button id="btn-quick-start" onclick="quickStart()" class="w-full py-3.5 bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 hover:brightness-110 text-stone-950 font-brush text-lg rounded-xl transition shadow-lg cursor-pointer">
+        바로 시작 · 강호에 발을 들이다
+      </button>
+      <button id="btn-toggle-setup" onclick="toggleStartSetup()" class="w-full py-2 text-[11px] font-bold text-stone-400 hover:text-amber-300 cursor-pointer">
+        ⚙️ 이름·출신·기질을 직접 정하고 시작하기 ▾
+      </button>
+
+      <div id="start-setup" style="display: none;" class="space-y-3">
       <div class="space-y-3 text-xs font-bold">
         <div>
           <label class="block text-stone-300 mb-1">무협명 (이름)</label>
@@ -147,13 +203,13 @@
         </div>
       </div>
 
-      <p class="text-[10px] text-stone-500 text-center">생을 마치면 기록이 천하 서열록(랭킹)에 자동으로 올라갑니다.</p>
+      <button id="btn-start" onclick="startGame()" class="w-full py-3 bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 hover:brightness-110 text-stone-950 font-brush text-base rounded-xl transition shadow-lg cursor-pointer">
+        이대로 강호에 발을 들이다
+      </button>
+      </div>
 
       <button id="btn-archive" onclick="openArchiveModal()" class="w-full py-2 bg-stone-900 border border-stone-700 hover:bg-stone-800 text-stone-300 font-bold text-xs rounded-xl cursor-pointer">📜 강호 열전</button>
 
-      <button id="btn-start" onclick="startGame()" class="w-full py-3.5 bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 hover:brightness-110 text-stone-950 font-brush text-base rounded-xl transition duration-150 shadow-xl cursor-pointer">
-        강호에 발을 들이다
-      </button>
     </div>
   </div>
 
@@ -268,7 +324,11 @@
 
       <div class="space-y-1.5 pt-1">
         <button id="btn-open-share" onclick="generateShareCard()" class="w-full py-3 bg-gradient-to-r from-emerald-600 to-teal-500 hover:brightness-110 text-white font-brush text-sm rounded-xl transition shadow-lg cursor-pointer flex items-center justify-center gap-1.5">
-          <span>📸 내 기록 공유 카드 생성 (이미지/카톡)</span>
+          <span>📸 내 강호 열전 카드 만들기 (이미지/카톡)</span>
+        </button>
+
+        <button id="btn-copy-link" onclick="copyMyLink(this)" class="w-full py-2.5 bg-stone-100 hover:bg-white text-stone-900 font-brush text-sm rounded-xl transition shadow cursor-pointer">
+          🔗 내 열전 링크 복사 · 벗에게 보내 겨뤄 보기
         </button>
 
         <button id="btn-submit-rank" onclick="submitToLeaderboard()" class="w-full py-2.5 bg-gradient-to-r from-amber-500 to-yellow-500 hover:brightness-110 text-stone-950 font-brush text-xs rounded-xl transition shadow cursor-pointer">
@@ -290,16 +350,16 @@
   <div id="share-card-modal" style="display: none;" class="fixed inset-0 bg-black/95 items-center justify-center p-3 z-[120]">
     <div class="hanji-card border-2 gold-border w-full max-w-sm p-4 rounded-3xl shadow-2xl space-y-3 text-center">
       <div class="flex justify-between items-center pb-1 border-b border-stone-800">
-        <h3 class="text-base font-brush text-amber-300">강호 명예 족자 (공유 썸네일)</h3>
+        <h3 class="text-base font-brush text-amber-300">강호 열전 (江湖列傳)</h3>
         <button onclick="closeShareCardModal()" class="text-stone-400 hover:text-white font-bold text-lg p-1">✕</button>
       </div>
 
       <div class="w-full bg-stone-950 rounded-2xl p-2 border border-stone-800 shadow-inner flex justify-center">
-        <canvas id="share-canvas" width="600" height="780" class="w-full h-auto rounded-xl shadow-2xl max-h-[55vh] object-contain"></canvas>
+        <canvas id="share-canvas" width="1080" height="1350" class="w-full h-auto rounded-xl shadow-2xl max-h-[55vh] object-contain"></canvas>
       </div>
 
       <p class="text-[10px] text-stone-400 font-medium">
-        스마트폰에서는 [공유하기]를 누르면 카카오톡/인스타로 바로 보낼 수 있습니다.
+        링크를 받은 벗은 내 열전을 먼저 보고 바로 도전할 수 있습니다.
       </p>
 
       <div class="grid grid-cols-2 gap-2 pt-1">
@@ -308,6 +368,9 @@
         </button>
         <button onclick="downloadShareCard()" class="py-3 bg-stone-800 hover:bg-stone-700 text-stone-200 font-brush text-sm rounded-xl cursor-pointer border border-stone-700">
           💾 이미지 저장
+        </button>
+        <button onclick="copyMyLink(this)" class="col-span-2 py-2.5 bg-stone-100 hover:bg-white text-stone-900 font-brush text-sm rounded-xl cursor-pointer">
+          🔗 내 열전 링크 복사
         </button>
       </div>
     </div>
@@ -1590,158 +1653,10 @@
       modal.style.display = "flex";
     }
 
-    function generateShareCard() {
-      const canvas = document.getElementById("share-canvas");
-      const ctx = canvas.getContext("2d");
-      const w = canvas.width;
-      const h = canvas.height;
-
-      // 1. 먹색 한지 배경
-      ctx.fillStyle = "#0c0d10";
-      ctx.fillRect(0, 0, w, h);
-
-      // 격자 패턴 질감
-      ctx.fillStyle = "rgba(217, 180, 110, 0.03)";
-      for (let x = 0; x < w; x += 15) {
-        for (let y = 0; y < h; y += 15) {
-          ctx.fillRect(x, y, 1, 1);
-        }
-      }
-
-      // 2. 동양풍 금빛 2중 테두리
-      ctx.strokeStyle = "rgba(217, 160, 60, 0.75)";
-      ctx.lineWidth = 4;
-      ctx.strokeRect(18, 18, w - 36, h - 36);
-
-      ctx.strokeStyle = "rgba(217, 160, 60, 0.25)";
-      ctx.lineWidth = 1.5;
-      ctx.strokeRect(26, 26, w - 52, h - 52);
-
-      // 모서리 장식
-      const corners = [[26, 26], [w - 26, 26], [26, h - 26], [w - 26, h - 26]];
-      ctx.fillStyle = "#d9a03c";
-      corners.forEach(([cx, cy]) => {
-        ctx.beginPath();
-        ctx.arc(cx, cy, 4, 0, Math.PI * 2);
-        ctx.fill();
-      });
-
-      // 3. 타이틀 영역
-      ctx.textAlign = "center";
-      ctx.fillStyle = "#f59e0b";
-      ctx.font = "bold 15px sans-serif";
-      ctx.fillText("✦ WUXIA LIFE SIMULATOR ✦", w / 2, 70);
-
-      ctx.fillStyle = "#fef08a";
-      ctx.font = "bold 34px 'Do Hyeon', 'Noto Serif KR', serif";
-      ctx.fillText("강호풍운록 (江湖風雲錄)", w / 2, 112);
-
-      ctx.fillStyle = "#a8a29e";
-      ctx.font = "bold 14px sans-serif";
-      ctx.fillText("── 천하에 아로새겨진 한 무인의 전설 ──", w / 2, 140);
-
-      // 4. 캐릭터 정보 박스
-      const boxY = 170;
-      ctx.fillStyle = "rgba(24, 25, 29, 0.85)";
-      ctx.strokeStyle = "rgba(180, 140, 80, 0.35)";
-      ctx.lineWidth = 1.5;
-      ctx.beginPath();
-      ctx.roundRect(40, boxY, w - 80, 180, 16);
-      ctx.fill();
-      ctx.stroke();
-
-      // 아바타 그리기
-      // 이미지로 그리려면 SVG에 xmlns 속성이 반드시 있어야 함
-      let avSvg = getAvatarSvg(char.avatarId);
-      if (!avSvg.includes("xmlns=")) avSvg = avSvg.replace("<svg", '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"');
-      const avImg = new Image();
-      const svgBlob = new Blob([avSvg], { type: "image/svg+xml;charset=utf-8" });
-      const avUrl = URL.createObjectURL(svgBlob);
-
-      avImg.onerror = function() {
-        URL.revokeObjectURL(avUrl);
-        avImg.onload(null, true);
-      };
-
-      avImg.onload = function(_e, failed) {
-        if (!failed) {
-          ctx.imageSmoothingEnabled = false;
-          ctx.drawImage(avImg, 65, boxY + 28, 120, 120);
-        }
-        URL.revokeObjectURL(avUrl);
-
-        // 텍스트 정보 (우측)
-        ctx.textAlign = "left";
-        ctx.fillStyle = "#fde047";
-        ctx.font = "bold 28px 'Do Hyeon', 'Noto Serif KR', serif";
-        ctx.fillText(char.name, 210, boxY + 65);
-
-        ctx.fillStyle = "#cbd5e1";
-        ctx.font = "bold 16px sans-serif";
-        ctx.fillText(`소속 : ${getFaction().label} · ${char.sect}`, 210, boxY + 98);
-
-        ctx.fillStyle = "#38bdf8";
-        ctx.font = "bold 15px sans-serif";
-        const endInfo = getEndingInfo();
-        ctx.fillText(`경지 : ${endInfo.rankLabel}`, 210, boxY + 128);
-
-        const pathColor = { orthodox: "#7dd3fc", unorthodox: "#fda4af", demonic: "#d8b4fe", neutral: "#e7e5e4" }[endInfo.path];
-        ctx.fillStyle = pathColor;
-        ctx.font = "bold 14px sans-serif";
-        ctx.fillText(`성향 : ${PATH_INFO[endInfo.path].label}  (협의 ${char.align.righteous} · 악명 ${char.align.evil} · 마성 ${char.align.demonic})`, 210, boxY + 156);
-
-        // 5. 스탯 박스 4분할
-        const statY = 375;
-        const stats = [
-          { label: "최종 무력", val: `${getCombatPower()}`, color: "#facc15" },
-          { label: "도달 연령", val: `${char.age} 세`, color: "#f3f4f6" },
-          { label: "내공 (內功)", val: `${char.qi} 년`, color: "#fbbf24" },
-          { label: "보유 은자", val: `${char.money} 냥`, color: "#34d399" }
-        ];
-
-        stats.forEach((st, i) => {
-          const col = i % 2;
-          const row = Math.floor(i / 2);
-          const bx = 40 + col * 265;
-          const by = statY + row * 105;
-
-          ctx.fillStyle = "rgba(18, 19, 22, 0.9)";
-          ctx.strokeStyle = "rgba(100, 100, 100, 0.35)";
-          ctx.lineWidth = 1;
-          ctx.beginPath();
-          ctx.roundRect(bx, by, 255, 90, 14);
-          ctx.fill();
-          ctx.stroke();
-
-          ctx.textAlign = "center";
-          ctx.fillStyle = "#94a3b8";
-          ctx.font = "bold 13px sans-serif";
-          ctx.fillText(st.label, bx + 127, by + 32);
-
-          ctx.fillStyle = st.color;
-          ctx.font = "bold 26px 'Do Hyeon', sans-serif";
-          ctx.fillText(st.val, bx + 127, by + 68);
-        });
-
-        // 6. 하단 에필로그 한 줄 요약
-        ctx.textAlign = "center";
-        ctx.fillStyle = "#e2e8f0";
-        ctx.font = "bold 16px 'Noto Serif KR', serif";
-        const endingTitle = document.getElementById("ending-title").innerText || "무림의 전설";
-        ctx.fillText(`★ [결말] ${endingTitle} ★`, w / 2, 630);
-
-        ctx.fillStyle = "#78716c";
-        ctx.font = "12px sans-serif";
-        ctx.fillText("지금 링크를 열어 당신의 무협 인생을 시뮬레이션해보세요!", w / 2, 690);
-
-        ctx.fillStyle = "#d97706";
-        ctx.font = "bold 13px sans-serif";
-        ctx.fillText("https://yulmooooo.github.io/gangho/", w / 2, 715);
-
-        document.getElementById("share-card-modal").style.display = "flex";
-      };
-
-      avImg.src = avUrl;
+    async function generateShareCard() {
+      document.getElementById("share-card-modal").style.display = "flex";
+      await waitForRankKey(2500);
+      await drawChronicleCard(document.getElementById("share-canvas"), myCardData());
     }
 
     function closeShareCardModal() {
@@ -1751,9 +1666,10 @@
     // 모바일 카카오톡/SNS 공유
     async function handleNativeShare() {
       const canvas = document.getElementById("share-canvas");
-      const title = `[강호풍운록] ${char.name}의 최종 기록!`;
-      const text = `${char.name}이(가) ${char.age}세에 최종 무력 ${getCombatPower()}에 도달했습니다! 당신도 천하제일에 도전해보세요.`;
-      const url = window.location.href;
+      await waitForRankKey();
+      const title = `[강호풍운록] ${char.name}의 강호 열전`;
+      const text = `${char.name}, 16세에 강호에 들어 ${char.age}세에 생을 마치다. 최종 무력 ${getCombatPower()}. 벗이여, 이 기록을 넘어설 수 있겠는가?`;
+      const url = myShareUrl();
 
       canvas.toBlob(async (blob) => {
         const file = new File([blob], "gangho-record.png", { type: "image/png" });
@@ -1781,11 +1697,278 @@
       });
     }
 
+    // ==========================================
+    // [공유] 바로 시작 · 강호 열전 카드 · 링크 복사 · 벗의 열전
+    // ==========================================
+    const SITE_URL = "https://yulmooooo.github.io/gangho/";
+    const CARD_ROAD = { orthodox: "정파의 길", unorthodox: "사파의 길", demonic: "마도의 길", neutral: "독행의 길" };
+    const QUICK_NAMES_A = ["풍", "백", "진", "한", "설", "위", "연", "천", "독고", "남궁", "제갈", "모용", "단", "사마", "구"];
+    const QUICK_NAMES_B = ["천혁", "무진", "소운", "태호", "운학", "청아", "서진", "하린", "검우", "월향", "비연", "도윤", "현", "강", "율"];
+
+    function toggleStartSetup(force) {
+      const box = document.getElementById("start-setup");
+      const open = force !== undefined ? force : box.style.display === "none";
+      box.style.display = open ? "block" : "none";
+      document.getElementById("btn-toggle-setup").innerText = open ? "⚙️ 직접 정하기 접기 ▴" : "⚙️ 이름·출신·기질을 직접 정하고 시작하기 ▾";
+    }
+
+    function quickStart() {
+      const keys = Object.keys(FACTIONS);
+      selectedFaction = keys[Math.floor(Math.random() * keys.length)];
+      const tk = Object.keys(TEMPERS);
+      selectedTemper = tk[Math.floor(Math.random() * tk.length)];
+      selectedAvatarId = PIXEL_ASSETS.avatars[Math.floor(Math.random() * PIXEL_ASSETS.avatars.length)].id;
+      const sect = selectedFaction === "neutral"
+        ? (Math.random() < 0.5 ? pick(["남궁세가 (南宮世家)", "모용세가 (慕容世家)", "제갈세가 (諸葛世家)"]) : FACTIONS.neutral.defaultSect)
+        : FACTIONS[selectedFaction].defaultSect;
+      document.getElementById("input-name").value = pick(QUICK_NAMES_A) + pick(QUICK_NAMES_B);
+      document.getElementById("input-sect").value = sect;
+      rollInitialStats();
+      startGame();
+    }
+
+    function formatRecordDate(ts) {
+      const d = new Date(ts || Date.now());
+      return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, "0")}.${String(d.getDate()).padStart(2, "0")}`;
+    }
+
+    function shortEndingTitle() {
+      const t = (document.getElementById("ending-title").innerText || "").trim();
+      return t.split(" - ")[0].slice(0, 30);
+    }
+
+    // 결과 카드에 넣을 굵직한 사건 3줄
+    function lifeHighlights() {
+      const seen = new Set();
+      const story = (char.story || []).filter(s => !/향년|부고|손에 넣었다/.test(s.text) && !seen.has(s.text) && seen.add(s.text));
+      const score = t => (/우승|천하제일/.test(t) ? 8 : 0) + (/정마대전|혈천마제|위지강|멸문의 진실|멸문시킨/.test(t) ? 6 : 0) + (/천하비무대회/.test(t) ? 2 : 0)
+        + (/생사결|혈검|숙명|혈수귀|사부/.test(t) ? 4 : 0) + (/기연|깨달/.test(t) ? 3 : 0) + (/창건|문파|제자/.test(t) ? 2 : 0)
+        + (/경지에 올랐|등극|돌파/.test(t) ? 2 : 0) - (/쫓기 시작|찾아 나섰다/.test(t) ? 5 : 0);
+      const picked = story.map((s, i) => ({ ...s, i, sc: score(s.text) })).sort((a, b) => b.sc - a.sc || a.i - b.i).slice(0, 3).sort((a, b) => a.i - b.i);
+      const fix = t => t.replace(/([가-힣A-Za-z0-9]+)(이\(가\)|을\(를\)|은\(는\)|과\(와\))/g, (m, w, p) => w + josa(w, ...{ "이(가)": ["이", "가"], "을(를)": ["을", "를"], "은(는)": ["은", "는"], "과(와)": ["과", "와"] }[p]));
+      return picked.map(s => ({ age: s.age, text: fix(s.text).replace(/[.!]+$/, "") }));
+    }
+
+    function myShareUrl() {
+      if (!char.rankKey) return SITE_URL;
+      return `${SITE_URL}?r=${encodeURIComponent(char.rankKey)}&e=${encodeURIComponent(shortEndingTitle())}`;
+    }
+
+    async function waitForRankKey(ms = 4000) {
+      const t0 = Date.now();
+      while (!char.rankKey && char.submitting && Date.now() - t0 < ms) await new Promise(r => setTimeout(r, 200));
+      return char.rankKey;
+    }
+
+    async function copyText(text) {
+      try { await navigator.clipboard.writeText(text); return true; } catch (e) {}
+      try {
+        const ta = document.createElement("textarea");
+        ta.value = text; ta.setAttribute("readonly", ""); ta.style.position = "fixed"; ta.style.opacity = "0";
+        document.body.appendChild(ta); ta.select(); const ok = document.execCommand("copy"); ta.remove(); return ok;
+      } catch (e) { return false; }
+    }
+
+    async function copyMyLink(btn) {
+      await waitForRankKey();
+      const url = myShareUrl();
+      const ok = await copyText(url);
+      const b = btn || document.getElementById("btn-copy-link");
+      if (ok) {
+        const old = b.innerHTML;
+        b.innerHTML = char.rankKey ? "✓ 내 열전 링크를 복사했습니다" : "✓ 게임 링크를 복사했습니다";
+        setTimeout(() => { b.innerHTML = old; }, 2200);
+      } else {
+        showCustomAlert(`아래 링크를 길게 눌러 복사해 주세요.\n${url}`);
+      }
+    }
+
+    // 오늘 서열 (같은 날 기록 중 몇 위인지)
+    async function fetchDayStanding(dailyKey, power) {
+      try {
+        const res = await fetch(`${rankingUrl()}?orderBy=${encodeURIComponent('"dailyKey"')}&equalTo=${encodeURIComponent('"' + dailyKey + '"')}`);
+        if (!res.ok) return null;
+        const data = await res.json() || {};
+        const list = Object.values(data).filter(x => x && x.dailyKey === dailyKey);
+        return { rank: list.filter(x => Number(x.power) > power).length + 1, total: list.length };
+      } catch (e) { return null; }
+    }
+
+    // ----- 강호 열전 카드 (1080×1350) -----
+    function loadImg(src) {
+      return new Promise(res => { const im = new Image(); im.onload = () => res(im); im.onerror = () => res(null); im.src = src; });
+    }
+
+    function fitFont(ctx, text, weight, size, maxW, family = "'Noto Serif KR', serif") {
+      let s = size;
+      do { ctx.font = `${weight} ${s}px ${family}`; s -= 2; } while (ctx.measureText(text).width > maxW && s > 12);
+      return text;
+    }
+
+    function clipText(ctx, text, maxW) {
+      if (ctx.measureText(text).width <= maxW) return text;
+      let t = text;
+      while (t.length > 1 && ctx.measureText(t + "…").width > maxW) t = t.slice(0, -1);
+      return t + "…";
+    }
+
+    async function drawChronicleCard(canvas, d) {
+      const ctx = canvas.getContext("2d");
+      const W = 1080, H = 1350;
+      canvas.width = W; canvas.height = H;
+      try { await Promise.all(["900 150px 'Noto Serif KR'", "800 30px 'Noto Serif KR'", "600 30px 'Noto Serif KR'"].map(f => document.fonts.load(f, "풍천혁風雲"))); } catch (e) {}
+      const [mtn, art, logo] = await Promise.all([loadImg("assets/card-mtn.jpg"), loadImg("assets/card-art.jpg"), loadImg("assets/logo-ink.png")]);
+      const INK = "#16120e", RED = "#8e2418", SUB = "#4a4036", PAPER = "#efe9de";
+
+      ctx.fillStyle = PAPER; ctx.fillRect(0, 0, W, H);
+      // 수묵 산과 무사 (가장자리가 번지듯 사라지게)
+      const faded = (im, w, h, mask) => {
+        const c = document.createElement("canvas"); c.width = w; c.height = h;
+        const x = c.getContext("2d"); x.drawImage(im, 0, 0, w, h);
+        x.globalCompositeOperation = "destination-in"; x.fillStyle = mask(x); x.fillRect(0, 0, w, h);
+        return c;
+      };
+      if (mtn) {
+        ctx.globalAlpha = 0.5;
+        ctx.drawImage(faded(mtn, W, 316, x => { const g = x.createLinearGradient(0, 0, 0, 316); g.addColorStop(0, "#000"); g.addColorStop(0.45, "rgba(0,0,0,.9)"); g.addColorStop(1, "rgba(0,0,0,0)"); return g; }), 0, 0);
+        ctx.globalAlpha = 1;
+      }
+      if (art) {
+        ctx.globalAlpha = 0.2;
+        ctx.drawImage(faded(art, 620, 523, x => { const g = x.createRadialGradient(330, 250, 90, 330, 250, 300); g.addColorStop(0, "#000"); g.addColorStop(1, "rgba(0,0,0,0)"); return g; }), W - 590, 300);
+        ctx.globalAlpha = 1;
+      }
+      // 한지 결
+      const n = document.createElement("canvas"); n.width = 180; n.height = 180;
+      const nx = n.getContext("2d"), img = nx.createImageData(180, 180);
+      for (let i = 0; i < img.data.length; i += 4) { const v = 90 + Math.random() * 60; img.data[i] = v; img.data[i + 1] = v * 0.85; img.data[i + 2] = v * 0.65; img.data[i + 3] = Math.random() * 26; }
+      nx.putImageData(img, 0, 0);
+      ctx.fillStyle = ctx.createPattern(n, "repeat"); ctx.fillRect(0, 0, W, H);
+      // 테두리
+      ctx.strokeStyle = "rgba(22,18,14,.55)"; ctx.lineWidth = 2; ctx.strokeRect(34, 34, W - 68, H - 68);
+      ctx.strokeStyle = "rgba(22,18,14,.22)"; ctx.lineWidth = 1; ctx.strokeRect(44, 44, W - 88, H - 88);
+
+      const L = 96, R = W - 96;
+      if (logo) ctx.drawImage(logo, L, 92, 247, 84);
+      // 열전 표식
+      ctx.font = "800 26px 'Noto Serif KR', serif"; ctx.textBaseline = "middle";
+      const tag = "江湖列傳 · 강호 열전"; const tw = ctx.measureText(tag).width + 40;
+      ctx.strokeStyle = RED; ctx.lineWidth = 2; ctx.strokeRect(R - tw, 104, tw, 56);
+      ctx.fillStyle = RED; ctx.textAlign = "right"; ctx.fillText(tag, R - 20, 133);
+      ctx.textAlign = "left";
+
+      // 이름 + 낙관
+      ctx.textBaseline = "alphabetic";
+      fitFont(ctx, d.name, 900, 150, 600);
+      ctx.fillStyle = INK; ctx.fillText(d.name, L, 462);
+      const nw = ctx.measureText(d.name).width;
+      const sx = L + nw + 34, sy = 340;
+      ctx.fillStyle = "#b3261a"; ctx.beginPath(); ctx.roundRect(sx, sy, 62, 116, 6); ctx.fill();
+      ctx.fillStyle = "#f6e7d0"; ctx.font = "900 40px 'Noto Serif KR', serif"; ctx.textAlign = "center";
+      ctx.fillText("風", sx + 31, sy + 50); ctx.fillText("雲", sx + 31, sy + 98); ctx.textAlign = "left";
+
+      // 16세 → 향년
+      ctx.font = "900 56px 'Noto Serif KR', serif"; ctx.fillStyle = INK;
+      const a1 = `${d.startAge}세 `; ctx.fillText(a1, L, 560);
+      let x = L + ctx.measureText(a1).width; ctx.fillStyle = RED; ctx.fillText("→", x, 560);
+      x += ctx.measureText("→ ").width; ctx.fillStyle = INK; ctx.fillText(`${d.age}세`, x, 560);
+      ctx.font = "600 30px 'Noto Serif KR', serif"; ctx.fillStyle = SUB;
+      ctx.fillText(clipText(ctx, `최종 경지 ${d.rankName} · ${d.sect} · ${d.pathLabel}`, R - L), L, 612);
+
+      const rg = ctx.createLinearGradient(L, 0, R, 0); rg.addColorStop(0, INK); rg.addColorStop(1, "rgba(22,18,14,.1)");
+      ctx.fillStyle = rg; ctx.fillRect(L, 676, R - L, 2);
+
+      // 사건 3줄
+      let y = 748;
+      d.events.forEach(ev => {
+        ctx.font = "900 31px 'Noto Serif KR', serif"; ctx.fillStyle = RED; ctx.fillText(`${ev.age}세`, L, y);
+        ctx.font = "600 31px 'Noto Serif KR', serif"; ctx.fillStyle = INK; ctx.fillText(clipText(ctx, ev.text, R - L - 120), L + 120, y);
+        y += 66;
+      });
+      // 결말
+      const ey = d.events.length ? y - 16 : 740;
+      ctx.fillStyle = "rgba(22,18,14,.06)"; ctx.fillRect(L, ey, R - L, 88);
+      ctx.fillStyle = INK; ctx.fillRect(L, ey, 6, 88);
+      ctx.font = "800 31px 'Noto Serif KR', serif"; ctx.fillStyle = RED; ctx.fillText("【결말】", L + 34, ey + 56);
+      ctx.fillStyle = INK; ctx.font = "700 31px 'Noto Serif KR', serif";
+      ctx.fillText(clipText(ctx, d.ending, R - L - 200), L + 34 + ctx.measureText("【결말】 ").width + 10, ey + 56);
+
+      // 숫자 세 칸
+      const sy2 = 1050, cw = (R - L) / 3;
+      ctx.fillStyle = INK; ctx.fillRect(L, sy2, R - L, 2); ctx.fillRect(L, sy2 + 138, R - L, 2);
+      const cells = [["최종 무력", d.power.toLocaleString(), INK], ["오늘 서열", d.dayRank ? `${d.dayRank}위` : "—", RED], ["깨달음", String(d.insights), INK]];
+      cells.forEach(([k, v, c], i) => {
+        const cx = L + cw * i + cw / 2;
+        if (i) { ctx.fillStyle = "rgba(22,18,14,.25)"; ctx.fillRect(L + cw * i, sy2 + 2, 1, 136); }
+        ctx.textAlign = "center"; ctx.font = "600 22px 'Noto Serif KR', serif"; ctx.fillStyle = "#6c5f4d"; ctx.fillText(k, cx, sy2 + 46);
+        ctx.font = "900 46px 'Noto Serif KR', serif"; ctx.fillStyle = c; ctx.fillText(v, cx, sy2 + 108);
+      });
+      ctx.textAlign = "left";
+      // 날짜 · 권유
+      ctx.fillStyle = RED; ctx.save(); ctx.translate(L + 6, 1258); ctx.rotate(Math.PI / 4); ctx.fillRect(-6, -6, 12, 12); ctx.restore();
+      ctx.font = "600 26px 'Noto Serif KR', serif"; ctx.fillStyle = SUB; ctx.fillText(`${d.date} 기록`, L + 26, 1267);
+      ctx.textAlign = "right"; ctx.font = "800 26px 'Noto Serif KR', serif"; ctx.fillStyle = INK; ctx.fillText("나도 강호에 발을 들이다 →", R, 1267);
+      ctx.textAlign = "left";
+    }
+
+    function myCardData() {
+      const info = getEndingInfo();
+      return {
+        name: char.name, startAge: 16, age: char.age,
+        rankName: (info.rankLabel || ranks[char.rankIdx].name).split(" / ")[0].split(" (")[0],
+        sect: char.sect.split(" (")[0], pathLabel: CARD_ROAD[info.path] || CARD_ROAD.neutral,
+        events: lifeHighlights(), ending: shortEndingTitle() || "무림의 전설",
+        power: getCombatPower(), dayRank: char.dayRank || null, insights: char.insights || 0,
+        date: formatRecordDate(char.recordedAt)
+      };
+    }
+
+    // ----- 벗의 열전 링크로 들어왔을 때 -----
+    async function showFriendChronicle() {
+      const q = new URLSearchParams(location.search);
+      const key = q.get("r");
+      if (!key || !/^[-_A-Za-z0-9]{8,40}$/.test(key)) return;
+      const box = document.getElementById("friend-intro");
+      try {
+        const res = await fetch(`${FIREBASE_DB_URL.replace(/\/$/, "")}/rankings/${key}.json`);
+        if (!res.ok) return;
+        const r = await res.json();
+        if (!r || !r.name) return;
+        const ending = (q.get("e") || "").slice(0, 30);
+        const path = PATH_INFO[r.path] ? r.path : "neutral";
+        const INK = "#16120e", RED = "#8e2418", SUB = "#4a4036";
+        box.innerHTML = `
+          <div style="font-size:12px;font-weight:800;color:#fda4af">◆ 벗이 남긴 강호 열전</div>
+          <div style="font-family:'Noto Serif KR',serif;background:#f3ede2;color:${INK};border:1.5px solid rgba(22,18,14,.6);border-radius:14px;padding:16px 16px 12px;box-shadow:0 10px 30px rgba(0,0,0,.35)">
+            <div style="display:flex;align-items:flex-end;gap:8px">
+              <span style="font-size:32px;font-weight:900;line-height:1">${escapeHtml(r.name)}</span>
+              <span style="background:#b3261a;color:#f6e7d0;font-weight:900;font-size:11px;line-height:1.15;border-radius:3px;padding:3px 4px;text-align:center">風<br>雲</span>
+            </div>
+            <div style="margin-top:8px;font-size:17px;font-weight:900">16세 <span style="color:${RED}">→</span> ${Number(r.age) || "?"}세 · ${escapeHtml(r.rankName || "")}</div>
+            <div style="margin-top:3px;font-size:11.5px;font-weight:600;color:${SUB}">${escapeHtml(String(r.sect || "").split(" (")[0])} · ${CARD_ROAD[path]} · ${formatRecordDate(r.createdAt)} 기록</div>
+            <div style="margin-top:10px;display:grid;grid-template-columns:repeat(3,1fr);text-align:center;border-top:1.5px solid ${INK};border-bottom:1.5px solid ${INK}">
+              <div style="padding:7px 0"><div style="font-size:10px;color:#6c5f4d;font-weight:600">최종 무력</div><div style="font-size:18px;font-weight:900">${(Number(r.power) || 0).toLocaleString()}</div></div>
+              <div style="padding:7px 0;border-left:1px solid rgba(22,18,14,.2);border-right:1px solid rgba(22,18,14,.2)"><div style="font-size:10px;color:#6c5f4d;font-weight:600">그날 서열</div><div id="friend-rank" style="font-size:18px;font-weight:900;color:${RED}">…</div></div>
+              <div style="padding:7px 0"><div style="font-size:10px;color:#6c5f4d;font-weight:600">경지</div><div style="font-size:14px;font-weight:900;padding-top:3px">${escapeHtml(r.rankName || "-")}</div></div>
+            </div>
+            ${ending ? `<div style="margin-top:9px;font-size:12.5px;font-weight:700"><span style="color:${RED}">【결말】</span> ${escapeHtml(ending)}</div>` : ""}
+          </div>
+          <p style="text-align:center;font-size:15px;font-weight:900;color:#f5f5f4;padding-top:4px;line-height:1.5">벗의 기록을 넘어설 수 있겠는가?<br><span style="color:#fcd34d">그대의 한 생은 어디까지 닿을까</span></p>`;
+        box.style.display = "block";
+        document.getElementById("start-intro").style.display = "none";
+        document.getElementById("start-hero").style.display = "none";
+        document.getElementById("btn-quick-start").innerText = "나도 강호에 발을 들이다";
+        const st = r.dailyKey ? await fetchDayStanding(r.dailyKey, Number(r.power) || 0) : null;
+        const el = document.getElementById("friend-rank");
+        if (el) el.innerText = st ? `${st.rank}위` : "-";
+      } catch (e) { console.warn("벗의 열전을 불러오지 못했습니다", e); }
+    }
+
     // 이미지 파일 직접 다운로드
     function downloadShareCard() {
       const canvas = document.getElementById("share-canvas");
       const a = document.createElement("a");
-      a.download = `강호풍운록_${char.name}_기록.png`;
+      a.download = `강호풍운록_${char.name}_열전.png`;
       a.href = canvas.toDataURL("image/png");
       a.click();
     }
@@ -1849,7 +2032,8 @@
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(record)
       });
-      return res.ok;
+      if (!res.ok) return false;
+      try { const j = await res.json(); return j && j.name ? j.name : true; } catch (e) { return true; }
     }
 
     // 생을 마치면 자동으로 호출됨 (auto=true면 서열록 창을 띄우지 않음)
@@ -1869,11 +2053,16 @@
       submitBtn.innerText = "천하 서열록에 기록을 올리는 중...";
 
       const record = char.pendingRecord || buildRankRecord();
+      char.recordedAt = record.createdAt;
+      char.submitting = true;
 
       try {
         const ok = await postRankRecord(record);
         const res = { ok };
         if (res.ok) {
+          if (typeof ok === "string") char.rankKey = ok;
+          char.submitting = false;
+          fetchDayStanding(record.dailyKey, record.power).then(st => { if (st) char.dayRank = st.rank; });
           hasSubmittedThisLife = true;
           markArchiveSubmitted(char.archiveId);
           submitBtn.innerText = auto ? "✓ 천하 서열록에 자동으로 올라갔습니다" : "✓ 천하 서열록 등록 완료";
@@ -1883,6 +2072,7 @@
           throw new Error("HTTP 오류");
         }
       } catch (err) {
+        char.submitting = false;
         console.error("랭킹 등록 실패:", err);
         if (!auto) showCustomAlert("서열록 등록에 실패했습니다. 다음에 접속할 때 자동으로 다시 시도합니다.");
         submitBtn.disabled = false;
@@ -1959,6 +2149,8 @@
         const scoreOf = item => Number(isSectMode ? item.sectPower : item.power) || 0;
         let list = Object.values(data).filter(item => item && item[filterKey] === currentTargetKey && (!isSectMode || Number(item.sectPower) > 0));
         list.sort((a, b) => scoreOf(b) - scoreOf(a));
+        const periodName = { daily: "오늘", weekly: "이번 주", monthly: "이번 달" }[currentRankTab];
+        document.getElementById("rank-period-info").innerText = `${periodName} ${isSectMode ? "문파" : "무인"} ${list.length}${isSectMode ? "곳" : "명"}이 기록을 남겼습니다 · 상위 30`;
         list = list.slice(0, 30);
 
         if (list.length === 0) {
@@ -6220,6 +6412,7 @@
       renderFactionSelector();
       renderTemperSelector();
       renderArchiveButton();
+      showFriendChronicle();
       setTimeout(syncPendingRecords, 1500);
       updateUI();
     };
