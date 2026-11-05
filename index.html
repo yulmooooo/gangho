@@ -189,6 +189,8 @@
     .text-emerald-300, .text-emerald-400 { color: #2f6436 !important; }
     .text-purple-300, .text-purple-400 { color: #5b3a78 !important; }
     .hover\:text-amber-300:hover { color: var(--red) !important; }
+    /* 진한 바탕 버튼 위 글자는 밝게 */
+    .bg-red-600.text-white, .bg-emerald-600.text-white, .bg-cyan-600.text-white, .bg-purple-600.text-white, .bg-amber-600.text-stone-950 { color: #f8ece0 !important; }
 
     /* 테두리 */
     .border-stone-800, .border-stone-800\/80, .border-stone-800\/60, .border-stone-700\/50 { border-color: var(--line) !important; }
@@ -972,14 +974,14 @@
       <div id="gacha-card" class="p-3.5 rounded-2xl transition border space-y-2">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2">
-            <div class="w-8 h-8 rounded bg-stone-950 border border-purple-500/40 flex items-center justify-center" id="icon-gacha-box"></div>
+            <div class="w-10 h-10 rounded flex items-center justify-center p-1" style="background:#efe7d8;border:1.5px solid #16120e" id="icon-gacha-box"></div>
             <div>
-              <strong id="gacha-title" class="font-brush text-sm block">봉인된 비밀 궤짝</strong>
-              <span id="gacha-badge" class="text-[9px] font-bold px-1.5 py-0.2 rounded border">도파민 가챠</span>
+              <strong id="gacha-title" class="font-brush text-base block" style="color:#16120e">봉인된 비밀 궤짝</strong>
+              <span class="text-[10px] font-bold" style="color:#5f5446">무엇이 나올지 열어 봐야 안다</span>
             </div>
           </div>
         </div>
-        <p class="text-[10px] text-stone-300 leading-tight font-medium">초대박(2%) 시 전설 비급 '천마신공' 원본 출현!</p>
+        <p class="text-[11px] leading-tight font-bold" style="color:#8e2418">2% 확률로 전설 비급 '천마신공' 원본이 나온다</p>
         <button id="btn-gacha-buy" onclick="buyGachaBox()" class="w-full py-2.5 font-brush text-sm rounded-xl shadow cursor-pointer transition">
           궤짝 열기 · 80냥
         </button>
@@ -2782,23 +2784,20 @@
       renderRareShop();
 
       const gachaCard = document.getElementById("gacha-card");
-      const gachaBadge = document.getElementById("gacha-badge");
-      const gachaTitle = document.getElementById("gacha-title");
       const btnGacha = document.getElementById("btn-gacha-buy");
-
+      gachaCard.className = "p-3.5 rounded-2xl space-y-2";
+      gachaCard.style.cssText = "background:#fbf6ea;border:2px solid #b3261a;box-shadow:inset 0 0 0 4px #fbf6ea, inset 0 0 0 5px rgba(179,38,26,.25)";
       if (char.money >= 80) {
-        gachaCard.className = "p-3.5 rounded-2xl bg-gradient-to-b from-stone-900 via-purple-950/40 to-stone-900 border-2 border-amber-500/80 shadow-lg space-y-2";
-        gachaBadge.className = "text-[9px] font-bold px-1.5 py-0.2 rounded bg-amber-500/20 border border-amber-400 text-amber-300";
-        gachaTitle.className = "font-brush text-sm text-amber-200";
+        gachaCard.style.opacity = "1";
         btnGacha.disabled = false;
-        btnGacha.className = "w-full py-2.5 bg-gradient-to-r from-amber-600 to-amber-500 hover:brightness-110 text-stone-950 font-brush text-sm rounded-xl shadow-lg cursor-pointer transition";
+        btnGacha.className = "w-full py-2.5 bg-red-600 text-white font-brush text-sm rounded-xl cursor-pointer transition";
       } else {
-        gachaCard.className = "p-3.5 rounded-2xl bg-stone-950 border border-stone-800 opacity-60 space-y-2";
-        gachaBadge.className = "text-[9px] font-bold px-1.5 py-0.2 rounded bg-stone-900 border border-stone-800 text-stone-500";
-        gachaTitle.className = "font-brush text-sm text-stone-400";
+        gachaCard.style.opacity = "0.65";
         btnGacha.disabled = true;
         btnGacha.className = "w-full py-2.5 bg-stone-800 text-stone-500 font-brush text-sm rounded-xl cursor-not-allowed";
+        btnGacha.innerText = "궤짝 열기 · 80냥 (은자 부족)";
       }
+      if (char.money >= 80) btnGacha.innerText = "궤짝 열기 · 80냥";
 
       const container = document.getElementById("shop-items-container");
       container.innerHTML = "";
