@@ -1208,7 +1208,9 @@
 
     // 성향 효과: 협의 → 녹봉, 악명 → 비무 상금, 마성 → 폐관 돌파
     function getSalaryForRank(rankIdx) {
-      const base = ranks[rankIdx].salary * getFaction().salaryMult * (char.flags && char.flags.agency ? 1.3 : 1);
+      const F = char.flags || {};
+      const seat = F.cultMaster ? 1.5 : F.sectHead ? 1.5 : F.clanHead ? 1.4 : F.surrendered ? 1.4 : F.topAgency ? 1.5 : F.agency ? 1.3 : 1;
+      const base = ranks[rankIdx].salary * getFaction().salaryMult * seat;
       const righteousBonus = 1 + Math.min(0.3, char.align.righteous / 200);
       const retire = char.age >= 70 ? 0.2 : char.age >= 60 ? 0.5 : 1;
       return Math.round(base * righteousBonus * retire);
@@ -2038,7 +2040,7 @@
       return {
         name: char.name, startAge: 16, age: char.age,
         rankName: (info.rankLabel || ranks[char.rankIdx].name).split(" / ")[0].split(" (")[0],
-        sect: char.sect.split(" (")[0], pathLabel: CARD_ROAD[info.path] || CARD_ROAD.neutral,
+        sect: (char.honors && char.honors.length ? char.honors[char.honors.length - 1] : char.sect.split(" (")[0]), pathLabel: CARD_ROAD[info.path] || CARD_ROAD.neutral,
         events: lifeHighlights(), ending: shortEndingTitle() || "무림의 전설",
         power: getCombatPower(), dayRank: char.dayRank || null, insights: char.insights || 0,
         date: formatRecordDate(char.recordedAt)
@@ -4504,7 +4506,7 @@
       char.deathCause = "";
       char.growthRevealed = false;
       char.peers = makePeers();
-      char.bonds = []; char.phaseSeen = null; char.vow = null;
+      char.bonds = []; char.phaseSeen = null; char.vow = null; char.honors = []; char.oarc = null;
       addStory(char.faction === "neutral"
         ? (isClan() ? `${char.sect}의 자손으로 강호에 첫발을 내디뎠다.` : "어디에도 속하지 않은 낭인으로 강호에 첫발을 내디뎠다.")
         : `${FACTIONS[char.faction].label} ${char.sect}에 입문하여 강호에 첫발을 내디뎠다.`);
@@ -4854,7 +4856,8 @@
       const box = document.getElementById("ending-extra");
       const story = char.story.slice(-14).map(s => `<div class="flex gap-2"><span class="shrink-0 text-amber-400 font-bold">${s.age}세</span><span>${escapeHtml(s.text)}</span></div>`).join("");
       const peers = getPeerFates().map(t => `<div>· ${escapeHtml(t)}</div>`).join("");
-      box.innerHTML = `
+      const honors = (char.honors || []).map(h => `<span class="inline-block px-2 py-0.5 mr-1 mb-1 rounded border border-amber-500/60 bg-amber-950/40 text-amber-200 text-[11px] font-bold">${escapeHtml(h)}</span>`).join("");
+      box.innerHTML = (honors ? `<div class="space-y-1"><div class="text-[11px] font-brush text-amber-300">칭호</div><div>${honors}</div></div>` : "") + `
         <div class="space-y-1"><div class="text-[11px] font-brush text-amber-300">인생 이야기</div><div class="space-y-0.5 text-[11px] text-stone-300">${story}</div></div>
         <div class="space-y-1 pt-2 border-t border-stone-800"><div class="text-[11px] font-brush text-amber-300">동기들의 결말</div><div class="space-y-0.5 text-[11px] text-stone-400">${peers}</div></div>`;
       document.getElementById("end-death-line").innerText = char.hasAscended
@@ -5578,29 +5581,33 @@
       // 1) 사부의 행방
       if (!A.master && char.age >= 21 && char.age <= 32 && Math.random() < 0.11) { A.master = { stage: 1, next: char.age }; }
       if (A.master && A.master.stage > 0 && A.master.stage < 9 && char.age >= A.master.next) {
-        await storyHeader("연작 · 사부의 행방");
+        await storyHeader("사부의 행방");
         await arcMaster(A.master, rec);
       }
       // 2) 숙명의 맞수 (동기와의 생사결)
       if (!A.rival && char.age >= 32 && char.age <= 55 && Math.random() < 0.15) {
         const myPath = getPath();
         const foe = (char.peers || []).filter(p => p.alive && p.path !== myPath && p.path !== "neutral").sort((a, b) => b.power - a.power)[0];
-        if (foe) { A.rival = { done: true }; await storyHeader("연작 · 숙명의 맞수"); await arcRival(foe, rec); }
+        if (foe) { A.rival = { done: true }; await storyHeader("숙명의 맞수"); await arcRival(foe, rec); }
       }
       if (char.dead) return;
       const busy = k => A[k] && A[k].stage > 0 && A[k].stage < 9;
       // 3) 멸문의 원수
       if (!A.feud && !busy("master") && char.age >= 24 && char.age <= 40 && Math.random() < 0.1) A.feud = { stage: 1, next: char.age, role: arcRole() };
       if (busy("feud") && char.age >= A.feud.next) {
-        await storyHeader("연작 · 멸문의 원수");
+        await storyHeader("멸문의 원수");
         await arcFeud(A.feud, rec);
         if (char.dead) return;
       }
-      // 4) 마교의 부활 (정마대전)
-      if (!A.cult && !busy("feud") && char.age >= 38 && char.age <= 58 && Math.random() < 0.12) A.cult = { stage: 1, next: char.age, role: arcRole() };
+      // 4) 출신 연작
+      await originArc(rec);
+      if (char.dead) return;
+      // 5) 마교의 부활 (정마대전) · 출신 연작의 고비가 남았으면 조금 기다린다
+      if (!A.cult && !busy("feud") && char.age >= 38 && char.age <= 62 && (originArcSettled() || char.age >= 55) && Math.random() < 0.14)
+        A.cult = { stage: 1, next: char.age, role: arcRole(), lead: warLeadRole() };
       if (busy("cult") && char.age >= A.cult.next) {
-        await storyHeader("연작 · 마교의 부활");
-        await arcCult(A.cult, rec);
+        await storyHeader(A.cult.lead === "demonic" ? "천마의 결단" : "정마대전");
+        if (A.cult.lead) await arcCultLead(A.cult, rec); else await arcCult(A.cult, rec);
       }
     }
 
@@ -5610,7 +5617,7 @@
     const lifePhase = age => age < 26 ? 0 : age < 41 ? 1 : age < 61 ? 2 : 3;
     function eligibleEvents() {
       const ph = lifePhase(char.age), role = arcRole();
-      return RANDOM_EVENTS.filter(e => (!e.ph || e.ph.includes(ph)) && (!e.role || e.role === role) && (!e.once || !char.seenEvents.includes(e.id)) && (!e.cond || e.cond()));
+      return RANDOM_EVENTS.filter(e => !e.arc && (!e.ph || e.ph.includes(ph)) && (!e.role || e.role === role) && (!e.once || !char.seenEvents.includes(e.id)) && (!e.cond || e.cond()));
     }
     const PERSON_SUR = ["연", "설", "단", "위", "진", "한", "백", "소", "하", "유", "모용", "남궁", "제갈", "구양"];
     const PERSON_F = ["소하", "청아", "월화", "서린", "예린", "하연", "운비", "설아"];
@@ -5798,7 +5805,7 @@
         const m = scaled(120);
         await say(`${b.name} ${b.org || "상단"}의 깃발을 단 마차가 줄지어 들어왔다. ${b.deed || "마두에게서 아이들을 구해 준 날"}, 주인은 그 은혜를 장부 맨 앞장에 적어 두었다고 했다.`, "text-stone-200", 300);
         char.money += m;
-        await rec.out(`상단주가 해마다 이익의 한 몫을 떼어 보내겠다고 했다. 첫 몫이 도착했다. (은자 +${m})`, "text-yellow-300");
+        await rec.out(`${b.org === "표국" ? "국주" : "상단주"}${josa(b.org === "표국" ? "국주" : "상단주", "이", "가")} 해마다 이익의 한 몫을 떼어 보내겠다고 했다. 첫 몫이 도착했다. (은자 +${m})`, "text-yellow-300");
         if (sect()) await say("상단은 문파의 후원자가 되었다.", "text-amber-200", 200);
         addStory(`예전에 구해 준 ${b.name} 상단이 후원자가 되었다.`);
       },
@@ -5995,13 +6002,14 @@
         })
       },
       {
-        id: "o_succession", role: "orthodox", ph: [2], once: true, cond: () => !sect(),
+        id: "o_succession", arc: true, role: "orthodox", ph: [2], once: true, cond: () => !sect(),
         build: () => ({
           title: "장문인의 자리",
           desc: `${char.homeName || char.sect.split(" (")[0]}의 장문인이 쓰러졌습니다. 장로회가 둘로 갈라졌고, 젊은 제자들 사이에서는 내 이름이 오르내립니다.`,
           choices: [
             { path: "neutral", label: "직접 장문인 자리에 나선다", hint: "명성 150 이상이면 유리 · 실패하면 명성 -8",
-              apply: () => { const ok = char.fame >= 150 ? Math.random() < 0.75 : Math.random() < 0.3;
+              apply: () => { const bonus = (char.flags.youngAlly ? 0.2 : 0) + (char.flags.elderAlly ? 0.1 : 0) + (char.flags.elderLeash ? 0.15 : 0);
+                const ok = Math.random() < Math.min(0.92, (char.fame >= 150 ? 0.6 : 0.25) + bonus);
                 if (ok) { char.flags.sectHead = true; gainFame(20); char.money += scaled(150); addStory(`${char.homeName || char.sect.split(" (")[0]}의 장문인이 되었다.`);
                   return { text: "장로회가 만장일치로 나를 추대했습니다. 장문인의 영패가 무겁게 손에 쥐어졌습니다.", chips: [["장문인", "취임"], ["명성", "+20"], ["은자", `+${scaled(150)}냥`]] }; }
                 gainFame(-8); return { text: "장로들의 표는 끝내 다른 쪽으로 기울었습니다.", chips: [["명성", "-8"]] }; } },
@@ -6082,7 +6090,7 @@
         }
       },
       {
-        id: "u_council", role: "unorthodox", ph: [2], once: true,
+        id: "u_council", arc: true, role: "unorthodox", ph: [2], once: true,
         build: () => {
           const cost = scaled(150);
           return {
@@ -6090,7 +6098,7 @@
             desc: "녹림 칠십이채가 한자리에 모였습니다. 총표파자의 자리를 두고 채주들이 서로를 노려봅니다.",
             choices: [
               { path: "demonic", label: "가장 강한 채주에게 도전한다", hint: "이기면 총표파자 · 지면 부상",
-                apply: () => { if (autoDuel(1.2).won) { char.flags.greenwoodKing = true; gainFame(20); char.money += scaled(120); addStory("녹림 칠십이채의 총표파자가 되었다.");
+                apply: () => { if (autoDuel(char.flags.fortChief || char.flags.brotherAlly ? 1.1 : 1.25).won) { char.flags.greenwoodKing = true; gainFame(20); char.money += scaled(120); addStory("녹림 칠십이채의 총표파자가 되었다.");
                     return { text: "칠십이채의 깃발이 내 앞에 꽂혔습니다. 녹림의 왕이 되었습니다.", chips: [["총표파자", "등극"], ["명성", "+20"]] }; }
                   char.injury = { ...INJURIES[1] }; return { text: "패했습니다. 채주들이 등을 돌렸습니다.", chips: [["부상", INJURIES[1].name]] }; } },
               { path: "unorthodox", label: `채주들에게 은자를 돌린다 (${cost}냥)`, hint: char.money >= cost ? "총표파자 · 악명 +4" : "은자가 부족하다",
@@ -6163,7 +6171,7 @@
           desc: "교의 장로회가 배교자 숙청 명단을 내렸습니다. 명단 맨 끝에, 나를 교에 거두어 준 노 당주의 이름이 있습니다.",
           choices: [
             { path: "demonic", label: "명대로 처리한다", hint: "마성 +6 · 내공 +5 · 교의 신임",
-              apply: () => { addAlign(0, 0, 6); gainStats(5, 0, 0); addStory("은인이었던 노 당주를 숙청 명단대로 처리했다."); return { text: "노 당주는 아무 말 없이 눈을 감았습니다.", chips: [["마성", "+6"], ["내공", "+5"]] }; } },
+              apply: () => { addAlign(0, 0, 6); gainStats(5, 0, 0); char.flags.cultTrust = (char.flags.cultTrust || 0) + 1; addStory("은인이었던 노 당주를 숙청 명단대로 처리했다."); return { text: "노 당주는 아무 말 없이 눈을 감았습니다.", chips: [["마성", "+6"], ["내공", "+5"]] }; } },
             { path: "orthodox", label: "노 당주를 몰래 빼돌린다", hint: "협의 +5 · 들키면 부상",
               apply: () => { addAlign(5, 0, 0); if (Math.random() < 0.3) { char.injury = { ...INJURIES[1] }; return { text: "추격대와 맞닥뜨려 크게 다쳤지만, 노 당주는 무사히 빠져나갔습니다.", chips: [["협의", "+5"], ["부상", INJURIES[1].name]] }; }
                 return { text: "노 당주는 서역으로 떠났습니다. 명단에는 '처리 완료'라고 적었습니다.", chips: [["협의", "+5"]] }; } },
@@ -6179,7 +6187,7 @@
           desc: "내공을 단숨에 끌어올리는 혈교의 비전 의식. 다만 산 사람의 피가 필요합니다. 제단 아래 붙잡혀 온 포로가 떨고 있습니다.",
           choices: [
             { path: "demonic", label: "포로를 제물로 바친다", hint: "마성 +8 · 내공 +15 · 악명 +4",
-              apply: () => { addAlign(0, 4, 8); gainStats(15, 0, 0); addStory("혈교 의식에 산 제물을 바쳤다."); return { text: "핏빛 기운이 단전을 가득 채웠습니다.", chips: [["마성", "+8"], ["내공", "+15"]] }; } },
+              apply: () => { addAlign(0, 4, 8); gainStats(15, 0, 0); char.flags.cultTrust = (char.flags.cultTrust || 0) + 1; addStory("혈교 의식에 산 제물을 바쳤다."); return { text: "핏빛 기운이 단전을 가득 채웠습니다.", chips: [["마성", "+8"], ["내공", "+15"]] }; } },
             { path: "neutral", label: "내 피로 대신한다", hint: "내공 +7 · 수명 -1 · 마성 +2",
               apply: () => { addAlign(0, 0, 2); gainStats(7, 0, 0); char.lifeBonus = (char.lifeBonus || 0) - 1; return { text: "손목에서 흐른 피가 제단을 적셨습니다. 어지러웠지만 내공은 늘었습니다.", chips: [["내공", "+7"], ["수명", "-1"]] }; } },
             { path: "orthodox", label: "의식을 거부하고 포로를 풀어 준다", hint: "협의 +5 · 마성 -4 · 명성 -3",
@@ -6188,7 +6196,7 @@
         })
       },
       {
-        id: "d_elder", role: "demonic", ph: [2], once: true,
+        id: "d_elder", arc: true, role: "demonic", ph: [2], once: true,
         build: () => ({
           title: "장로 서열전",
           desc: "신교의 장로 자리 하나가 비었습니다. 서열전은 생사결로 치러집니다. 상대는 삼십 년 동안 그 자리를 노려 온 혈영당주입니다.",
@@ -6230,7 +6238,7 @@
             desc: `사촌 ${nm}${josa(nm, "이", "가")} 기루에서 행패를 부리다 사람을 다치게 했습니다. 이 일이 알려지면 가문의 이름에 먹칠이 됩니다.`,
             choices: [
               { path: "unorthodox", label: "돈으로 조용히 덮어 준다", hint: `은자 -${scaled(30)} · 악명 +2`,
-                apply: () => { char.money = Math.max(0, char.money - scaled(30)); addAlign(0, 2, 0); return { text: "피해자의 입이 은자로 막혔습니다. 사촌은 고맙다는 말도 하지 않았습니다.", chips: [["악명", "+2"]] }; } },
+                apply: () => { char.money = Math.max(0, char.money - scaled(30)); addAlign(0, 2, 0); char.flags.cousinAlly = true; return { text: "피해자의 입이 은자로 막혔습니다. 사촌은 고맙다는 말도 하지 않았습니다.", chips: [["악명", "+2"]] }; } },
               { path: "neutral", label: "가주에게 사실대로 고한다", hint: "협의 +3 · 명성 +3",
                 apply: () => { addAlign(3, 0, 0); gainFame(3); return { text: "가주는 사촌을 사당에 무릎 꿇렸습니다. 사촌은 나를 오래 미워했습니다.", chips: [["협의", "+3"], ["명성", "+3"]] }; } },
               { path: "orthodox", label: "사촌을 끌고 가 피해자에게 사죄시킨다", hint: "협의 +5",
@@ -6252,10 +6260,10 @@
               { path: "orthodox", label: `${char.spouse}${josa(char.spouse, "을", "를")} 두고 그럴 수 없다며 거절한다`, hint: "협의 +4 · 가주의 노여움",
                 apply: () => { addAlign(4, 0, 0); char.money = Math.max(0, char.money - scaled(40)); return { text: "가주의 노여움을 샀지만, 그날 밤 반려의 손을 오래 잡았습니다.", chips: [["협의", "+4"]] }; } },
               { path: "unorthodox", label: "가문을 위해 혼사를 받아들인다", hint: `은자 +${scaled(150)} · 명성 +5 · 악명 +3`,
-                apply: () => { char.money += scaled(150); gainFame(5); addAlign(0, 3, 0); return { text: "두 가문이 손을 잡았습니다. 집으로 돌아가는 길이 유난히 길었습니다.", chips: [["은자", `+${scaled(150)}냥`], ["악명", "+3"]] }; } }
+                apply: () => { char.money += scaled(150); gainFame(5); addAlign(0, 3, 0); char.flags.inLaws = true; return { text: "두 가문이 손을 잡았습니다. 집으로 돌아가는 길이 유난히 길었습니다.", chips: [["은자", `+${scaled(150)}냥`], ["악명", "+3"]] }; } }
             ] : [
               { path: "neutral", label: "가문을 위해 혼사를 받아들인다", hint: `반려 · 은자 +${scaled(150)} · 명성 +5`,
-                apply: () => { char.spouse = nm; char.money += scaled(150); gainFame(5); addStory(`가문이 정한 혼사로 ${nm}${josa(nm, "과", "와")} 혼례를 올렸다.`);
+                apply: () => { char.spouse = nm; char.money += scaled(150); gainFame(5); char.flags.inLaws = true; addStory(`가문이 정한 혼사로 ${nm}${josa(nm, "과", "와")} 혼례를 올렸다.`);
                   return { text: `혼례날 처음 본 ${nm}${josa(nm, "은", "는")} 생각보다 다정한 사람이었습니다.`, chips: [["반려", nm], ["은자", `+${scaled(150)}냥`]] }; } },
               { path: "unorthodox", label: "혼사를 깨고 집을 나간다", hint: "신법 +5 · 가주의 노여움",
                 apply: () => { gainStats(0, 0, 5); char.money = Math.max(0, char.money - scaled(40)); return { text: "담을 넘어 밤길을 달렸습니다. 처음으로 내 뜻대로 산 날이었습니다.", chips: [["신법", "+5"]] }; } }
@@ -6264,7 +6272,7 @@
         }
       },
       {
-        id: "c_succession", role: "clan", ph: [2], once: true,
+        id: "c_succession", arc: true, role: "clan", ph: [2], once: true,
         build: () => {
           const nm = personName(false);
           return {
@@ -6272,7 +6280,7 @@
             desc: `늙은 가주가 자리에 누웠습니다. 맏형 ${nm}${josa(nm, "과", "와")} 나 사이에서 가문의 장로들이 갈라졌습니다.`,
             choices: [
               { path: "demonic", label: "비무로 가주 자리를 가린다", hint: "이기면 가주 · 지면 부상",
-                apply: () => { if (autoDuel(1.1).won) { char.flags.clanHead = true; gainFame(18); char.money += scaled(200); addStory(`맏형 ${nm}${josa(nm, "을", "를")} 꺾고 ${char.homeName || char.sect.split(" (")[0]}의 가주가 되었다.`);
+                apply: () => { if (autoDuel(Math.max(0.9, 1.15 - 0.06 * (char.flags.clanAllies || 0))).won) { char.flags.clanHead = true; gainFame(18); char.money += scaled(200); addStory(`맏형 ${nm}${josa(nm, "을", "를")} 꺾고 ${char.homeName || char.sect.split(" (")[0]}의 가주가 되었다.`);
                     return { text: "맏형이 검을 내려놓았습니다. 가주의 인장이 내 손에 들어왔습니다.", chips: [["가주", "취임"], ["명성", "+18"], ["은자", `+${scaled(200)}냥`]] }; }
                   char.injury = { ...INJURIES[1] }; return { text: "맏형의 검이 한 수 위였습니다.", chips: [["부상", INJURIES[1].name]] }; } },
               { path: "orthodox", label: "맏형을 가주로 밀어 준다", hint: "협의 +5 · 은자 +",
@@ -6362,7 +6370,7 @@
         })
       },
       {
-        id: "r_agency", role: "ronin", ph: [2], once: true, cond: () => !sect(),
+        id: "r_agency", arc: true, role: "ronin", ph: [2], once: true, cond: () => !sect(),
         build: () => {
           const cost = scaled(180);
           return {
@@ -6449,6 +6457,385 @@
         addStory(`누명을 쓴 사내 ${b.name}${josa(b.name, "이", "가")} 진범을 잡아 돌아왔다.`);
       }
     });
+
+    // ==========================================
+    // [출신 연작] 장문인의 자리 · 녹림왕 · 천마의 후계 · 가주의 자리 · 강호표국
+    // ==========================================
+    function addHonor(t) {
+      char.honors = char.honors || [];
+      if (!char.honors.includes(t)) char.honors.push(t);
+    }
+    const runEvent = async id => { const e = RANDOM_EVENTS.find(x => x.id === id); char.seenEvents.push(id); await storyEvent(e.build()); };
+
+    // 출신 연작의 마지막 고비를 넘겼는지 (정마대전을 조금 늦춰 기다릴지 판단)
+    function originArcSettled() {
+      const o = char.oarc;
+      return !o || o.stage >= 9;
+    }
+    // 정마대전에서 판을 움직일 자리에 올랐는지
+    function warLeadRole() {
+      const r = arcRole(), f = char.flags || {};
+      if (r === "demonic" && f.cultMaster) return "demonic";
+      if (r === "orthodox" && f.sectHead) return "orthodox";
+      if (r === "unorthodox" && f.greenwoodKing && !f.greenwoodFallen) return "unorthodox";
+      if (r === "clan" && f.clanHead) return "clan";
+      if (r === "ronin" && f.topAgency) return "ronin";
+      return null;
+    }
+
+    async function originArc(rec) {
+      if (!char.oarc) char.oarc = { role: arcRole(), stage: 1, next: 0 };
+      const o = char.oarc;
+      if (o.stage >= 9 || char.age < o.next) return;
+      // 출신이 바뀌었으면 (파문·탈교 등) 연작은 거기서 끝
+      if (arcRole() !== o.role) { o.stage = 9; return; }
+      const A = char.arcs || {};
+      const other = ["master", "feud", "cult"].some(k => A[k] && A[k].stage > 0 && A[k].stage < 9 && A[k].next <= char.age);
+      if (other) return;
+      await ORIGIN_ARCS[o.role](o, rec);
+    }
+
+    const ORIGIN_ARCS = {
+      // ---------------- 정파: 장문인의 자리 ----------------
+      orthodox: async (o, rec) => {
+        if (o.stage === 1) {
+          if (char.age < 31 || sect()) { if (sect()) o.stage = 9; return; }
+          await storyHeader("장로의 그늘");
+          await say(`${char.homeName}의 재물 장부를 정리하다 이상한 것을 발견했다. 대장로가 십 년 넘게 문파의 은자를 빼돌려 왔다.`, "text-stone-200", 300);
+          await say("대장로는 장문인 다음가는 어른이다. 장문인의 건강이 나빠진 지금, 다음 자리를 노리고 있다는 소문도 있다.", "text-stone-400 italic", 260);
+          const i = await arcChoose([
+            { label: "장로회 앞에서 밝힌다", hint: "협의 +5 · 젊은 제자들이 내 편 · 대장로의 원한", p: "orthodox" },
+            { label: "못 본 것으로 하고 대장로의 사람이 된다", hint: "악명 +3 · 대장로의 지지", p: "neutral" },
+            { label: "대장로를 찾아가 입막음 값을 받는다", hint: `은자 +${scaled(100)} · 악명 +5 · 대장로의 약점`, p: "unorthodox" }
+          ]);
+          if (i === 0) { addAlign(5, 0, 0); gainFame(6); char.flags.youngAlly = true; await rec.out("장로회가 발칵 뒤집혔다. 대장로는 물러났고, 젊은 제자들이 나를 다시 보기 시작했다. (협의 +5, 명성 +6)", "text-sky-300"); addStory("대장로의 횡령을 장로회 앞에 밝혔다."); }
+          else if (i === 1) { addAlign(0, 3, 0); char.flags.elderAlly = true; await rec.out("대장로가 내 어깨를 두드렸다. \"자네는 큰일을 할 사람이야.\"", "text-stone-300"); }
+          else { addAlign(0, 5, 0); char.money += scaled(100); char.flags.elderLeash = true; await rec.out(`대장로의 얼굴이 하얗게 질렸다. 은자와 함께 그의 목줄을 쥐었다. (은자 +${scaled(100)})`, "text-rose-300"); }
+          o.stage = 2; o.next = Math.max(char.age + ri(4, 8), 42);
+          return;
+        }
+        if (o.stage === 2) {
+          if (sect()) { o.stage = 9; return; }
+          await storyHeader("장문인의 자리");
+          await runEvent("o_succession");
+          o.stage = 9;
+          if (char.flags.sectHead) { addHonor(`${char.homeName} 장문인`); await say("장문인의 영패를 받던 날, 산문을 내려가던 젊은 날의 내가 떠올랐다.", "text-stone-400 italic", 260); }
+        }
+      },
+
+      // ---------------- 사파: 녹림왕 ----------------
+      unorthodox: async (o, rec) => {
+        if (o.stage === 1) {
+          if (char.age < 28) return;
+          await storyHeader("산채의 주인");
+          await say("늙은 채주가 피를 토하며 쓰러졌다. 형제들의 눈이 일제히 나와 맏형님에게 쏠렸다.", "text-stone-200", 300);
+          const i = await arcChoose([
+            { label: "채주의 유언대로 산채를 물려받는다", hint: "산채의 주인 · 명성 +6", p: "neutral" },
+            { label: "맏형님에게 양보하고 오른팔이 된다", hint: "협의 +4 · 맏형님의 의리", p: "orthodox" },
+            { label: "맏형님을 밀어내고 산채를 빼앗는다", hint: "악명 +6 · 산채의 주인 · 원한", p: "unorthodox" }
+          ]);
+          if (i === 0) { char.flags.fortChief = true; gainFame(6); await rec.out("채주의 칼을 이어받았다. 이제 이 산채는 내 것이다.", "text-amber-200"); addStory("늙은 채주의 산채를 물려받았다."); }
+          else if (i === 1) { addAlign(4, 0, 0); char.flags.brotherAlly = true; await rec.out("맏형님이 내 손을 꽉 잡았다. \"이 은혜는 반드시 갚는다.\"", "text-sky-300"); }
+          else { addAlign(0, 6, 0); char.flags.fortChief = true; await rec.out("맏형님은 산을 내려갔다. 등 뒤로 그가 이를 가는 소리가 들렸다.", "text-rose-300"); addStory("맏형님을 밀어내고 산채를 차지했다."); }
+          o.stage = 2; o.next = Math.max(char.age + ri(6, 10), 40);
+          return;
+        }
+        if (o.stage === 2) {
+          await storyHeader("녹림 총회");
+          if (char.flags.brotherAlly) await say("산채의 주인이 된 맏형님이 나를 녹림 총회의 대표로 내세웠다. \"그날의 은혜를 갚을 때다.\"", "text-sky-300 italic", 260);
+          await runEvent("u_council");
+          if (char.flags.greenwoodKing) { o.stage = 3; o.next = char.age + ri(2, 5); } else o.stage = 9;
+          return;
+        }
+        if (o.stage === 3) {
+          await storyHeader("관부의 토벌");
+          await say("조정이 녹림 칠십이채를 쓸어버리겠다며 관군 삼천을 보냈다. 동시에 밀사 하나가 몰래 찾아왔다. \"귀순하면 벼슬을 내리겠다는 황명이오.\"", "text-stone-200", 320);
+          const i = await arcChoose([
+            { label: "칠십이채를 이끌고 관군에 맞선다", hint: "생사결 · 이기면 진정한 녹림왕", p: "unorthodox" },
+            { label: "형제들과 함께 귀순해 벼슬을 받는다", hint: "협의 +6 · 귀순한 장군 · 녹봉 ↑", p: "orthodox" }
+          ]);
+          o.stage = 9;
+          if (i === 1) {
+            char.flags.surrendered = true; char.flags.greenwoodFallen = true; addAlign(6, -6, 0); gainFame(10);
+            addHonor("귀순한 장군");
+            await rec.out("칠십이채의 깃발을 내리고 관복을 입었다. 형제들의 반은 울었고, 반은 웃었다. (협의 +6, 명성 +10)", "text-sky-300 font-bold");
+            addStory("녹림 칠십이채를 이끌고 조정에 귀순해 장군이 되었다.");
+            return;
+          }
+          const won = await storyFight(char.name + "와 칠십이채", Math.round(getCombatPower() * 1.1), "토벌군 대장군", Math.round(getBenchmarkPower() * 1.35));
+          if (won) { gainFame(25); gainStats(8, 10, 6); char.insights = (char.insights || 0) + 1; addHonor("녹림왕"); await rec.out("관군의 깃발이 골짜기에 처박혔다. 강호는 그날부터 나를 녹림왕이라 불렀다. (명성 +25, 무력 +24, 깨달음 +1)", "text-yellow-300 font-bold"); addStory("관군 삼천을 물리치고 녹림왕이 되었다."); return; }
+          char.flags.greenwoodFallen = true;
+          if (await arcLoss("관군의 화살비 속에 쓰러졌다", "칠십이채의 깃발이 하나둘 쓰러지는 것을 보며 눈을 감았다…", 0.15, rec)) return;
+          addStory("관군에게 패해 칠십이채가 흩어졌다.");
+        }
+      },
+
+      // ---------------- 마교: 천마의 후계 ----------------
+      demonic: async (o, rec) => {
+        if (o.stage === 1) {
+          if (char.age < 30) return;
+          await storyHeader("교주의 눈");
+          await say("교주가 나를 직접 불렀다. 핏빛 장막 너머에서 목소리가 내려왔다. \"정파 장로 하나가 신교의 밀정을 붙잡았다. 장로의 목과 밀정의 입, 둘 다 가져오너라.\"", "text-stone-200", 320);
+          const i = await arcChoose([
+            { label: "명을 받들어 장로와 밀정을 함께 처리한다", hint: "마성 +5 · 교주의 신임", p: "demonic" },
+            { label: "장로만 처리하고 밀정은 살려 보낸다", hint: "협의 +3 · 신임은 조금만", p: "neutral" },
+            { label: "명을 거두어 달라고 청한다", hint: "협의 +4 · 교주의 눈 밖에 난다", p: "orthodox" }
+          ]);
+          if (i === 0) { addAlign(0, 2, 5); char.flags.cultTrust = (char.flags.cultTrust || 0) + 2; await rec.out("두 개의 목을 바쳤다. 장막 너머에서 낮은 웃음소리가 들렸다.", "text-rose-300"); }
+          else if (i === 1) { addAlign(3, 0, 0); char.flags.cultTrust = (char.flags.cultTrust || 0) + 1; await rec.out("밀정은 살아서 돌아갔다. 교주는 아무 말도 하지 않았다.", "text-stone-300"); }
+          else { addAlign(4, 0, -2); char.flags.cultTrust = (char.flags.cultTrust || 0) - 1; await rec.out("장막 너머가 오래 조용했다. 그날 이후 나를 보는 장로들의 눈빛이 달라졌다.", "text-stone-400"); }
+          o.stage = 2; o.next = Math.max(char.age + ri(5, 9), 41);
+          return;
+        }
+        if (o.stage === 2) {
+          await storyHeader("장로 서열전");
+          await runEvent("d_elder");
+          if (char.dead) return;
+          if (char.flags.cultElder) { addHonor("신교 장로"); o.stage = 3; o.next = Math.max(char.age + ri(4, 8), 50); } else o.stage = 9;
+          return;
+        }
+        if (o.stage === 3) {
+          o.stage = 9;
+          await storyHeader("천마의 후계");
+          await say("늙은 교주가 후계자를 정하겠다고 했다. 남은 것은 나와 혈영당의 늙은 여우, 둘뿐이다. 신교의 법은 하나다. 살아남는 자가 천마다.", "text-stone-200", 320);
+          const peer = bondsOf("cult_peer").find(b => b.done);
+          if (peer) await say(`장로 ${peer.name}${josa(peer.name, "이", "가")} 조용히 내 쪽에 섰다. 혈지의 배수구를 기억하는 사람이었다.`, "text-sky-300 italic", 260);
+          const trust = char.flags.cultTrust || 0;
+          if (trust >= 3) await say("교주의 눈빛이 나에게 머물렀다. 오랫동안 쌓아 온 신임이었다.", "text-rose-200 italic", 240);
+          const help = 1 + (peer ? 0.1 : 0) + Math.max(-0.1, Math.min(0.15, trust * 0.04));
+          const won = await storyFight(char.name, Math.round(getCombatPower() * help), "혈영당주", Math.round(getBenchmarkPower() * 1.4));
+          if (won) {
+            char.flags.cultMaster = true; gainFame(30); gainStats(10, 8, 8); char.insights = (char.insights || 0) + 1;
+            addHonor("천마(天魔)");
+            await rec.out("혈영당주가 쓰러지자 신교의 모든 무릎이 꺾였다. 천마의 자리에 올랐다. (명성 +30, 무력 +26, 깨달음 +1)", "text-yellow-300 font-bold");
+            addStory("후계 다툼에서 이겨 천마신교의 교주가 되었다.");
+            return;
+          }
+          if (await arcLoss("천마의 후계 다툼에서 혈영당주에게 쓰러졌다", "핏빛 장막이 마지막으로 보였다…", 0.25, rec)) return;
+          addStory("천마의 후계 다툼에서 패했다.");
+        }
+      },
+
+      // ---------------- 세가: 가주의 자리 ----------------
+      clan: async (o, rec) => {
+        if (o.stage === 1) {
+          if (char.age < 34) return;
+          await storyHeader("가문의 위기");
+          await say(`이웃 세가가 ${char.homeName}의 비단 상권을 통째로 집어삼키려 하고 있다. 장사꾼들이 하나둘 등을 돌렸다.`, "text-stone-200", 300);
+          if (char.flags.inLaws) await say("혼인으로 맺어진 처가에서 사람이 왔다. \"사돈 집안의 일이니 가만있을 수 없지요.\"", "text-sky-300 italic", 240);
+          if (char.flags.cousinAlly) await say("예전에 허물을 덮어 주었던 사촌이 상인들을 설득하러 나섰다.", "text-sky-300 italic", 240);
+          const i = await arcChoose([
+            { label: "이웃 세가의 가주에게 비무를 청한다", hint: "이기면 상권을 지킨다", p: "demonic" },
+            { label: "가문의 재물을 풀어 상인들을 붙잡는다", hint: `은자 -${scaled(100)} · 상권을 지킨다`, p: "neutral" },
+            { label: "상권 일부를 내주고 화친한다", hint: "협의 +3 · 가문 안의 평판 하락", p: "orthodox" }
+          ]);
+          if (i === 0) {
+            const help = 1 + (char.flags.inLaws ? 0.1 : 0) + (char.flags.cousinAlly ? 0.05 : 0);
+            if (await storyFight(char.name, Math.round(getCombatPower() * help), "이웃 세가의 가주", Math.round(getBenchmarkPower() * 1.15))) { char.flags.clanSaved = true; gainFame(10); await rec.out("상권을 지켜 냈다. 장로들이 처음으로 내 이름을 다음 가주로 입에 올렸다. (명성 +10)", "text-yellow-300"); addStory("이웃 세가와의 비무로 가문의 상권을 지켜 냈다."); }
+            else { char.injury = { ...INJURIES[1] }; await rec.out(`패했다. 상권의 절반을 잃었다. (${INJURIES[1].name})`, "text-rose-300"); }
+          } else if (i === 1) {
+            if (char.money >= scaled(100)) { char.money -= scaled(100); char.flags.clanSaved = true; await rec.out(`가문의 금고를 열었다. 상인들이 돌아왔다. (은자 -${scaled(100)})`, "text-amber-200"); }
+            else await rec.out("풀 재물이 부족했다. 상인들은 끝내 떠났다.", "text-stone-400");
+          } else { addAlign(3, 0, 0); await rec.out("피는 흘리지 않았지만, 장로들은 혀를 찼다.", "text-stone-400"); }
+          o.stage = 2; o.next = Math.max(char.age + ri(3, 7), 42);
+          return;
+        }
+        if (o.stage === 2) {
+          await storyHeader("가주의 자리");
+          const allies = ["inLaws", "cousinAlly", "clanSaved"].filter(k => char.flags[k]).length + (bondsOf("branch_child").some(b => b.done) ? 1 : 0);
+          const names = [char.flags.inLaws && "처가", char.flags.cousinAlly && "사촌", char.flags.clanSaved && "지켜 낸 상인들", bondsOf("branch_child").some(b => b.done) && "방계의 아이"].filter(Boolean);
+          if (names.length) await say(`가문 안에서 ${names.join(", ")}${josa(names[names.length - 1], "이", "가")} 내 편에 섰다.`, "text-sky-300 italic", 240);
+          char.flags.clanAllies = allies;
+          await runEvent("c_succession");
+          o.stage = 9;
+          if (char.flags.clanHead) addHonor(`${char.homeName} 가주`);
+        }
+      },
+
+      // ---------------- 낭인: 강호표국 ----------------
+      ronin: async (o, rec) => {
+        if (o.stage === 1) {
+          if (char.age < 41 || sect()) { if (sect()) o.stage = 9; return; }
+          await storyHeader("표국을 세우다");
+          await runEvent("r_agency");
+          if (char.flags.agency) { o.stage = 2; o.next = char.age + ri(2, 4); o.rep = 0; o.jobs = 0; }
+          else { o.next = char.age + 4; o.tries = (o.tries || 0) + 1; if (o.tries >= 3) o.stage = 9; }
+          return;
+        }
+        if (o.stage === 2) {
+          await storyHeader("큰 표물");
+          const job = pick([
+            { t: "황실에 바칠 공물을 북경까지 나르는 일이다. 길목마다 녹림이 노린다.", foe: "녹림의 습격대", r: 1.1, win: () => { gainFame(10); char.money += scaled(80); return `공물이 무사히 도착했다. 황실의 현판이 표국에 걸렸다. (명성 +10, 은자 +${scaled(80)})`; } },
+            { t: "흑도 거물의 검은 돈을 몰래 옮겨 달라는 의뢰다. 값은 세 배다.", foe: "돈을 노린 흑도 무리", r: 1.05, dark: true, win: () => { char.money += scaled(160); addAlign(0, 4, 0); return `검은 돈이 무사히 옮겨졌다. 장부에는 적지 않았다. (은자 +${scaled(160)}, 악명 +4)`; } },
+            { t: "홍수로 집을 잃은 피난민 수백을 남쪽으로 호송하는 일이다. 품삯은 거의 없다.", foe: "피난길을 노리는 도적 떼", r: 1.0, win: () => { addAlign(6, 0, 0); gainFame(8); return "피난민 모두가 살아서 강을 건넜다. (협의 +6, 명성 +8)"; } }
+          ]);
+          await say(job.t, "text-stone-200", 300);
+          const ok = await storyFight(char.name, Math.round(getCombatPower() * (char.injury ? 0.85 : 1)), job.foe, Math.round(getBenchmarkPower() * job.r));
+          if (ok) { o.rep++; await rec.out(job.win(), "text-yellow-300"); }
+          else { char.money = Math.max(0, char.money - scaled(60)); await rec.out(`표물을 지키지 못했다. 배상금을 물었다. (은자 -${scaled(60)})`, "text-rose-300"); }
+          o.jobs++;
+          if (o.jobs >= 2) { o.stage = o.rep >= 1 ? 3 : 9; o.next = Math.max(char.age + ri(3, 6), 55); }
+          else o.next = char.age + ri(3, 5);
+          return;
+        }
+        if (o.stage === 3) {
+          o.stage = 9;
+          await storyHeader("천하제일 표국");
+          await say("강북 최대의 표국 금룡표국이 우리 표국을 눈엣가시로 여겼다. 국주끼리의 비무로 강호 표물의 판도를 가리자는 도전장이 왔다.", "text-stone-200", 300);
+          const vice = bondsOf("framed_man").find(b => b.done);
+          if (vice) await say(`부국주 ${vice.name}${josa(vice.name, "이", "가")} 내 등 뒤를 지켰다. 누명을 벗겨 준 그날부터 함께해 온 사람이다.`, "text-sky-300 italic", 240);
+          const won = await storyFight(char.name, Math.round(getCombatPower() * (1 + (vice ? 0.1 : 0) + o.rep * 0.05)), "금룡표국 국주", Math.round(getBenchmarkPower() * 1.3));
+          if (won) { char.flags.topAgency = true; gainFame(20); char.money += scaled(150); addHonor("천하제일표국 국주"); await rec.out(`금룡표국의 깃발이 내려갔다. 천하의 표물이 우리 표국으로 몰려들었다. (명성 +20, 은자 +${scaled(150)})`, "text-yellow-300 font-bold"); addStory("금룡표국을 꺾고 천하제일 표국의 국주가 되었다."); }
+          else { char.injury = { ...INJURIES[1] }; await rec.out(`패했다. 표국은 남았지만 천하제일의 이름은 금룡에게 갔다. (${INJURIES[1].name})`, "text-rose-300"); }
+        }
+      }
+    };
+
+    // ---------------- 정마대전: 자리에 오른 사람은 판을 움직인다 ----------------
+    const WAR_LEAD = {
+      demonic: {
+        open: "늙은 장로들이 무릎을 꿇었다. \"천마시여, 정파 놈들이 십만대산 어귀까지 밀고 들어왔습니다. 이제 피로 갚을 때입니다.\" 전쟁을 열지는 오직 내 한마디에 달렸다.",
+        opts: [
+          { label: "전쟁을 연다. 천하를 삼킨다", hint: "마성 +6 · 내가 전쟁의 주인 · 마지막 상대는 무림맹주", p: "demonic", key: "war", side: "cult" },
+          { label: "전쟁은 없다. 신교를 지킨다", hint: "협의 +4 · 강경파 장로의 반란", p: "neutral", key: "peace", side: "neutral" },
+          { label: "정파와 손을 잡는다", hint: "협의 +8 · 교 안에서 배교자로 몰린다", p: "orthodox", key: "ally", side: "alliance" }
+        ],
+        s2: {
+          war: { s: "선전포고와 함께 신교의 군세가 정파 문파 셋을 단숨에 무너뜨렸다. 마지막 문파의 장문인이 홀로 산문을 막아섰다.", foe: "청성파 장문인", r: 1.2 },
+          peace: { s: "강경파 장로 독고혈이 반란을 일으켰다. \"겁쟁이 천마는 필요 없다!\" 반란군이 천마전을 에워쌌다.", foe: "반란 장로 독고혈", r: 1.25 },
+          ally: { s: "정파와의 밀약이 새어 나갔다. 신교의 장로들이 나를 배교자로 몰아 천마전으로 쳐들어왔다.", foe: "혈위대장", r: 1.2 }
+        },
+        s3: {
+          war: { s: "혈하평원. 내가 일으킨 전쟁의 마지막 싸움이다. 맞은편에 무림맹주 남궁진이 검을 뽑았다.", foe: "무림맹주 남궁진", r: 1.6, win: "천하를 삼킨 천마", winText: "무림맹주가 쓰러지자 정파의 깃발이 모두 꺾였다. 강호는 붉은 깃발 아래 놓였다.", result: "cult" },
+          peace: { s: "반란군의 잔당이 정파와 손잡고 마지막 공세를 펼쳤다. 그 선두에 독고혈의 스승, 혈마노조가 서 있었다.", foe: "혈마노조", r: 1.5, win: "신교를 지킨 천마", winText: "반란이 끝났다. 신교와 정파는 백 년의 휴전을 맺었다.", result: "alliance" },
+          ally: { s: "정파 연합과 함께 신교의 강경파 본진으로 쳐들어갔다. 그들의 우두머리는 늙은 교주 시절의 대호법이었다.", foe: "대호법 혈뇌", r: 1.5, win: "정사(正邪)를 하나로 묶은 천마", winText: "강경파가 무너지고, 신교는 처음으로 정파와 같은 탁자에 앉았다.", result: "alliance" }
+        }
+      },
+      orthodox: {
+        open: "무림맹이 나를 정마대전 토벌대의 총지휘로 추대했다. 천하 정파의 칼끝이 내 한마디를 기다린다.",
+        opts: [
+          { label: "십만대산까지 총공세를 펼친다", hint: "가장 위험하고 가장 큰 공 · 마지막 상대는 혈천마제", p: "orthodox", key: "war", side: "alliance" },
+          { label: "무리하지 않고 정파의 땅을 지킨다", hint: "피해가 적다 · 전쟁이 길어진다", p: "neutral", key: "peace", side: "alliance" },
+          { label: "혈천마제와 휴전 회담을 연다", hint: "협의 +4 · 맹 안의 비난", p: "unorthodox", key: "ally", side: "neutral" }
+        ],
+        s2: {
+          war: { s: "토벌대가 십만대산의 첫 관문을 들이쳤다. 관문을 지키는 것은 마교 사대호법 중 하나다.", foe: "마교 사대호법", r: 1.25 },
+          peace: { s: "마교의 별동대가 맹의 보급로를 끊으려 했다. 방어선 한복판에서 별동대장과 마주쳤다.", foe: "마교 별동대장", r: 1.15 },
+          ally: { s: "회담장에 자객이 숨어 있었다. 휴전을 원하지 않는 자가 양쪽 모두에 있었다.", foe: "회담장의 자객", r: 1.15 }
+        },
+        s3: {
+          war: { s: "십만대산 천마전. 혈천마제가 옥좌에서 천천히 일어났다.", foe: "혈천마제", r: 1.6, win: "마교를 멸한 맹주", winText: "천마전이 무너졌다. 마교는 이제 전설 속에만 남았다.", result: "alliance" },
+          peace: { s: "삼 년을 버틴 방어선 앞에 혈천마제가 직접 나타났다.", foe: "혈천마제", r: 1.5, win: "강호의 방패", winText: "혈천마제가 물러나며 전쟁이 끝났다. 정파의 땅은 한 뼘도 빼앗기지 않았다.", result: "alliance" },
+          ally: { s: "회담 마지막 날, 혈천마제가 조건을 걸었다. \"천하의 고수인 그대와 겨뤄, 그대가 이기면 군대를 물리겠다.\"", foe: "혈천마제", r: 1.45, win: "피 없이 전쟁을 끝낸 맹주", winText: "혈천마제는 약속대로 군대를 물렸다. 칼 대신 말로 끝난 전쟁이었다.", result: "alliance" }
+        }
+      },
+      unorthodox: {
+        open: "정파와 마교가 동시에 녹림 칠십이채에 사자를 보냈다. 녹림이 어느 쪽에 서느냐에 따라 전쟁의 판도가 바뀐다.",
+        opts: [
+          { label: "무림맹 편에 선다. 조건은 녹림의 사면", hint: "협의 +4 · 이기면 녹림 사면", p: "orthodox", key: "war", side: "alliance" },
+          { label: "마교 편에 선다. 강호의 절반을 나눈다", hint: "악명 +6 · 이기면 강호의 절반", p: "demonic", key: "peace", side: "cult" },
+          { label: "양쪽이 지칠 때까지 기다렸다가 친다", hint: "가장 큰 도박 · 실패하면 양쪽의 적", p: "unorthodox", key: "ally", side: "third" }
+        ],
+        s2: {
+          war: { s: "녹림의 칼잡이들이 마교의 보급 부대를 산길에서 덮쳤다.", foe: "마교 보급대장", r: 1.15 },
+          peace: { s: "녹림이 정파 문파의 뒤를 쳤다. 문파의 노장로가 홀로 길을 막았다.", foe: "정파 노장로", r: 1.15 },
+          ally: { s: "양쪽의 첩자가 녹림을 끌어들이려 산채에 숨어들었다. 둘 다 처리해야 판이 유지된다.", foe: "양쪽의 첩자들", r: 1.2 }
+        },
+        s3: {
+          war: { s: "혈하평원. 녹림의 깃발이 정파의 왼쪽 날개에 섰다. 맞은편에 마교 호법이 칼을 뽑았다.", foe: "마교 사대호법", r: 1.4, win: "사면받은 녹림왕", winText: "전쟁이 끝나고 조정이 녹림 칠십이채를 사면했다. 형제들이 처음으로 떳떳하게 장터를 걸었다.", result: "alliance" },
+          peace: { s: "혈하평원. 녹림의 깃발이 마교와 나란히 섰다. 맞은편에 정파의 검성이 섰다.", foe: "화산파 검성", r: 1.4, win: "강호의 절반을 가진 녹림왕", winText: "강호의 절반이 녹림과 마교의 것이 되었다.", result: "cult" },
+          ally: { s: "양쪽 모두 지쳐 쓰러지기 직전, 녹림 칠십이채가 산에서 쏟아져 내려왔다. 남은 것은 양쪽 진영의 마지막 고수들뿐이다.", foe: "양 진영의 마지막 고수들", r: 1.6, win: "어부지리의 녹림왕", winText: "정파도 마교도 녹림 앞에 무릎을 꿇었다. 강호의 주인이 바뀌었다.", result: "third" }
+        }
+      },
+      clan: {
+        open: "오대세가가 나를 연합의 수장으로 세웠다. 세가의 재물과 가병이 어느 쪽으로 가느냐가 전쟁을 가른다.",
+        opts: [
+          { label: "맹에 군자금과 가병을 댄다", hint: "협의 +4 · 이기면 세가의 위상 ↑", p: "orthodox", key: "war", side: "alliance" },
+          { label: "전쟁 물자를 팔아 가문을 키운다", hint: "은자 ↑↑ · 전쟁 뒤 맹의 눈총", p: "unorthodox", key: "peace", side: "neutral" },
+          { label: "세가 연합으로 제3세력을 세운다", hint: "가장 위험한 길 · 성공하면 천하삼분", p: "demonic", key: "ally", side: "third" }
+        ],
+        s2: {
+          war: { s: "세가의 가병이 맹과 함께 마교의 전진 기지를 들이쳤다.", foe: "마교 전진기지 주장", r: 1.15 },
+          peace: { s: "물자를 실은 세가의 수레를 양쪽 모두가 노렸다. 마교의 약탈대가 먼저 왔다.", foe: "마교 약탈대장", r: 1.1 },
+          ally: { s: "세가 연합의 독자 노선에 맹이 분노했다. 맹의 집법당주가 세가 회의장에 쳐들어왔다.", foe: "무림맹 집법당주", r: 1.25 }
+        },
+        s3: {
+          war: { s: "혈하평원. 오대세가의 깃발이 맹의 오른쪽 날개를 맡았다. 맞은편에 마교 호법이 섰다.", foe: "마교 사대호법", r: 1.4, win: "세가를 맹의 기둥으로 세운 가주", winText: "전쟁이 끝나고, 무림맹의 장로석 절반을 세가가 차지했다.", result: "alliance" },
+          peace: { s: "전쟁이 끝날 무렵, 물자로 부를 쌓은 세가를 노리고 패잔병들이 몰려왔다.", foe: "마교 패잔병 두목", r: 1.2, win: "천하의 금고를 쥔 가주", winText: "전쟁이 끝났을 때, 강호의 돈은 모두 세가의 금고로 흘러들어 와 있었다.", result: "alliance" },
+          ally: { s: "정마 양쪽이 동시에 세가 연합을 쳤다. 연합의 운명을 건 마지막 싸움이다.", foe: "정마 연합 토벌대장", r: 1.55, win: "천하를 셋으로 나눈 가주", winText: "정파, 마교, 그리고 세가. 강호는 셋으로 나뉘었다.", result: "third" }
+        }
+      },
+      ronin: {
+        open: "전쟁 물자를 누가 나르느냐가 승패를 가른다. 정파와 마교 모두 천하제일 표국의 문을 두드렸다.",
+        opts: [
+          { label: "맹의 보급을 맡는다", hint: "협의 +3 · 혈천마제의 자객이 노린다", p: "orthodox", key: "war", side: "alliance" },
+          { label: "마교의 보급을 맡는다", hint: "은자 ↑↑ · 정파의 적", p: "unorthodox", key: "peace", side: "cult" },
+          { label: "피난민 호송에 표국을 다 쓴다", hint: "은자 ↓ · 협의 ↑↑", p: "neutral", key: "ally", side: "neutral" }
+        ],
+        s2: {
+          war: { s: "맹의 군량을 싣고 가던 밤, 혈천마제가 보낸 자객이 표국 행렬을 덮쳤다.", foe: "혈천마제의 자객", r: 1.2 },
+          peace: { s: "마교의 군량을 나르던 길, 정파의 협객들이 표국을 막아섰다.", foe: "정파 협객단", r: 1.15 },
+          ally: { s: "피난민 행렬 뒤로 패잔병 무리가 따라붙었다.", foe: "패잔병 두목", r: 1.05 }
+        },
+        s3: {
+          war: { s: "결전을 앞두고 끊긴 맹의 마지막 보급로. 그 길목을 마교의 호법이 지키고 있었다.", foe: "마교 사대호법", r: 1.35, win: "정마대전을 이긴 표국주", winText: "마지막 군량이 제때 도착했다. 맹주는 승전 연회에서 표국주의 이름을 가장 먼저 불렀다.", result: "alliance" },
+          peace: { s: "마교의 마지막 군량을 지키는 싸움. 정파의 검성이 직접 나섰다.", foe: "화산파 검성", r: 1.35, win: "마교의 돈줄을 쥔 국주", winText: "마교가 이겼다. 강호의 모든 물길이 내 표국을 지나게 되었다.", result: "cult" },
+          ally: { s: "피난민 수천이 강을 건너는 마지막 날, 도적이 된 탈영병들이 나루터를 막았다.", foe: "탈영병 무리의 두목", r: 1.15, win: "만인의 은인", winText: "피난민 모두가 강을 건넜다. 그들은 자식들에게 표국의 깃발을 가르쳤다.", result: null }
+        }
+      }
+    };
+
+    async function arcCultLead(st, rec) {
+      const L = WAR_LEAD[st.lead];
+      if (st.stage === 1) {
+        if (st.lead !== "demonic") {
+          await say("서역 하늘에 붉은 별이 떨어진 밤, 천마신교에 새 교주가 섰다. 스스로를 혈천마제(血天魔帝)라 부르는 자다.", "text-stone-200", 350);
+          await say("한 달 사이 정파 문파 셋이 불탔다. 강호에 정마대전의 기운이 감돈다.", "text-rose-300", 300);
+        }
+        await say(L.open, "text-amber-100", 320);
+        const i = await arcChoose(L.opts);
+        const o = L.opts[i];
+        st.key = o.key; st.side = o.side;
+        const fx = { orthodox: () => addAlign(4, 0, 0), unorthodox: () => addAlign(0, 5, 0), demonic: () => addAlign(0, 0, 6), neutral: () => {} }[o.p];
+        fx();
+        if (st.lead === "demonic" && o.key === "ally") addAlign(4, 0, 0);
+        if (st.lead === "clan" && o.key === "peace") char.money += scaled(250);
+        if (st.lead === "ronin" && o.key === "peace") char.money += scaled(200);
+        if (st.lead === "ronin" && o.key === "ally") { char.money = Math.max(0, char.money - scaled(100)); addAlign(8, 0, 0); }
+        await rec.out(`${o.label}.`, "text-amber-200");
+        addStory(`정마대전의 갈림길에서 택했다. '${o.label}'`);
+        st.stage = 2; st.next = char.age + ri(1, 2);
+        return;
+      }
+      if (st.stage === 2) {
+        const M = L.s2[st.key];
+        await say(M.s, "text-stone-200", 300);
+        const won = await storyFight(char.name, Math.round(getCombatPower() * (char.injury ? 0.85 : 1)), M.foe, Math.round(getBenchmarkPower() * M.r));
+        if (won) { gainStats(8, 8, 8); gainFame(12); st.merit = 1; await rec.out(`★ ${M.foe}${josa(M.foe, "을", "를")} 꺾었다. (무력 +24, 명성 +12)`, "text-yellow-300 font-bold"); }
+        else if (await arcLoss(`정마대전에서 ${M.foe}에게 쓰러졌다`, "함성이 점점 멀어진다…", 0.1, rec)) return;
+        st.stage = 3; st.next = char.age + ri(1, 2);
+        return;
+      }
+      if (st.stage === 3) {
+        st.stage = 9;
+        const F = L.s3[st.key];
+        await storyPause(100);
+        await say(F.s, "text-rose-200", 330);
+        const won = await storyFight(char.name, Math.round(getCombatPower() * (char.injury ? 0.85 : 1) * (st.merit ? 1.08 : 1)), F.foe, Math.round(getBenchmarkPower() * F.r));
+        if (won) {
+          gainStats(26, 20, 20); gainFame(55); char.insights = (char.insights || 0) + 1; char.money += scaled(150);
+          addHonor(F.win);
+          await rec.out(`★★ ${F.foe}${josa(F.foe, "을", "를")} 쓰러뜨렸다! (무력 +66, 명성 +55, 깨달음 +1)`, "text-cyan-300 font-bold");
+          await say(F.winText, "text-sky-300", 300);
+          addStory(`정마대전을 이끌어 '${F.win}'${josa(F.win, "이", "가")} 되었다.`);
+          if (F.result) char.flags.war = F.result;
+          return;
+        }
+        char.flags.war = F.result === "cult" ? "alliance" : F.result === "alliance" ? "cult" : "alliance";
+        if (await arcLoss(`정마대전의 결전에서 ${F.foe}에게 쓰러졌다`, "내가 이끈 깃발이 쓰러지는 것을 보며 눈을 감았다…", 0.3, rec)) return;
+        addStory("정마대전의 결전에서 패했다.");
+      }
+    }
 
     // ---- 나이대별 새 사건 ----
     RANDOM_EVENTS.push(
