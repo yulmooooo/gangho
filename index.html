@@ -981,7 +981,7 @@
             </div>
           </div>
         </div>
-        <p class="text-[11px] leading-tight font-bold" style="color:#8e2418">2% 확률로 전설 비급 '천마신공' 원본이 나온다</p>
+        <p class="text-[11px] leading-tight font-bold" style="color:#8e2418">2% 확률로 전설 비급이 나온다 (천마신공 등 6종, 종류마다 한 생에 한 번)</p>
         <button id="btn-gacha-buy" onclick="buyGachaBox()" class="w-full py-2.5 font-brush text-sm rounded-xl shadow cursor-pointer transition">
           궤짝 열기 · 80냥
         </button>
@@ -2891,6 +2891,22 @@
     }
 
     // === 암시장 궤짝 개봉 ===
+    // 궤짝 초대박(2%)에서 나오는 전설 비급: 한 생에 종류마다 한 번씩
+    const MYTHIC_ITEMS = [
+      { id: "cheonma", name: "천마신공", title: "천마신공(天魔神功)", icon: "천마신공", qi: 60, ext: 35, agi: 30, fame: 50,
+        desc: "피와 번개의 기운이 서린 신화 속의 비급 원본입니다! 깨우치는 순간 전신의 혈맥이 폭발적으로 확장되었습니다." },
+      { id: "taegeuk", name: "태극혜검", title: "태극혜검(太極慧劍)", icon: "자하신공", qi: 50, ext: 30, agi: 45, fame: 50,
+        desc: "무당의 개파조사가 남긴 검결입니다. 원을 그리는 검로를 따라가다 보니, 힘을 빼는 법을 처음으로 알았습니다." },
+      { id: "guyang", name: "구양진경", title: "구양진경(九陽眞經)", icon: "구음진경", qi: 85, ext: 25, agi: 15, fame: 50,
+        desc: "경전 사이에 숨겨져 있던 지고한 양강의 심법입니다. 단전에 뜨거운 해가 떠오른 듯 내력이 끓어올랐습니다." },
+      { id: "igieo", name: "이기어검", title: "이기어검(以氣馭劍) 비결", icon: "청홍검", qi: 25, ext: 60, agi: 40, fame: 50,
+        desc: "기(氣)로 검을 부린다는 전설의 경지에 이르는 비결입니다. 손을 떠난 검이 허공에서 한 번 울었습니다." },
+      { id: "neungpa", name: "능파미보", title: "능파미보(凌波微步)", icon: "백년하수오", qi: 35, ext: 20, agi: 70, fame: 50,
+        desc: "물결 위를 걷는다는 신비의 보법입니다. 한 걸음 내딛자 바람보다 먼저 몸이 앞서 있었습니다." },
+      { id: "hwari", name: "만년화리 내단", title: "만년화리 내단(萬年火鯉內丹)", icon: "연단환", qi: 100, ext: 10, agi: 10, fame: 40, life: 2,
+        desc: "만 년을 산 화리(火鯉)의 내단입니다. 삼키는 순간 단전이 불타오르고, 수명마저 늘어났습니다." }
+    ];
+
     function buyGachaBox() {
       const COST = 80;
       if (char.money < COST) {
@@ -2945,7 +2961,7 @@
             { label: "신법", val: "+6", color: "text-cyan-400" }
           ]
         };
-      } else if (roll < 98) {
+      } else if (roll < 98 || !(char.flags.mythics = char.flags.mythics || []) || MYTHIC_ITEMS.every(m => char.flags.mythics.includes(m.id))) {
         char.ext += 25;
         char.qi += 15;
         char.fame += 20;
@@ -2965,29 +2981,24 @@
           ]
         };
       } else {
-        char.qi += 60;
-        char.ext += 35;
-        char.agi += 30;
-        char.fame += 50;
-        yearGains.qi += 60;
-        yearGains.ext += 35;
-        yearGains.agi += 30;
-        yearGains.fame += 50;
+        // 전설 비급은 한 생에 종류마다 한 번씩만
+        const pool = MYTHIC_ITEMS.filter(m => !char.flags.mythics.includes(m.id));
+        const m = pool[Math.floor(Math.random() * pool.length)];
+        char.flags.mythics.push(m.id);
+        char.qi += m.qi; char.ext += m.ext; char.agi += m.agi; char.fame += m.fame;
+        yearGains.qi += m.qi; yearGains.ext += m.ext; yearGains.agi += m.agi; yearGains.fame += m.fame;
+        if (m.life) char.lifeBonus = Math.min(7, (char.lifeBonus || 0) + m.life);
         gachaCard.classList.add("flash-gold");
         setTimeout(() => gachaCard.classList.remove("flash-gold"), 1200);
-        addLog(char.age, `★★★ [초대박] 전설 비급 '천마신공' 원본 획득! 천하가 경악합니다!`, "text-amber-400 font-brush text-sm");
-        gachaResult = {
-          tier: "MYTHIC",
-          title: "전설 비급 '천마신공(天魔神功)'",
-          desc: "피와 번개의 기운이 서린 신화 속의 비급 원본입니다! 깨우치는 순간 전신의 혈맥이 폭발적으로 확장되었습니다.",
-          iconKey: "천마신공",
-          details: [
-            { label: "내공", val: "+60년", color: "text-amber-300" },
-            { label: "외공", val: "+35", color: "text-red-400" },
-            { label: "신법", val: "+30", color: "text-cyan-400" },
-            { label: "명성", val: "+50", color: "text-emerald-400" }
-          ]
-        };
+        addLog(char.age, `★★★ [초대박] 전설의 '${m.name}' 획득! 천하가 경악합니다!`, "text-amber-400 font-brush text-sm");
+        addStory(`암시장의 궤짝에서 전설의 '${m.name}'${josa(m.name, "을", "를")} 얻었다.`);
+        const det = [];
+        if (m.qi) det.push({ label: "내공", val: `+${m.qi}년`, color: "text-amber-300" });
+        if (m.ext) det.push({ label: "외공", val: `+${m.ext}`, color: "text-red-400" });
+        if (m.agi) det.push({ label: "신법", val: `+${m.agi}`, color: "text-cyan-400" });
+        if (m.fame) det.push({ label: "명성", val: `+${m.fame}`, color: "text-emerald-400" });
+        if (m.life) det.push({ label: "수명", val: `+${m.life}`, color: "text-emerald-300" });
+        gachaResult = { tier: "MYTHIC", title: `전설의 '${m.title}'`, desc: m.desc, iconKey: m.icon, details: det };
       }
 
       checkRankUp();
