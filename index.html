@@ -112,6 +112,119 @@
     .immortal-card {
       animation: immortalAura 2.5s infinite;
     }
+      /* =========================================================
+       수묵 테마 (한지·먹) — Tailwind 색 클래스를 먹색 계열로 다시 입힘
+       ========================================================= */
+    :root {
+      --ink: #16120e; --ink2: #2b251f; --ink3: #3a332c; --sub: #5f5446; --sub2: #7a6d5c; --faint: #9a8d7a;
+      --paper: #efe9de; --paper2: #f6f1e7; --paper3: #e6dfd1; --paper4: #ddd4c3;
+      --seal: #b3261a; --red: #8e2418; --gold: #8a5a14; --gold2: #5c4318;
+      --line: rgba(22,18,14,.28); --line2: rgba(22,18,14,.5);
+    }
+    body {
+      font-family: 'Noto Serif KR', 'Pretendard', serif !important;
+      background-color: var(--paper3) !important;
+      background-image:
+        linear-gradient(180deg, rgba(230,223,209,0) 0, var(--paper3) 260px),
+        url("assets/card-mtn.jpg"),
+        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='4'/><feColorMatrix values='0 0 0 0 .4 0 0 0 0 .34 0 0 0 0 .25 0 0 0 .14 0'/></filter><rect width='220' height='220' filter='url(%23n)'/></svg>") !important;
+      background-repeat: no-repeat, no-repeat, repeat !important;
+      background-size: 100% 100%, 100% 260px, 220px 220px !important;
+      background-position: top, top, 0 0 !important;
+      background-attachment: scroll !important;
+      color: var(--ink) !important;
+    }
+    .font-brush { font-family: 'Noto Serif KR', serif !important; font-weight: 900 !important; letter-spacing: .02em; }
+    .hanji-card {
+      background: var(--paper2) !important;
+      border: 1.5px solid var(--line2) !important;
+      box-shadow: inset 0 0 0 4px var(--paper2), inset 0 0 0 5px rgba(22,18,14,.12), 0 6px 18px rgba(60,40,20,.10) !important;
+    }
+    .gold-border { border-color: var(--line2) !important; }
+    ::-webkit-scrollbar-thumb { background: #b9ad99 !important; }
+
+    /* 배경 */
+    .bg-black\/95, .bg-black\/90 { background-color: rgba(38,30,22,.55) !important; backdrop-filter: blur(2px); }
+    .bg-stone-950, .bg-stone-950\/90, .bg-stone-950\/80, .bg-stone-950\/70, .bg-stone-950\/60, .bg-stone-950\/40 { background-color: rgba(239,233,222,.85) !important; }
+    .bg-stone-900, .bg-stone-900\/90, .bg-stone-900\/80, .bg-stone-900\/60 { background-color: #fbf8f1 !important; }
+    .bg-stone-800 { background-color: var(--paper3) !important; }
+    .bg-stone-700 { background-color: var(--paper4) !important; }
+    .hover\:bg-stone-800:hover, .hover\:bg-stone-700:hover { background-color: var(--paper4) !important; }
+    .bg-rose-950, .bg-rose-950\/60, .bg-rose-950\/40, .bg-red-950 { background-color: #f1dcd5 !important; }
+    .bg-sky-950, .bg-blue-950\/60, .bg-blue-950\/40 { background-color: #dde6ec !important; }
+    .bg-cyan-950, .bg-cyan-900\/60 { background-color: #d9e8eb !important; }
+    .bg-purple-950, .bg-purple-950\/60, .bg-purple-950\/40 { background-color: #e6dcea !important; }
+    .bg-emerald-950, .bg-emerald-950\/60, .bg-emerald-950\/40 { background-color: #dde8d9 !important; }
+    .bg-amber-950\/80, .bg-amber-950\/60, .bg-amber-950\/40, .bg-amber-950\/30, .bg-amber-950\/20, .bg-yellow-950, .bg-yellow-950\/30, .bg-amber-500\/20 { background-color: #f1e6cc !important; }
+    .bg-stone-100, .bg-white { background-color: var(--paper2) !important; }
+
+    /* 버튼 (밝은 색 바탕 → 먹 바탕) */
+    .bg-gradient-to-r.from-amber-600, .bg-gradient-to-r.from-amber-500, .bg-gradient-to-r.from-yellow-500,
+    .bg-amber-600, .bg-amber-500, .bg-amber-700, .bg-amber-900, .bg-amber-500\/90 {
+      background-image: none !important; background-color: var(--ink) !important; color: #f3e6c8 !important;
+      box-shadow: 0 3px 0 var(--seal) !important;
+    }
+    .bg-gradient-to-r.from-red-600, .bg-red-600, .bg-gradient-to-r.from-red-950 { background-image: none !important; background-color: var(--seal) !important; color: #f8ece0 !important; }
+    .bg-gradient-to-r.from-cyan-600, .bg-cyan-600, .bg-cyan-700 { background-image: none !important; background-color: #2f4e5f !important; color: #f3ede2 !important; }
+    .bg-gradient-to-r.from-emerald-600, .bg-emerald-600, .bg-emerald-700 { background-image: none !important; background-color: #3d5a3a !important; color: #f3ede2 !important; }
+    .bg-purple-600, .bg-gradient-to-r.from-purple-500 { background-image: none !important; background-color: #4e3566 !important; color: #f3ede2 !important; }
+    .bg-gradient-to-r.from-stone-900, .bg-gradient-to-r.from-stone-800, .bg-gradient-to-r.from-sky-950, .bg-gradient-to-r.from-amber-950 { background-image: none !important; background-color: #fbf8f1 !important; }
+    .bg-stone-300 { background-color: var(--paper4) !important; }
+    [class*="from-amber-6"] *, [class*="from-amber-5"] * { color: inherit; }
+
+    /* 글자 */
+    .text-white, .text-stone-100, .text-stone-200 { color: var(--ink) !important; }
+    .text-stone-300 { color: var(--ink3) !important; }
+    .text-stone-400 { color: var(--sub) !important; }
+    .text-stone-500 { color: var(--sub2) !important; }
+    .text-stone-600 { color: var(--faint) !important; }
+    .text-stone-900, .text-stone-950 { color: #f3e6c8 !important; }
+    .bg-stone-100 .text-stone-900, .bg-stone-100.text-stone-900, .bg-white.text-stone-900 { color: var(--ink) !important; }
+    .text-amber-100, .text-amber-200, .text-amber-200\/70 { color: var(--gold2) !important; }
+    .text-amber-300, .text-amber-300\/90, .text-amber-300\/80, .text-amber-400, .text-amber-500, .text-amber-500\/80 { color: var(--gold) !important; }
+    .text-yellow-200, .text-yellow-300, .text-yellow-400 { color: var(--red) !important; }
+    .text-rose-200, .text-rose-300, .text-rose-400, .text-rose-500, .text-red-300, .text-red-400 { color: #a3281b !important; }
+    .text-sky-300, .text-sky-400, .text-blue-300, .text-blue-400 { color: #2b5674 !important; }
+    .text-cyan-200, .text-cyan-300, .text-cyan-300\/80, .text-cyan-400 { color: #1f5d6e !important; }
+    .text-emerald-300, .text-emerald-400 { color: #2f6436 !important; }
+    .text-purple-300, .text-purple-400 { color: #5b3a78 !important; }
+    .hover\:text-amber-300:hover { color: var(--red) !important; }
+
+    /* 테두리 */
+    .border-stone-800, .border-stone-800\/80, .border-stone-800\/60, .border-stone-700\/50 { border-color: var(--line) !important; }
+    .border-stone-700, .border-stone-700\/80, .border-stone-600, .border-stone-500, .border-stone-500\/60 { border-color: var(--line2) !important; }
+    [class*="border-amber-"] { border-color: rgba(22,18,14,.62) !important; }
+    .border-amber-400, .border-yellow-400, .border-yellow-400\/80 { border-color: var(--ink) !important; }
+    [class*="border-rose-"], [class*="border-red-"] { border-color: rgba(163,40,27,.55) !important; }
+    [class*="border-sky-"], [class*="border-blue-"] { border-color: rgba(43,86,116,.5) !important; }
+    [class*="border-cyan-"] { border-color: rgba(31,93,110,.5) !important; }
+    [class*="border-purple-"] { border-color: rgba(91,58,120,.5) !important; }
+    [class*="border-emerald-"] { border-color: rgba(47,100,54,.5) !important; }
+    .ring-amber-400\/60 { --tw-ring-color: rgba(22,18,14,.6) !important; }
+
+    /* 둥근 모서리는 살짝만 (족자·화첩 느낌) */
+    .rounded-3xl { border-radius: 10px !important; }
+    .rounded-2xl { border-radius: 8px !important; }
+    .rounded-xl { border-radius: 6px !important; }
+
+    /* 빛나는 그림자 걷어내기 */
+    [class*="shadow-[0_0"] { box-shadow: none !important; }
+    .shadow-2xl, .shadow-xl { box-shadow: 0 10px 30px rgba(60,40,20,.18) !important; }
+
+    /* 능력치 막대: 붓 획 */
+    .ink-track { background: rgba(22,18,14,.08) !important; border-color: transparent !important; border-radius: 0 !important; overflow: visible !important; }
+    .ink-stroke {
+      -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 10' preserveAspectRatio='none'><path d='M0 2 Q2 0 6 1 L94 1.5 Q99 2 100 5 Q99 9 95 8.5 L5 9 Q1 9 0 6Z'/></svg>");
+      mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 10' preserveAspectRatio='none'><path d='M0 2 Q2 0 6 1 L94 1.5 Q99 2 100 5 Q99 9 95 8.5 L5 9 Q1 9 0 6Z'/></svg>");
+      -webkit-mask-size: 100% 100%; mask-size: 100% 100%;
+    }
+
+    /* 픽셀 아이콘 액자 */
+    .pixel-frame, [id^="avatar-"] svg, #char-avatar svg { image-rendering: pixelated; }
+    #char-avatar, .avatar-frame { background: #efe7d8 !important; }
+
+    /* 깜빡임 효과 색 */
+    @keyframes goldFlash { 0% { box-shadow: 0 0 0 rgba(179,38,26,0); } 50% { box-shadow: 0 0 0 4px rgba(179,38,26,.55); } 100% { box-shadow: 0 0 0 rgba(179,38,26,0); } }
   </style>
 </head>
 <body class="min-h-screen flex justify-center items-start sm:py-6 sm:px-4">
@@ -138,10 +251,10 @@
       </div>
 
       <button id="btn-quick-start" onclick="quickStart()" class="w-full py-3.5 bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 hover:brightness-110 text-stone-950 font-brush text-lg rounded-xl transition shadow-lg cursor-pointer">
-        바로 시작 · 강호에 발을 들이다
+        강호에 발을 들이다
       </button>
       <button id="btn-toggle-setup" onclick="toggleStartSetup()" class="w-full py-2 text-[11px] font-bold text-stone-400 hover:text-amber-300 cursor-pointer">
-        ⚙️ 이름·출신·기질을 직접 정하고 시작하기 ▾
+        직접 정하고 시작하기 ▾
       </button>
 
       <div id="start-setup" style="display: none;" class="space-y-3">
@@ -204,7 +317,7 @@
       </div>
 
       <button id="btn-start" onclick="startGame()" class="w-full py-3 bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 hover:brightness-110 text-stone-950 font-brush text-base rounded-xl transition shadow-lg cursor-pointer">
-        이대로 강호에 발을 들이다
+        이대로 길을 나서다
       </button>
       </div>
 
@@ -231,7 +344,7 @@
       </div>
 
       <button onclick="closeRankUpModal()" class="w-full py-3.5 bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 hover:brightness-110 text-stone-950 font-brush text-base rounded-xl transition shadow-lg cursor-pointer">
-        천하에 위명을 떨치다 (확인)
+        위명을 떨치다
       </button>
     </div>
   </div>
@@ -250,7 +363,7 @@
       </div>
 
       <button onclick="closeBreakthroughResultModal()" class="w-full py-3.5 bg-gradient-to-r from-stone-800 to-stone-700 hover:brightness-110 text-white font-brush text-base rounded-xl transition shadow-lg cursor-pointer">
-        폐관에서 걸어나오다 (확인)
+        폐관에서 나오다
       </button>
     </div>
   </div>
@@ -272,10 +385,10 @@
 
       <div class="grid grid-cols-2 gap-2 pt-1">
         <button id="btn-gacha-again" onclick="buyGachaBox()" class="py-3 bg-gradient-to-r from-amber-600 to-amber-500 hover:brightness-110 text-stone-950 font-brush text-sm rounded-xl transition cursor-pointer shadow">
-          한 번 더 개봉 (80냥)
+          한 번 더 열기 · 80냥
         </button>
         <button id="btn-gacha-close" onclick="closeGachaResultModal()" class="py-3 bg-stone-800 hover:bg-stone-700 text-stone-300 font-brush text-sm rounded-xl cursor-pointer">
-          확인 및 닫기
+          닫기
         </button>
       </div>
     </div>
@@ -323,25 +436,19 @@
       </div>
 
       <div class="space-y-1.5 pt-1">
-        <button id="btn-open-share" onclick="generateShareCard()" class="w-full py-3 bg-gradient-to-r from-emerald-600 to-teal-500 hover:brightness-110 text-white font-brush text-sm rounded-xl transition shadow-lg cursor-pointer flex items-center justify-center gap-1.5">
-          <span>📸 내 강호 열전 카드 만들기 (이미지/카톡)</span>
+        <button id="btn-open-share" onclick="generateShareCard()" class="w-full py-3 bg-amber-600 text-stone-950 font-brush text-base rounded-xl transition cursor-pointer">
+          열전 카드 만들기
         </button>
-
-        <button id="btn-copy-link" onclick="copyMyLink(this)" class="w-full py-2.5 bg-stone-100 hover:bg-white text-stone-900 font-brush text-sm rounded-xl transition shadow cursor-pointer">
-          🔗 내 열전 링크 복사 · 벗에게 보내 겨뤄 보기
+        <button id="btn-copy-link" onclick="copyMyLink(this)" class="w-full py-2.5 bg-red-600 text-white font-brush text-sm rounded-xl transition cursor-pointer">
+          열전 링크 복사하기
         </button>
-
-        <button id="btn-submit-rank" onclick="submitToLeaderboard()" class="w-full py-2.5 bg-gradient-to-r from-amber-500 to-yellow-500 hover:brightness-110 text-stone-950 font-brush text-xs rounded-xl transition shadow cursor-pointer">
-          🏆 천하 서열록(랭킹)에 내 기록 헌액하기
+        <button id="btn-submit-rank" onclick="submitToLeaderboard()" class="w-full py-2 bg-stone-900 border border-stone-700 text-stone-400 font-brush text-xs rounded-xl transition cursor-pointer">
+          천하 서열록에 이름 올리기
         </button>
-
-        <button onclick="openLeaderboardModal()" class="w-full py-2 bg-stone-900 border border-amber-600/50 hover:bg-stone-800 text-amber-300 font-brush text-xs rounded-xl cursor-pointer">
-          📜 천하 서열록 (실시간 Top 30) 열람
-        </button>
-
-        <button onclick="location.reload()" class="w-full py-2 bg-stone-800 hover:bg-stone-700 text-stone-300 font-brush text-xs rounded-xl cursor-pointer">
-          새로운 생으로 환생하다 (다시 시작) 🔄
-        </button>
+        <div class="grid grid-cols-2 gap-1.5">
+          <button onclick="openLeaderboardModal()" class="py-2 bg-stone-900 border border-stone-700 hover:bg-stone-800 text-stone-200 font-brush text-xs rounded-xl cursor-pointer">천하 서열록 보기</button>
+          <button onclick="location.href = location.pathname" class="py-2 bg-stone-900 border border-stone-700 hover:bg-stone-800 text-stone-200 font-brush text-xs rounded-xl cursor-pointer">새 생을 시작하다</button>
+        </div>
       </div>
     </div>
   </div>
@@ -364,13 +471,13 @@
 
       <div class="grid grid-cols-2 gap-2 pt-1">
         <button id="btn-native-share" onclick="handleNativeShare()" class="py-3 bg-gradient-to-r from-amber-600 to-amber-500 hover:brightness-110 text-stone-950 font-brush text-sm rounded-xl cursor-pointer shadow">
-          📲 카톡 / SNS 공유
+          공유하기
         </button>
         <button onclick="downloadShareCard()" class="py-3 bg-stone-800 hover:bg-stone-700 text-stone-200 font-brush text-sm rounded-xl cursor-pointer border border-stone-700">
-          💾 이미지 저장
+          그림 저장
         </button>
-        <button onclick="copyMyLink(this)" class="col-span-2 py-2.5 bg-stone-100 hover:bg-white text-stone-900 font-brush text-sm rounded-xl cursor-pointer">
-          🔗 내 열전 링크 복사
+        <button onclick="copyMyLink(this)" class="col-span-2 py-2.5 bg-red-600 text-white font-brush text-sm rounded-xl cursor-pointer">
+          링크 복사
         </button>
       </div>
     </div>
@@ -388,8 +495,8 @@
       </div>
 
       <div class="grid grid-cols-2 gap-1 p-1 bg-stone-950 rounded-xl border border-amber-700/50 text-center font-bold text-xs">
-        <button id="mode-person" onclick="switchRankMode('person')" class="py-1.5 rounded-lg cursor-pointer transition">🗡️ 개인 서열</button>
-        <button id="mode-sect" onclick="switchRankMode('sect')" class="py-1.5 rounded-lg cursor-pointer transition">🏯 문파 서열</button>
+        <button id="mode-person" onclick="switchRankMode('person')" class="py-1.5 rounded-lg cursor-pointer transition">개인 서열</button>
+        <button id="mode-sect" onclick="switchRankMode('sect')" class="py-1.5 rounded-lg cursor-pointer transition">문파 서열</button>
       </div>
 
       <div class="grid grid-cols-3 gap-1 p-1 bg-stone-950 rounded-xl border border-stone-800 text-center font-bold text-xs">
@@ -406,7 +513,7 @@
 
       <div class="text-[10px] text-stone-400 text-center flex justify-between px-1">
         <span id="rank-period-info">오늘 기준 무력 순위 Top 30</span>
-        <button onclick="loadLeaderboard()" class="text-amber-400 hover:underline cursor-pointer">🔄 새로고침</button>
+        <button onclick="loadLeaderboard()" class="text-amber-400 hover:underline cursor-pointer">새로고침</button>
       </div>
 
       <div id="leaderboard-list" class="flex-1 overflow-y-auto space-y-1.5 pr-1 text-xs">
@@ -433,7 +540,7 @@
         </div>
         <div class="text-right flex flex-col items-end">
           <button onclick="openLeaderboardModal()" class="px-2 py-0.5 mb-1 rounded bg-amber-950/80 border border-amber-500/50 text-[10px] font-bold text-amber-300 hover:bg-amber-900 cursor-pointer shadow">
-            🏆 강호 서열록
+            천하 서열록
           </button>
           <div>
             <span id="char-age" class="text-2xl font-brush text-stone-100">16</span>
@@ -471,7 +578,7 @@
               <span id="stat-qi" class="text-amber-300 font-extrabold">10 년</span>
             </div>
           </div>
-          <div class="w-full bg-stone-950 h-2 rounded-full overflow-hidden border border-stone-800 relative">
+          <div class="w-full bg-stone-950 h-2 rounded-full overflow-hidden border border-stone-800 relative ink-track">
             <div id="bar-qi-bg" class="absolute inset-0 bg-transparent"></div>
             <div id="bar-qi-fill" class="h-full transition-all duration-300 relative z-10" style="width: 10%"></div>
           </div>
@@ -486,7 +593,7 @@
               <span id="stat-ext" class="text-red-400 font-extrabold">15</span>
             </div>
           </div>
-          <div class="w-full bg-stone-950 h-2 rounded-full overflow-hidden border border-stone-800 relative">
+          <div class="w-full bg-stone-950 h-2 rounded-full overflow-hidden border border-stone-800 relative ink-track">
             <div id="bar-ext-bg" class="absolute inset-0 bg-transparent"></div>
             <div id="bar-ext-fill" class="h-full transition-all duration-300 relative z-10" style="width: 15%"></div>
           </div>
@@ -501,7 +608,7 @@
               <span id="stat-agi" class="text-cyan-400 font-extrabold">12</span>
             </div>
           </div>
-          <div class="w-full bg-stone-950 h-2 rounded-full overflow-hidden border border-stone-800 relative">
+          <div class="w-full bg-stone-950 h-2 rounded-full overflow-hidden border border-stone-800 relative ink-track">
             <div id="bar-agi-bg" class="absolute inset-0 bg-transparent"></div>
             <div id="bar-agi-fill" class="h-full transition-all duration-300 relative z-10" style="width: 12%"></div>
           </div>
@@ -516,7 +623,7 @@
               <span id="stat-fame" class="text-emerald-400 font-extrabold">0</span>
             </div>
           </div>
-          <div class="w-full bg-stone-950 h-2 rounded-full overflow-hidden border border-stone-800 relative">
+          <div class="w-full bg-stone-950 h-2 rounded-full overflow-hidden border border-stone-800 relative ink-track">
             <div id="bar-fame-bg" class="absolute inset-0 bg-transparent"></div>
             <div id="bar-fame-fill" class="h-full transition-all duration-300 relative z-10" style="width: 0%"></div>
           </div>
@@ -579,34 +686,34 @@
           <span id="injury-badge" class="hidden text-[10px] font-bold px-1.5 py-0.5 rounded bg-rose-950 text-rose-300 border border-rose-600/60"></span>
         </div>
         <div class="flex items-center gap-1">
-          <button id="btn-auto" onclick="toggleAuto()" class="px-2.5 py-1 rounded-lg border font-bold text-[11px]">⏩ 운명에 맡기기</button>
+          <button id="btn-auto" onclick="toggleAuto()" class="px-2.5 py-1 rounded-lg border font-bold text-[11px]">운명에 맡기기</button>
           <button id="btn-speed" onclick="cycleSpeed()" class="px-2 py-1 rounded-lg border border-stone-700 bg-stone-900 text-stone-300 font-bold text-[11px] cursor-pointer">1x</button>
         </div>
       </div>
       <div id="log-list" onclick="storySkip()" class="flex-1 overflow-y-auto px-3.5 py-3 space-y-2 text-[13px]"></div>
       <div class="p-2.5 border-t border-stone-800 bg-stone-950/60">
-        <button id="btn-pass-year" onclick="passYear()" class="w-full py-3 font-brush text-lg rounded-xl">▶ 한 해를 시작하다</button>
+        <button id="btn-pass-year" onclick="passYear()" class="w-full py-3 font-brush text-lg rounded-xl">한 해를 보내다</button>
       </div>
     </section>
 
     <!-- 보조 메뉴 -->
     <section class="space-y-2">
       <button id="btn-breakthrough" onclick="openBreakthroughModal()" class="w-full py-2.5 bg-gradient-to-r from-red-950 via-stone-900 to-red-950 border-2 border-red-600/70 text-red-300 breakthrough-pulse rounded-xl font-brush text-base flex items-center justify-center gap-1.5 cursor-pointer shadow hidden">
-        <span>⚡ 생사 폐관 돌파 (경지 초월 시도)</span>
+        <span>생사 폐관 · 경지 돌파</span>
       </button>
       <button id="btn-ascension" onclick="executeAscensionTrial()" class="w-full py-3 bg-gradient-to-r from-sky-950 via-cyan-900 to-amber-950 border-2 border-cyan-400 text-cyan-200 immortal-card rounded-xl font-brush text-base flex items-center justify-center gap-1.5 cursor-pointer shadow-xl hidden">
-        <span>⚡ 우화등선(羽化登仙): 구천현뢰 천겁 돌파</span>
+        <span>우화등선 · 천겁에 맞서다</span>
       </button>
       <div class="grid grid-cols-3 gap-1.5">
         <button id="btn-sect" onclick="handleSectButton()" class="py-2 bg-stone-900 hover:bg-stone-800 text-amber-200 border border-amber-600/40 rounded-xl font-brush text-sm flex flex-col items-center justify-center cursor-pointer shadow">
-          <span id="sect-btn-label">🏯 문파 창건</span>
+          <span id="sect-btn-label">문파 창건</span>
           <span id="sect-btn-sub" class="text-[9px] text-stone-400 font-medium leading-tight"></span>
         </button>
         <button id="btn-market" onclick="openMarketModal()" class="py-2 bg-stone-900 hover:bg-stone-800 text-amber-300 border border-amber-600/40 rounded-xl font-brush text-sm flex flex-col items-center justify-center cursor-pointer shadow">
-          <span>🏮 전포·궤짝</span>
+          <span>전포·궤짝</span>
         </button>
         <button onclick="openChronicleModal()" class="py-2 bg-stone-900 hover:bg-stone-800 text-amber-300 border border-amber-600/40 rounded-xl font-brush text-sm flex flex-col items-center justify-center cursor-pointer shadow">
-          <span>📜 연대기</span>
+          <span>연대기</span>
         </button>
       </div>
     </section>
@@ -706,8 +813,8 @@
         <button onclick="closeSectModal()" class="text-stone-400 hover:text-white font-bold p-1 text-lg">✕</button>
       </div>
       <div class="grid grid-cols-2 gap-1 p-1 bg-stone-950 rounded-xl border border-stone-800 text-center font-bold text-xs">
-        <button id="sect-tab-build" onclick="switchSectTab('build')" class="py-1.5 rounded-lg cursor-pointer transition">🏯 전각 증축</button>
-        <button id="sect-tab-disc" onclick="switchSectTab('disc')" class="py-1.5 rounded-lg cursor-pointer transition">🧑‍🎓 제자</button>
+        <button id="sect-tab-build" onclick="switchSectTab('build')" class="py-1.5 rounded-lg cursor-pointer transition">전각 증축</button>
+        <button id="sect-tab-disc" onclick="switchSectTab('disc')" class="py-1.5 rounded-lg cursor-pointer transition">제자</button>
       </div>
       <div id="sect-level-bar" class="text-[10px] text-stone-400"></div>
       <div id="sect-tab-body" class="flex-1 overflow-y-auto space-y-2 pr-1 text-xs"></div>
@@ -874,7 +981,7 @@
         </div>
         <p class="text-[10px] text-stone-300 leading-tight font-medium">초대박(2%) 시 전설 비급 '천마신공' 원본 출현!</p>
         <button id="btn-gacha-buy" onclick="buyGachaBox()" class="w-full py-2.5 font-brush text-sm rounded-xl shadow cursor-pointer transition">
-          궤짝 개봉 (80냥)
+          궤짝 열기 · 80냥
         </button>
       </div>
 
@@ -929,52 +1036,52 @@
         {
           id: "huashan",
           name: "청의검객",
-          svg: `<svg viewBox="0 0 16 16" class="w-full h-full pixel-art" fill="none"><rect x="5" y="1" width="6" height="3" fill="#1e293b"/><rect x="4" y="4" width="8" height="5" fill="#fcd34d"/><rect x="6" y="5" width="1" height="1" fill="#000"/><rect x="9" y="5" width="1" height="1" fill="#000"/><rect x="7" y="7" width="2" height="1" fill="#e11d48"/><rect x="4" y="9" width="8" height="5" fill="#0284c7"/><rect x="6" y="9" width="4" height="5" fill="#f8fafc"/><rect x="12" y="7" width="1" height="6" fill="#94a3b8"/><rect x="12" y="13" width="1" height="1" fill="#f59e0b"/></svg>`
+          svg: `<svg viewBox="0 0 16 16" class="w-full h-full pixel-art" fill="none" shape-rendering="crispEdges"><rect x="5" y="0" width="6" height="1" fill="#1a1612"/><rect x="4" y="1" width="1" height="1" fill="#1a1612"/><rect x="5" y="1" width="6" height="1" fill="#405260"/><rect x="11" y="1" width="1" height="1" fill="#1a1612"/><rect x="4" y="2" width="1" height="1" fill="#1a1612"/><rect x="5" y="2" width="6" height="1" fill="#405260"/><rect x="11" y="2" width="1" height="1" fill="#1a1612"/><rect x="4" y="3" width="1" height="1" fill="#1a1612"/><rect x="5" y="3" width="6" height="1" fill="#405260"/><rect x="11" y="3" width="1" height="1" fill="#1a1612"/><rect x="3" y="4" width="1" height="1" fill="#1a1612"/><rect x="4" y="4" width="8" height="1" fill="#e6cfaa"/><rect x="12" y="4" width="1" height="1" fill="#1a1612"/><rect x="3" y="5" width="1" height="1" fill="#1a1612"/><rect x="4" y="5" width="2" height="1" fill="#e6cfaa"/><rect x="6" y="5" width="1" height="1" fill="#1a1612"/><rect x="7" y="5" width="2" height="1" fill="#e6cfaa"/><rect x="9" y="5" width="1" height="1" fill="#1a1612"/><rect x="10" y="5" width="2" height="1" fill="#e6cfaa"/><rect x="12" y="5" width="1" height="1" fill="#1a1612"/><rect x="3" y="6" width="1" height="1" fill="#1a1612"/><rect x="4" y="6" width="8" height="1" fill="#e6cfaa"/><rect x="12" y="6" width="1" height="1" fill="#1a1612"/><rect x="3" y="7" width="1" height="1" fill="#1a1612"/><rect x="4" y="7" width="3" height="1" fill="#e6cfaa"/><rect x="7" y="7" width="2" height="1" fill="#b3261a"/><rect x="9" y="7" width="3" height="1" fill="#e6cfaa"/><rect x="12" y="7" width="1" height="1" fill="#768c98"/><rect x="13" y="7" width="1" height="1" fill="#1a1612"/><rect x="3" y="8" width="1" height="1" fill="#1a1612"/><rect x="4" y="8" width="8" height="1" fill="#e6cfaa"/><rect x="12" y="8" width="1" height="1" fill="#768c98"/><rect x="13" y="8" width="1" height="1" fill="#1a1612"/><rect x="3" y="9" width="1" height="1" fill="#1a1612"/><rect x="4" y="9" width="2" height="1" fill="#405260"/><rect x="6" y="9" width="4" height="1" fill="#f4eee2"/><rect x="10" y="9" width="2" height="1" fill="#405260"/><rect x="12" y="9" width="1" height="1" fill="#768c98"/><rect x="13" y="9" width="1" height="1" fill="#1a1612"/><rect x="3" y="10" width="1" height="1" fill="#1a1612"/><rect x="4" y="10" width="2" height="1" fill="#405260"/><rect x="6" y="10" width="4" height="1" fill="#f4eee2"/><rect x="10" y="10" width="2" height="1" fill="#405260"/><rect x="12" y="10" width="1" height="1" fill="#768c98"/><rect x="13" y="10" width="1" height="1" fill="#1a1612"/><rect x="3" y="11" width="1" height="1" fill="#1a1612"/><rect x="4" y="11" width="2" height="1" fill="#405260"/><rect x="6" y="11" width="4" height="1" fill="#f4eee2"/><rect x="10" y="11" width="2" height="1" fill="#405260"/><rect x="12" y="11" width="1" height="1" fill="#768c98"/><rect x="13" y="11" width="1" height="1" fill="#1a1612"/><rect x="3" y="12" width="1" height="1" fill="#1a1612"/><rect x="4" y="12" width="2" height="1" fill="#405260"/><rect x="6" y="12" width="4" height="1" fill="#f4eee2"/><rect x="10" y="12" width="2" height="1" fill="#405260"/><rect x="12" y="12" width="1" height="1" fill="#768c98"/><rect x="13" y="12" width="1" height="1" fill="#1a1612"/><rect x="3" y="13" width="1" height="1" fill="#1a1612"/><rect x="4" y="13" width="2" height="1" fill="#405260"/><rect x="6" y="13" width="4" height="1" fill="#f4eee2"/><rect x="10" y="13" width="2" height="1" fill="#405260"/><rect x="12" y="13" width="1" height="1" fill="#8c6434"/><rect x="13" y="13" width="1" height="1" fill="#1a1612"/><rect x="4" y="14" width="9" height="1" fill="#1a1612"/></svg>`
         },
         {
           id: "shaolin",
           name: "황포승려",
-          svg: `<svg viewBox="0 0 16 16" class="w-full h-full pixel-art" fill="none"><circle cx="8" cy="6" r="4" fill="#fcd34d"/><rect x="6" y="5" width="1" height="1" fill="#000"/><rect x="9" y="5" width="1" height="1" fill="#000"/><rect x="7" y="3" width="2" height="1" fill="#b45309"/><rect x="4" y="9" width="8" height="5" fill="#d97706"/><rect x="7" y="9" width="2" height="5" fill="#dc2626"/><rect x="3" y="8" width="1" height="6" fill="#78350f"/></svg>`
+          svg: `<svg viewBox="0 0 16 16" class="w-full h-full pixel-art" fill="none" shape-rendering="crispEdges"><rect x="6" y="1" width="4" height="1" fill="#1a1612"/><rect x="5" y="2" width="1" height="1" fill="#1a1612"/><rect x="6" y="2" width="4" height="1" fill="#e6cfaa"/><rect x="10" y="2" width="1" height="1" fill="#1a1612"/><rect x="4" y="3" width="1" height="1" fill="#1a1612"/><rect x="5" y="3" width="2" height="1" fill="#e6cfaa"/><rect x="7" y="3" width="2" height="1" fill="#8c6434"/><rect x="9" y="3" width="2" height="1" fill="#e6cfaa"/><rect x="11" y="3" width="1" height="1" fill="#1a1612"/><rect x="3" y="4" width="1" height="1" fill="#1a1612"/><rect x="4" y="4" width="8" height="1" fill="#e6cfaa"/><rect x="12" y="4" width="1" height="1" fill="#1a1612"/><rect x="3" y="5" width="1" height="1" fill="#1a1612"/><rect x="4" y="5" width="2" height="1" fill="#e6cfaa"/><rect x="6" y="5" width="1" height="1" fill="#1a1612"/><rect x="7" y="5" width="2" height="1" fill="#e6cfaa"/><rect x="9" y="5" width="1" height="1" fill="#1a1612"/><rect x="10" y="5" width="2" height="1" fill="#e6cfaa"/><rect x="12" y="5" width="1" height="1" fill="#1a1612"/><rect x="3" y="6" width="1" height="1" fill="#1a1612"/><rect x="4" y="6" width="8" height="1" fill="#e6cfaa"/><rect x="12" y="6" width="1" height="1" fill="#1a1612"/><rect x="3" y="7" width="1" height="1" fill="#1a1612"/><rect x="4" y="7" width="8" height="1" fill="#e6cfaa"/><rect x="12" y="7" width="1" height="1" fill="#1a1612"/><rect x="2" y="8" width="1" height="1" fill="#1a1612"/><rect x="3" y="8" width="1" height="1" fill="#8c6434"/><rect x="4" y="8" width="1" height="1" fill="#1a1612"/><rect x="5" y="8" width="6" height="1" fill="#e6cfaa"/><rect x="11" y="8" width="1" height="1" fill="#1a1612"/><rect x="2" y="9" width="1" height="1" fill="#1a1612"/><rect x="3" y="9" width="4" height="1" fill="#8c6434"/><rect x="7" y="9" width="2" height="1" fill="#b3261a"/><rect x="9" y="9" width="3" height="1" fill="#8c6434"/><rect x="12" y="9" width="1" height="1" fill="#1a1612"/><rect x="2" y="10" width="1" height="1" fill="#1a1612"/><rect x="3" y="10" width="4" height="1" fill="#8c6434"/><rect x="7" y="10" width="2" height="1" fill="#b3261a"/><rect x="9" y="10" width="3" height="1" fill="#8c6434"/><rect x="12" y="10" width="1" height="1" fill="#1a1612"/><rect x="2" y="11" width="1" height="1" fill="#1a1612"/><rect x="3" y="11" width="4" height="1" fill="#8c6434"/><rect x="7" y="11" width="2" height="1" fill="#b3261a"/><rect x="9" y="11" width="3" height="1" fill="#8c6434"/><rect x="12" y="11" width="1" height="1" fill="#1a1612"/><rect x="2" y="12" width="1" height="1" fill="#1a1612"/><rect x="3" y="12" width="4" height="1" fill="#8c6434"/><rect x="7" y="12" width="2" height="1" fill="#b3261a"/><rect x="9" y="12" width="3" height="1" fill="#8c6434"/><rect x="12" y="12" width="1" height="1" fill="#1a1612"/><rect x="2" y="13" width="1" height="1" fill="#1a1612"/><rect x="3" y="13" width="4" height="1" fill="#8c6434"/><rect x="7" y="13" width="2" height="1" fill="#b3261a"/><rect x="9" y="13" width="3" height="1" fill="#8c6434"/><rect x="12" y="13" width="1" height="1" fill="#1a1612"/><rect x="3" y="14" width="9" height="1" fill="#1a1612"/></svg>`
         },
         {
           id: "tang",
           name: "자색자객",
-          svg: `<svg viewBox="0 0 16 16" class="w-full h-full pixel-art" fill="none"><rect x="4" y="2" width="8" height="4" fill="#581c87"/><rect x="4" y="6" width="8" height="3" fill="#fcd34d"/><rect x="5" y="6" width="1" height="1" fill="#a855f7"/><rect x="10" y="6" width="1" height="1" fill="#a855f7"/><rect x="4" y="8" width="8" height="6" fill="#3b0764"/><rect x="12" y="8" width="2" height="2" fill="#10b981"/></svg>`
+          svg: `<svg viewBox="0 0 16 16" class="w-full h-full pixel-art" fill="none" shape-rendering="crispEdges"><rect x="4" y="1" width="8" height="1" fill="#1a1612"/><rect x="3" y="2" width="1" height="1" fill="#1a1612"/><rect x="4" y="2" width="8" height="1" fill="#5d4a6e"/><rect x="12" y="2" width="1" height="1" fill="#1a1612"/><rect x="3" y="3" width="1" height="1" fill="#1a1612"/><rect x="4" y="3" width="8" height="1" fill="#5d4a6e"/><rect x="12" y="3" width="1" height="1" fill="#1a1612"/><rect x="3" y="4" width="1" height="1" fill="#1a1612"/><rect x="4" y="4" width="8" height="1" fill="#5d4a6e"/><rect x="12" y="4" width="1" height="1" fill="#1a1612"/><rect x="3" y="5" width="1" height="1" fill="#1a1612"/><rect x="4" y="5" width="8" height="1" fill="#5d4a6e"/><rect x="12" y="5" width="1" height="1" fill="#1a1612"/><rect x="3" y="6" width="1" height="1" fill="#1a1612"/><rect x="4" y="6" width="1" height="1" fill="#e6cfaa"/><rect x="5" y="6" width="1" height="1" fill="#8d7a9c"/><rect x="6" y="6" width="4" height="1" fill="#e6cfaa"/><rect x="10" y="6" width="1" height="1" fill="#8d7a9c"/><rect x="11" y="6" width="1" height="1" fill="#e6cfaa"/><rect x="12" y="6" width="1" height="1" fill="#1a1612"/><rect x="3" y="7" width="1" height="1" fill="#1a1612"/><rect x="4" y="7" width="8" height="1" fill="#e6cfaa"/><rect x="12" y="7" width="2" height="1" fill="#1a1612"/><rect x="3" y="8" width="1" height="1" fill="#1a1612"/><rect x="4" y="8" width="8" height="1" fill="#5d4a6e"/><rect x="12" y="8" width="2" height="1" fill="#4c6b48"/><rect x="14" y="8" width="1" height="1" fill="#1a1612"/><rect x="3" y="9" width="1" height="1" fill="#1a1612"/><rect x="4" y="9" width="8" height="1" fill="#5d4a6e"/><rect x="12" y="9" width="2" height="1" fill="#4c6b48"/><rect x="14" y="9" width="1" height="1" fill="#1a1612"/><rect x="3" y="10" width="1" height="1" fill="#1a1612"/><rect x="4" y="10" width="8" height="1" fill="#5d4a6e"/><rect x="12" y="10" width="2" height="1" fill="#1a1612"/><rect x="3" y="11" width="1" height="1" fill="#1a1612"/><rect x="4" y="11" width="8" height="1" fill="#5d4a6e"/><rect x="12" y="11" width="1" height="1" fill="#1a1612"/><rect x="3" y="12" width="1" height="1" fill="#1a1612"/><rect x="4" y="12" width="8" height="1" fill="#5d4a6e"/><rect x="12" y="12" width="1" height="1" fill="#1a1612"/><rect x="3" y="13" width="1" height="1" fill="#1a1612"/><rect x="4" y="13" width="8" height="1" fill="#5d4a6e"/><rect x="12" y="13" width="1" height="1" fill="#1a1612"/><rect x="4" y="14" width="8" height="1" fill="#1a1612"/></svg>`
         },
         {
           id: "ronin",
           name: "삿갓낭인",
-          svg: `<svg viewBox="0 0 16 16" class="w-full h-full pixel-art" fill="none"><polygon points="8,1 1,7 15,7" fill="#78350f"/><polygon points="8,2 3,7 13,7" fill="#a16207"/><rect x="5" y="7" width="6" height="3" fill="#fcd34d"/><rect x="6" y="8" width="1" height="1" fill="#000"/><rect x="9" y="8" width="1" height="1" fill="#000"/><rect x="4" y="10" width="8" height="5" fill="#44403c"/><rect x="2" y="10" width="2" height="5" fill="#cbd5e1"/></svg>`
+          svg: `<svg viewBox="0 0 16 16" class="w-full h-full pixel-art" fill="none" shape-rendering="crispEdges"><rect x="7" y="0" width="2" height="1" fill="#1a1612"/><rect x="6" y="1" width="1" height="1" fill="#1a1612"/><rect x="7" y="1" width="2" height="1" fill="#8c6434"/><rect x="9" y="1" width="1" height="1" fill="#1a1612"/><rect x="5" y="2" width="1" height="1" fill="#1a1612"/><rect x="6" y="2" width="4" height="1" fill="#8c6434"/><rect x="10" y="2" width="1" height="1" fill="#1a1612"/><rect x="4" y="3" width="1" height="1" fill="#1a1612"/><rect x="5" y="3" width="6" height="1" fill="#8c6434"/><rect x="11" y="3" width="1" height="1" fill="#1a1612"/><rect x="3" y="4" width="1" height="1" fill="#1a1612"/><rect x="4" y="4" width="8" height="1" fill="#8c6434"/><rect x="12" y="4" width="1" height="1" fill="#1a1612"/><rect x="2" y="5" width="1" height="1" fill="#1a1612"/><rect x="3" y="5" width="10" height="1" fill="#8c6434"/><rect x="13" y="5" width="1" height="1" fill="#1a1612"/><rect x="1" y="6" width="1" height="1" fill="#1a1612"/><rect x="2" y="6" width="12" height="1" fill="#8c6434"/><rect x="14" y="6" width="1" height="1" fill="#1a1612"/><rect x="2" y="7" width="3" height="1" fill="#1a1612"/><rect x="5" y="7" width="6" height="1" fill="#e6cfaa"/><rect x="11" y="7" width="3" height="1" fill="#1a1612"/><rect x="4" y="8" width="1" height="1" fill="#1a1612"/><rect x="5" y="8" width="1" height="1" fill="#e6cfaa"/><rect x="6" y="8" width="1" height="1" fill="#1a1612"/><rect x="7" y="8" width="2" height="1" fill="#e6cfaa"/><rect x="9" y="8" width="1" height="1" fill="#1a1612"/><rect x="10" y="8" width="1" height="1" fill="#e6cfaa"/><rect x="11" y="8" width="1" height="1" fill="#1a1612"/><rect x="2" y="9" width="3" height="1" fill="#1a1612"/><rect x="5" y="9" width="6" height="1" fill="#e6cfaa"/><rect x="11" y="9" width="1" height="1" fill="#1a1612"/><rect x="1" y="10" width="1" height="1" fill="#1a1612"/><rect x="2" y="10" width="2" height="1" fill="#768c98"/><rect x="4" y="10" width="8" height="1" fill="#3a332c"/><rect x="12" y="10" width="1" height="1" fill="#1a1612"/><rect x="1" y="11" width="1" height="1" fill="#1a1612"/><rect x="2" y="11" width="2" height="1" fill="#768c98"/><rect x="4" y="11" width="8" height="1" fill="#3a332c"/><rect x="12" y="11" width="1" height="1" fill="#1a1612"/><rect x="1" y="12" width="1" height="1" fill="#1a1612"/><rect x="2" y="12" width="2" height="1" fill="#768c98"/><rect x="4" y="12" width="8" height="1" fill="#3a332c"/><rect x="12" y="12" width="1" height="1" fill="#1a1612"/><rect x="1" y="13" width="1" height="1" fill="#1a1612"/><rect x="2" y="13" width="2" height="1" fill="#768c98"/><rect x="4" y="13" width="8" height="1" fill="#3a332c"/><rect x="12" y="13" width="1" height="1" fill="#1a1612"/><rect x="1" y="14" width="1" height="1" fill="#1a1612"/><rect x="2" y="14" width="2" height="1" fill="#768c98"/><rect x="4" y="14" width="8" height="1" fill="#3a332c"/><rect x="12" y="14" width="1" height="1" fill="#1a1612"/><rect x="2" y="15" width="10" height="1" fill="#1a1612"/></svg>`
         },
         {
           id: "taoist",
           name: "백발도사",
-          svg: `<svg viewBox="0 0 16 16" class="w-full h-full pixel-art" fill="none"><rect x="4" y="1" width="8" height="4" fill="#f8fafc"/><rect x="5" y="4" width="6" height="4" fill="#fcd34d"/><rect x="6" y="5" width="1" height="1" fill="#000"/><rect x="9" y="5" width="1" height="1" fill="#000"/><rect x="6" y="7" width="4" height="2" fill="#e2e8f0"/><rect x="4" y="8" width="8" height="6" fill="#1e1b4b"/><rect x="7" y="9" width="2" height="4" fill="#38bdf8"/></svg>`
+          svg: `<svg viewBox="0 0 16 16" class="w-full h-full pixel-art" fill="none" shape-rendering="crispEdges"><rect x="4" y="0" width="8" height="1" fill="#1a1612"/><rect x="3" y="1" width="1" height="1" fill="#1a1612"/><rect x="4" y="1" width="8" height="1" fill="#f4eee2"/><rect x="12" y="1" width="1" height="1" fill="#1a1612"/><rect x="3" y="2" width="1" height="1" fill="#1a1612"/><rect x="4" y="2" width="8" height="1" fill="#f4eee2"/><rect x="12" y="2" width="1" height="1" fill="#1a1612"/><rect x="3" y="3" width="1" height="1" fill="#1a1612"/><rect x="4" y="3" width="8" height="1" fill="#f4eee2"/><rect x="12" y="3" width="1" height="1" fill="#1a1612"/><rect x="3" y="4" width="1" height="1" fill="#1a1612"/><rect x="4" y="4" width="1" height="1" fill="#f4eee2"/><rect x="5" y="4" width="6" height="1" fill="#e6cfaa"/><rect x="11" y="4" width="1" height="1" fill="#f4eee2"/><rect x="12" y="4" width="1" height="1" fill="#1a1612"/><rect x="4" y="5" width="1" height="1" fill="#1a1612"/><rect x="5" y="5" width="1" height="1" fill="#e6cfaa"/><rect x="6" y="5" width="1" height="1" fill="#1a1612"/><rect x="7" y="5" width="2" height="1" fill="#e6cfaa"/><rect x="9" y="5" width="1" height="1" fill="#1a1612"/><rect x="10" y="5" width="1" height="1" fill="#e6cfaa"/><rect x="11" y="5" width="1" height="1" fill="#1a1612"/><rect x="4" y="6" width="1" height="1" fill="#1a1612"/><rect x="5" y="6" width="6" height="1" fill="#e6cfaa"/><rect x="11" y="6" width="1" height="1" fill="#1a1612"/><rect x="4" y="7" width="1" height="1" fill="#1a1612"/><rect x="5" y="7" width="1" height="1" fill="#e6cfaa"/><rect x="6" y="7" width="4" height="1" fill="#768c98"/><rect x="10" y="7" width="1" height="1" fill="#e6cfaa"/><rect x="11" y="7" width="1" height="1" fill="#1a1612"/><rect x="3" y="8" width="1" height="1" fill="#1a1612"/><rect x="4" y="8" width="8" height="1" fill="#405260"/><rect x="12" y="8" width="1" height="1" fill="#1a1612"/><rect x="3" y="9" width="1" height="1" fill="#1a1612"/><rect x="4" y="9" width="3" height="1" fill="#405260"/><rect x="7" y="9" width="2" height="1" fill="#768c98"/><rect x="9" y="9" width="3" height="1" fill="#405260"/><rect x="12" y="9" width="1" height="1" fill="#1a1612"/><rect x="3" y="10" width="1" height="1" fill="#1a1612"/><rect x="4" y="10" width="3" height="1" fill="#405260"/><rect x="7" y="10" width="2" height="1" fill="#768c98"/><rect x="9" y="10" width="3" height="1" fill="#405260"/><rect x="12" y="10" width="1" height="1" fill="#1a1612"/><rect x="3" y="11" width="1" height="1" fill="#1a1612"/><rect x="4" y="11" width="3" height="1" fill="#405260"/><rect x="7" y="11" width="2" height="1" fill="#768c98"/><rect x="9" y="11" width="3" height="1" fill="#405260"/><rect x="12" y="11" width="1" height="1" fill="#1a1612"/><rect x="3" y="12" width="1" height="1" fill="#1a1612"/><rect x="4" y="12" width="3" height="1" fill="#405260"/><rect x="7" y="12" width="2" height="1" fill="#768c98"/><rect x="9" y="12" width="3" height="1" fill="#405260"/><rect x="12" y="12" width="1" height="1" fill="#1a1612"/><rect x="3" y="13" width="1" height="1" fill="#1a1612"/><rect x="4" y="13" width="8" height="1" fill="#405260"/><rect x="12" y="13" width="1" height="1" fill="#1a1612"/><rect x="4" y="14" width="8" height="1" fill="#1a1612"/></svg>`
         },
         {
           id: "maiden",
           name: "홍의여검",
-          svg: `<svg viewBox="0 0 16 16" class="w-full h-full pixel-art" fill="none"><rect x="3" y="2" width="10" height="4" fill="#09090b"/><rect x="4" y="5" width="8" height="4" fill="#fef08a"/><rect x="5" y="6" width="1" height="1" fill="#e11d48"/><rect x="10" y="6" width="1" height="1" fill="#e11d48"/><rect x="7" y="8" width="2" height="1" fill="#f43f5e"/><rect x="4" y="9" width="8" height="5" fill="#be123c"/><rect x="6" y="9" width="4" height="5" fill="#fda4af"/></svg>`
+          svg: `<svg viewBox="0 0 16 16" class="w-full h-full pixel-art" fill="none" shape-rendering="crispEdges"><rect x="3" y="1" width="10" height="1" fill="#1a1612"/><rect x="2" y="2" width="12" height="1" fill="#1a1612"/><rect x="2" y="3" width="12" height="1" fill="#1a1612"/><rect x="2" y="4" width="12" height="1" fill="#1a1612"/><rect x="2" y="5" width="2" height="1" fill="#1a1612"/><rect x="4" y="5" width="8" height="1" fill="#e6cfaa"/><rect x="12" y="5" width="2" height="1" fill="#1a1612"/><rect x="3" y="6" width="1" height="1" fill="#1a1612"/><rect x="4" y="6" width="1" height="1" fill="#e6cfaa"/><rect x="5" y="6" width="1" height="1" fill="#b3261a"/><rect x="6" y="6" width="4" height="1" fill="#e6cfaa"/><rect x="10" y="6" width="1" height="1" fill="#b3261a"/><rect x="11" y="6" width="1" height="1" fill="#e6cfaa"/><rect x="12" y="6" width="1" height="1" fill="#1a1612"/><rect x="3" y="7" width="1" height="1" fill="#1a1612"/><rect x="4" y="7" width="8" height="1" fill="#e6cfaa"/><rect x="12" y="7" width="1" height="1" fill="#1a1612"/><rect x="3" y="8" width="1" height="1" fill="#1a1612"/><rect x="4" y="8" width="3" height="1" fill="#e6cfaa"/><rect x="7" y="8" width="2" height="1" fill="#b3261a"/><rect x="9" y="8" width="3" height="1" fill="#e6cfaa"/><rect x="12" y="8" width="1" height="1" fill="#1a1612"/><rect x="3" y="9" width="1" height="1" fill="#1a1612"/><rect x="4" y="9" width="8" height="1" fill="#b3261a"/><rect x="12" y="9" width="1" height="1" fill="#1a1612"/><rect x="3" y="10" width="1" height="1" fill="#1a1612"/><rect x="4" y="10" width="8" height="1" fill="#b3261a"/><rect x="12" y="10" width="1" height="1" fill="#1a1612"/><rect x="3" y="11" width="1" height="1" fill="#1a1612"/><rect x="4" y="11" width="8" height="1" fill="#b3261a"/><rect x="12" y="11" width="1" height="1" fill="#1a1612"/><rect x="3" y="12" width="1" height="1" fill="#1a1612"/><rect x="4" y="12" width="8" height="1" fill="#b3261a"/><rect x="12" y="12" width="1" height="1" fill="#1a1612"/><rect x="3" y="13" width="1" height="1" fill="#1a1612"/><rect x="4" y="13" width="8" height="1" fill="#b3261a"/><rect x="12" y="13" width="1" height="1" fill="#1a1612"/><rect x="4" y="14" width="8" height="1" fill="#1a1612"/></svg>`
         }
       ],
       items: {
-        "청강검": `<svg viewBox="0 0 16 16" class="w-full h-full pixel-art" fill="none"><polygon points="12,1 15,4 7,12 4,9" fill="#94a3b8"/><polygon points="13,2 14,3 7,10 6,9" fill="#f8fafc"/><rect x="3" y="10" width="3" height="1" transform="rotate(-45 3 10)" fill="#78350f"/><circle cx="2" cy="14" r="1.5" fill="#f59e0b"/></svg>`,
-        "자하신공": `<svg viewBox="0 0 16 16" class="w-full h-full pixel-art" fill="none"><rect x="3" y="2" width="10" height="12" rx="1" fill="#581c87"/><rect x="4" y="3" width="8" height="10" fill="#7e22ce"/><rect x="5" y="4" width="6" height="8" fill="#a855f7"/><rect x="6" y="6" width="4" height="1" fill="#fef08a"/><rect x="6" y="8" width="3" height="1" fill="#fef08a"/><rect x="2" y="2" width="2" height="12" fill="#3b0764"/></svg>`,
-        "한철중검": `<svg viewBox="0 0 16 16" class="w-full h-full pixel-art" fill="none"><rect x="8" y="2" width="5" height="9" transform="rotate(45 8 2)" fill="#334155"/><rect x="9" y="3" width="2" height="8" transform="rotate(45 9 3)" fill="#64748b"/><rect x="3" y="9" width="5" height="2" transform="rotate(45 3 9)" fill="#0f172a"/><rect x="2" y="13" width="2" height="2" fill="#0284c7"/></svg>`,
-        "구음진경": `<svg viewBox="0 0 16 16" class="w-full h-full pixel-art" fill="none"><rect x="3" y="2" width="10" height="12" rx="1" fill="#991b1b"/><rect x="4" y="3" width="8" height="10" fill="#dc2626"/><circle cx="8" cy="8" r="3" fill="#fef08a"/><path d="M8,5 A3,3 0 0,0 8,11 A1.5,1.5 0 0,0 8,8 A1.5,1.5 0 0,1 8,5" fill="#000"/><rect x="2" y="2" width="2" height="12" fill="#450a0a"/></svg>`,
-        "천마신공": `<svg viewBox="0 0 16 16" class="w-full h-full pixel-art" fill="none"><rect x="2" y="2" width="12" height="12" rx="1" fill="#450a0a"/><circle cx="8" cy="8" r="4" fill="#eab308"/><path d="M8,4 L10,8 L6,8 Z" fill="#000"/><rect x="3" y="3" width="2" height="10" fill="#b91c1c"/></svg>`,
-        "청홍검": `<svg viewBox="0 0 16 16" class="w-full h-full pixel-art" fill="none"><polygon points="13,1 15,3 6,12 4,10" fill="#a855f7"/><polygon points="12,2 14,4 5,13 3,11" fill="#38bdf8"/><circle cx="2" cy="14" r="1.5" fill="#eab308"/></svg>`,
-        "백년하수오": `<svg viewBox="0 0 16 16" class="w-full h-full pixel-art" fill="none"><circle cx="8" cy="9" r="4" fill="#047857"/><rect x="7" y="3" width="2" height="4" fill="#10b981"/><circle cx="8" cy="2" r="1" fill="#34d399"/></svg>`,
-        "연단환": `<svg viewBox="0 0 16 16" class="w-full h-full pixel-art" fill="none"><circle cx="8" cy="8" r="5" fill="#d97706"/><circle cx="7" cy="7" r="1.5" fill="#fef08a"/></svg>`,
-        "dust": `<svg viewBox="0 0 16 16" class="w-full h-full pixel-art" fill="none"><circle cx="5" cy="10" r="1.5" fill="#78716c"/><circle cx="11" cy="9" r="2" fill="#57534e"/><circle cx="8" cy="6" r="1" fill="#a8a29e"/></svg>`,
-        "chest": `<svg viewBox="0 0 16 16" class="w-full h-full pixel-art" fill="none"><rect x="2" y="4" width="12" height="10" rx="1" fill="#78350f"/><rect x="2" y="4" width="12" height="4" fill="#a16207"/><rect x="2" y="8" width="12" height="1" fill="#1c1917"/><rect x="7" y="7" width="2" height="3" fill="#f59e0b"/><circle cx="8" cy="8.5" r="0.5" fill="#000"/></svg>`
+        "청강검": `<svg viewBox="0 0 16 16" class="w-full h-full pixel-art" fill="none" shape-rendering="crispEdges"><rect x="11" y="0" width="2" height="1" fill="#1a1612"/><rect x="10" y="1" width="1" height="1" fill="#1a1612"/><rect x="11" y="1" width="2" height="1" fill="#768c98"/><rect x="13" y="1" width="1" height="1" fill="#1a1612"/><rect x="9" y="2" width="1" height="1" fill="#1a1612"/><rect x="10" y="2" width="4" height="1" fill="#768c98"/><rect x="14" y="2" width="1" height="1" fill="#1a1612"/><rect x="8" y="3" width="1" height="1" fill="#1a1612"/><rect x="9" y="3" width="3" height="1" fill="#768c98"/><rect x="12" y="3" width="1" height="1" fill="#f4eee2"/><rect x="13" y="3" width="2" height="1" fill="#768c98"/><rect x="15" y="3" width="1" height="1" fill="#1a1612"/><rect x="7" y="4" width="1" height="1" fill="#1a1612"/><rect x="8" y="4" width="3" height="1" fill="#768c98"/><rect x="11" y="4" width="1" height="1" fill="#f4eee2"/><rect x="12" y="4" width="3" height="1" fill="#768c98"/><rect x="15" y="4" width="1" height="1" fill="#1a1612"/><rect x="6" y="5" width="1" height="1" fill="#1a1612"/><rect x="7" y="5" width="3" height="1" fill="#768c98"/><rect x="10" y="5" width="1" height="1" fill="#f4eee2"/><rect x="11" y="5" width="3" height="1" fill="#768c98"/><rect x="14" y="5" width="1" height="1" fill="#1a1612"/><rect x="5" y="6" width="1" height="1" fill="#1a1612"/><rect x="6" y="6" width="3" height="1" fill="#768c98"/><rect x="9" y="6" width="1" height="1" fill="#f4eee2"/><rect x="10" y="6" width="3" height="1" fill="#768c98"/><rect x="13" y="6" width="1" height="1" fill="#1a1612"/><rect x="4" y="7" width="1" height="1" fill="#1a1612"/><rect x="5" y="7" width="3" height="1" fill="#768c98"/><rect x="8" y="7" width="1" height="1" fill="#f4eee2"/><rect x="9" y="7" width="3" height="1" fill="#768c98"/><rect x="12" y="7" width="1" height="1" fill="#1a1612"/><rect x="3" y="8" width="1" height="1" fill="#1a1612"/><rect x="4" y="8" width="1" height="1" fill="#8c6434"/><rect x="5" y="8" width="1" height="1" fill="#6e655a"/><rect x="6" y="8" width="1" height="1" fill="#768c98"/><rect x="7" y="8" width="1" height="1" fill="#f4eee2"/><rect x="8" y="8" width="3" height="1" fill="#768c98"/><rect x="11" y="8" width="1" height="1" fill="#1a1612"/><rect x="2" y="9" width="1" height="1" fill="#1a1612"/><rect x="3" y="9" width="2" height="1" fill="#8c6434"/><rect x="5" y="9" width="1" height="1" fill="#a89e90"/><rect x="6" y="9" width="4" height="1" fill="#768c98"/><rect x="10" y="9" width="1" height="1" fill="#1a1612"/><rect x="2" y="10" width="1" height="1" fill="#1a1612"/><rect x="3" y="10" width="1" height="1" fill="#8c6434"/><rect x="4" y="10" width="1" height="1" fill="#1a1612"/><rect x="5" y="10" width="4" height="1" fill="#768c98"/><rect x="9" y="10" width="1" height="1" fill="#1a1612"/><rect x="3" y="11" width="1" height="1" fill="#1a1612"/><rect x="5" y="11" width="1" height="1" fill="#1a1612"/><rect x="6" y="11" width="2" height="1" fill="#768c98"/><rect x="8" y="11" width="1" height="1" fill="#1a1612"/><rect x="1" y="12" width="2" height="1" fill="#1a1612"/><rect x="6" y="12" width="2" height="1" fill="#1a1612"/><rect x="0" y="13" width="1" height="1" fill="#1a1612"/><rect x="1" y="13" width="2" height="1" fill="#8c6434"/><rect x="3" y="13" width="1" height="1" fill="#1a1612"/><rect x="0" y="14" width="1" height="1" fill="#1a1612"/><rect x="1" y="14" width="2" height="1" fill="#8c6434"/><rect x="3" y="14" width="1" height="1" fill="#1a1612"/><rect x="1" y="15" width="2" height="1" fill="#1a1612"/></svg>`,
+        "자하신공": `<svg viewBox="0 0 16 16" class="w-full h-full pixel-art" fill="none" shape-rendering="crispEdges"><rect x="2" y="1" width="11" height="1" fill="#1a1612"/><rect x="1" y="2" width="1" height="1" fill="#1a1612"/><rect x="2" y="2" width="11" height="1" fill="#5d4a6e"/><rect x="13" y="2" width="1" height="1" fill="#1a1612"/><rect x="1" y="3" width="1" height="1" fill="#1a1612"/><rect x="2" y="3" width="11" height="1" fill="#5d4a6e"/><rect x="13" y="3" width="1" height="1" fill="#1a1612"/><rect x="1" y="4" width="1" height="1" fill="#1a1612"/><rect x="2" y="4" width="3" height="1" fill="#5d4a6e"/><rect x="5" y="4" width="6" height="1" fill="#8d7a9c"/><rect x="11" y="4" width="2" height="1" fill="#5d4a6e"/><rect x="13" y="4" width="1" height="1" fill="#1a1612"/><rect x="1" y="5" width="1" height="1" fill="#1a1612"/><rect x="2" y="5" width="3" height="1" fill="#5d4a6e"/><rect x="5" y="5" width="6" height="1" fill="#8d7a9c"/><rect x="11" y="5" width="2" height="1" fill="#5d4a6e"/><rect x="13" y="5" width="1" height="1" fill="#1a1612"/><rect x="1" y="6" width="1" height="1" fill="#1a1612"/><rect x="2" y="6" width="3" height="1" fill="#5d4a6e"/><rect x="5" y="6" width="1" height="1" fill="#8d7a9c"/><rect x="6" y="6" width="4" height="1" fill="#e6cfaa"/><rect x="10" y="6" width="1" height="1" fill="#8d7a9c"/><rect x="11" y="6" width="2" height="1" fill="#5d4a6e"/><rect x="13" y="6" width="1" height="1" fill="#1a1612"/><rect x="1" y="7" width="1" height="1" fill="#1a1612"/><rect x="2" y="7" width="3" height="1" fill="#5d4a6e"/><rect x="5" y="7" width="6" height="1" fill="#8d7a9c"/><rect x="11" y="7" width="2" height="1" fill="#5d4a6e"/><rect x="13" y="7" width="1" height="1" fill="#1a1612"/><rect x="1" y="8" width="1" height="1" fill="#1a1612"/><rect x="2" y="8" width="3" height="1" fill="#5d4a6e"/><rect x="5" y="8" width="1" height="1" fill="#8d7a9c"/><rect x="6" y="8" width="3" height="1" fill="#e6cfaa"/><rect x="9" y="8" width="2" height="1" fill="#8d7a9c"/><rect x="11" y="8" width="2" height="1" fill="#5d4a6e"/><rect x="13" y="8" width="1" height="1" fill="#1a1612"/><rect x="1" y="9" width="1" height="1" fill="#1a1612"/><rect x="2" y="9" width="3" height="1" fill="#5d4a6e"/><rect x="5" y="9" width="6" height="1" fill="#8d7a9c"/><rect x="11" y="9" width="2" height="1" fill="#5d4a6e"/><rect x="13" y="9" width="1" height="1" fill="#1a1612"/><rect x="1" y="10" width="1" height="1" fill="#1a1612"/><rect x="2" y="10" width="3" height="1" fill="#5d4a6e"/><rect x="5" y="10" width="6" height="1" fill="#8d7a9c"/><rect x="11" y="10" width="2" height="1" fill="#5d4a6e"/><rect x="13" y="10" width="1" height="1" fill="#1a1612"/><rect x="1" y="11" width="1" height="1" fill="#1a1612"/><rect x="2" y="11" width="3" height="1" fill="#5d4a6e"/><rect x="5" y="11" width="6" height="1" fill="#8d7a9c"/><rect x="11" y="11" width="2" height="1" fill="#5d4a6e"/><rect x="13" y="11" width="1" height="1" fill="#1a1612"/><rect x="1" y="12" width="1" height="1" fill="#1a1612"/><rect x="2" y="12" width="11" height="1" fill="#5d4a6e"/><rect x="13" y="12" width="1" height="1" fill="#1a1612"/><rect x="1" y="13" width="1" height="1" fill="#1a1612"/><rect x="2" y="13" width="11" height="1" fill="#5d4a6e"/><rect x="13" y="13" width="1" height="1" fill="#1a1612"/><rect x="2" y="14" width="11" height="1" fill="#1a1612"/></svg>`,
+        "한철중검": `<svg viewBox="0 0 16 16" class="w-full h-full pixel-art" fill="none" shape-rendering="crispEdges"><rect x="7" y="1" width="2" height="1" fill="#1a1612"/><rect x="6" y="2" width="1" height="1" fill="#1a1612"/><rect x="7" y="2" width="2" height="1" fill="#405260"/><rect x="9" y="2" width="1" height="1" fill="#1a1612"/><rect x="5" y="3" width="1" height="1" fill="#1a1612"/><rect x="6" y="3" width="4" height="1" fill="#405260"/><rect x="10" y="3" width="1" height="1" fill="#1a1612"/><rect x="4" y="4" width="1" height="1" fill="#1a1612"/><rect x="5" y="4" width="3" height="1" fill="#405260"/><rect x="8" y="4" width="2" height="1" fill="#6e655a"/><rect x="10" y="4" width="1" height="1" fill="#405260"/><rect x="11" y="4" width="1" height="1" fill="#1a1612"/><rect x="3" y="5" width="1" height="1" fill="#1a1612"/><rect x="4" y="5" width="3" height="1" fill="#405260"/><rect x="7" y="5" width="2" height="1" fill="#6e655a"/><rect x="9" y="5" width="2" height="1" fill="#405260"/><rect x="11" y="5" width="1" height="1" fill="#1a1612"/><rect x="2" y="6" width="1" height="1" fill="#1a1612"/><rect x="3" y="6" width="3" height="1" fill="#405260"/><rect x="6" y="6" width="2" height="1" fill="#6e655a"/><rect x="8" y="6" width="3" height="1" fill="#405260"/><rect x="11" y="6" width="1" height="1" fill="#1a1612"/><rect x="1" y="7" width="1" height="1" fill="#1a1612"/><rect x="2" y="7" width="3" height="1" fill="#405260"/><rect x="5" y="7" width="2" height="1" fill="#6e655a"/><rect x="7" y="7" width="3" height="1" fill="#405260"/><rect x="10" y="7" width="1" height="1" fill="#1a1612"/><rect x="1" y="8" width="1" height="1" fill="#1a1612"/><rect x="2" y="8" width="2" height="1" fill="#405260"/><rect x="4" y="8" width="2" height="1" fill="#6e655a"/><rect x="6" y="8" width="3" height="1" fill="#405260"/><rect x="9" y="8" width="1" height="1" fill="#1a1612"/><rect x="1" y="9" width="1" height="1" fill="#1a1612"/><rect x="2" y="9" width="2" height="1" fill="#405260"/><rect x="4" y="9" width="1" height="1" fill="#6e655a"/><rect x="5" y="9" width="3" height="1" fill="#405260"/><rect x="8" y="9" width="1" height="1" fill="#1a1612"/><rect x="1" y="10" width="3" height="1" fill="#1a1612"/><rect x="4" y="10" width="3" height="1" fill="#405260"/><rect x="7" y="10" width="1" height="1" fill="#1a1612"/><rect x="2" y="11" width="3" height="1" fill="#1a1612"/><rect x="5" y="11" width="1" height="1" fill="#405260"/><rect x="6" y="11" width="1" height="1" fill="#1a1612"/><rect x="2" y="12" width="5" height="1" fill="#1a1612"/><rect x="1" y="13" width="1" height="1" fill="#1a1612"/><rect x="2" y="13" width="2" height="1" fill="#405260"/><rect x="4" y="13" width="3" height="1" fill="#1a1612"/><rect x="1" y="14" width="1" height="1" fill="#1a1612"/><rect x="2" y="14" width="2" height="1" fill="#405260"/><rect x="4" y="14" width="2" height="1" fill="#1a1612"/><rect x="2" y="15" width="2" height="1" fill="#1a1612"/></svg>`,
+        "구음진경": `<svg viewBox="0 0 16 16" class="w-full h-full pixel-art" fill="none" shape-rendering="crispEdges"><rect x="2" y="1" width="11" height="1" fill="#1a1612"/><rect x="1" y="2" width="1" height="1" fill="#1a1612"/><rect x="2" y="2" width="11" height="1" fill="#7a1a12"/><rect x="13" y="2" width="1" height="1" fill="#1a1612"/><rect x="1" y="3" width="1" height="1" fill="#1a1612"/><rect x="2" y="3" width="2" height="1" fill="#7a1a12"/><rect x="4" y="3" width="8" height="1" fill="#b3261a"/><rect x="12" y="3" width="1" height="1" fill="#7a1a12"/><rect x="13" y="3" width="1" height="1" fill="#1a1612"/><rect x="1" y="4" width="1" height="1" fill="#1a1612"/><rect x="2" y="4" width="2" height="1" fill="#7a1a12"/><rect x="4" y="4" width="8" height="1" fill="#b3261a"/><rect x="12" y="4" width="1" height="1" fill="#7a1a12"/><rect x="13" y="4" width="1" height="1" fill="#1a1612"/><rect x="1" y="5" width="1" height="1" fill="#1a1612"/><rect x="2" y="5" width="2" height="1" fill="#7a1a12"/><rect x="4" y="5" width="2" height="1" fill="#b3261a"/><rect x="6" y="5" width="1" height="1" fill="#8c6434"/><rect x="7" y="5" width="2" height="1" fill="#e6cfaa"/><rect x="9" y="5" width="1" height="1" fill="#c39650"/><rect x="10" y="5" width="2" height="1" fill="#b3261a"/><rect x="12" y="5" width="1" height="1" fill="#7a1a12"/><rect x="13" y="5" width="1" height="1" fill="#1a1612"/><rect x="1" y="6" width="1" height="1" fill="#1a1612"/><rect x="2" y="6" width="2" height="1" fill="#7a1a12"/><rect x="4" y="6" width="1" height="1" fill="#b3261a"/><rect x="5" y="6" width="2" height="1" fill="#8c6434"/><rect x="7" y="6" width="3" height="1" fill="#e6cfaa"/><rect x="10" y="6" width="1" height="1" fill="#c39650"/><rect x="11" y="6" width="1" height="1" fill="#b3261a"/><rect x="12" y="6" width="1" height="1" fill="#7a1a12"/><rect x="13" y="6" width="1" height="1" fill="#1a1612"/><rect x="1" y="7" width="1" height="1" fill="#1a1612"/><rect x="2" y="7" width="2" height="1" fill="#7a1a12"/><rect x="4" y="7" width="1" height="1" fill="#b3261a"/><rect x="5" y="7" width="1" height="1" fill="#1a1612"/><rect x="6" y="7" width="1" height="1" fill="#8c6434"/><rect x="7" y="7" width="4" height="1" fill="#e6cfaa"/><rect x="11" y="7" width="1" height="1" fill="#b3261a"/><rect x="12" y="7" width="1" height="1" fill="#7a1a12"/><rect x="13" y="7" width="1" height="1" fill="#1a1612"/><rect x="1" y="8" width="1" height="1" fill="#1a1612"/><rect x="2" y="8" width="2" height="1" fill="#7a1a12"/><rect x="4" y="8" width="1" height="1" fill="#b3261a"/><rect x="5" y="8" width="3" height="1" fill="#1a1612"/><rect x="8" y="8" width="1" height="1" fill="#8c6434"/><rect x="9" y="8" width="2" height="1" fill="#e6cfaa"/><rect x="11" y="8" width="1" height="1" fill="#b3261a"/><rect x="12" y="8" width="1" height="1" fill="#7a1a12"/><rect x="13" y="8" width="1" height="1" fill="#1a1612"/><rect x="1" y="9" width="1" height="1" fill="#1a1612"/><rect x="2" y="9" width="2" height="1" fill="#7a1a12"/><rect x="4" y="9" width="1" height="1" fill="#b3261a"/><rect x="5" y="9" width="1" height="1" fill="#8c6434"/><rect x="6" y="9" width="3" height="1" fill="#1a1612"/><rect x="9" y="9" width="1" height="1" fill="#c9a24a"/><rect x="10" y="9" width="1" height="1" fill="#c39650"/><rect x="11" y="9" width="1" height="1" fill="#b3261a"/><rect x="12" y="9" width="1" height="1" fill="#7a1a12"/><rect x="13" y="9" width="1" height="1" fill="#1a1612"/><rect x="1" y="10" width="1" height="1" fill="#1a1612"/><rect x="2" y="10" width="2" height="1" fill="#7a1a12"/><rect x="4" y="10" width="2" height="1" fill="#b3261a"/><rect x="6" y="10" width="1" height="1" fill="#8c6434"/><rect x="7" y="10" width="2" height="1" fill="#1a1612"/><rect x="9" y="10" width="1" height="1" fill="#c39650"/><rect x="10" y="10" width="2" height="1" fill="#b3261a"/><rect x="12" y="10" width="1" height="1" fill="#7a1a12"/><rect x="13" y="10" width="1" height="1" fill="#1a1612"/><rect x="1" y="11" width="1" height="1" fill="#1a1612"/><rect x="2" y="11" width="2" height="1" fill="#7a1a12"/><rect x="4" y="11" width="8" height="1" fill="#b3261a"/><rect x="12" y="11" width="1" height="1" fill="#7a1a12"/><rect x="13" y="11" width="1" height="1" fill="#1a1612"/><rect x="1" y="12" width="1" height="1" fill="#1a1612"/><rect x="2" y="12" width="2" height="1" fill="#7a1a12"/><rect x="4" y="12" width="8" height="1" fill="#b3261a"/><rect x="12" y="12" width="1" height="1" fill="#7a1a12"/><rect x="13" y="12" width="1" height="1" fill="#1a1612"/><rect x="1" y="13" width="1" height="1" fill="#1a1612"/><rect x="2" y="13" width="11" height="1" fill="#7a1a12"/><rect x="13" y="13" width="1" height="1" fill="#1a1612"/><rect x="2" y="14" width="11" height="1" fill="#1a1612"/></svg>`,
+        "천마신공": `<svg viewBox="0 0 16 16" class="w-full h-full pixel-art" fill="none" shape-rendering="crispEdges"><rect x="2" y="1" width="12" height="1" fill="#1a1612"/><rect x="1" y="2" width="1" height="1" fill="#1a1612"/><rect x="2" y="2" width="12" height="1" fill="#7a1a12"/><rect x="14" y="2" width="1" height="1" fill="#1a1612"/><rect x="1" y="3" width="1" height="1" fill="#1a1612"/><rect x="2" y="3" width="1" height="1" fill="#7a1a12"/><rect x="3" y="3" width="2" height="1" fill="#b3261a"/><rect x="5" y="3" width="9" height="1" fill="#7a1a12"/><rect x="14" y="3" width="1" height="1" fill="#1a1612"/><rect x="1" y="4" width="1" height="1" fill="#1a1612"/><rect x="2" y="4" width="1" height="1" fill="#7a1a12"/><rect x="3" y="4" width="2" height="1" fill="#b3261a"/><rect x="5" y="4" width="6" height="1" fill="#8c6434"/><rect x="11" y="4" width="3" height="1" fill="#7a1a12"/><rect x="14" y="4" width="1" height="1" fill="#1a1612"/><rect x="1" y="5" width="1" height="1" fill="#1a1612"/><rect x="2" y="5" width="1" height="1" fill="#7a1a12"/><rect x="3" y="5" width="2" height="1" fill="#b3261a"/><rect x="5" y="5" width="2" height="1" fill="#c9a24a"/><rect x="7" y="5" width="2" height="1" fill="#1a1612"/><rect x="9" y="5" width="2" height="1" fill="#c9a24a"/><rect x="11" y="5" width="1" height="1" fill="#8c6434"/><rect x="12" y="5" width="2" height="1" fill="#7a1a12"/><rect x="14" y="5" width="1" height="1" fill="#1a1612"/><rect x="1" y="6" width="1" height="1" fill="#1a1612"/><rect x="2" y="6" width="1" height="1" fill="#7a1a12"/><rect x="3" y="6" width="2" height="1" fill="#b3261a"/><rect x="5" y="6" width="1" height="1" fill="#c9a24a"/><rect x="6" y="6" width="1" height="1" fill="#8c6434"/><rect x="7" y="6" width="2" height="1" fill="#1a1612"/><rect x="9" y="6" width="1" height="1" fill="#8c6434"/><rect x="10" y="6" width="1" height="1" fill="#c9a24a"/><rect x="11" y="6" width="1" height="1" fill="#8c6434"/><rect x="12" y="6" width="2" height="1" fill="#7a1a12"/><rect x="14" y="6" width="1" height="1" fill="#1a1612"/><rect x="1" y="7" width="1" height="1" fill="#1a1612"/><rect x="2" y="7" width="1" height="1" fill="#7a1a12"/><rect x="3" y="7" width="2" height="1" fill="#b3261a"/><rect x="5" y="7" width="1" height="1" fill="#c9a24a"/><rect x="6" y="7" width="4" height="1" fill="#1a1612"/><rect x="10" y="7" width="2" height="1" fill="#c9a24a"/><rect x="12" y="7" width="2" height="1" fill="#7a1a12"/><rect x="14" y="7" width="1" height="1" fill="#1a1612"/><rect x="1" y="8" width="1" height="1" fill="#1a1612"/><rect x="2" y="8" width="1" height="1" fill="#7a1a12"/><rect x="3" y="8" width="2" height="1" fill="#b3261a"/><rect x="5" y="8" width="7" height="1" fill="#c9a24a"/><rect x="12" y="8" width="2" height="1" fill="#7a1a12"/><rect x="14" y="8" width="1" height="1" fill="#1a1612"/><rect x="1" y="9" width="1" height="1" fill="#1a1612"/><rect x="2" y="9" width="1" height="1" fill="#7a1a12"/><rect x="3" y="9" width="2" height="1" fill="#b3261a"/><rect x="5" y="9" width="6" height="1" fill="#c9a24a"/><rect x="11" y="9" width="1" height="1" fill="#8c6434"/><rect x="12" y="9" width="2" height="1" fill="#7a1a12"/><rect x="14" y="9" width="1" height="1" fill="#1a1612"/><rect x="1" y="10" width="1" height="1" fill="#1a1612"/><rect x="2" y="10" width="1" height="1" fill="#7a1a12"/><rect x="3" y="10" width="2" height="1" fill="#b3261a"/><rect x="5" y="10" width="6" height="1" fill="#c9a24a"/><rect x="11" y="10" width="1" height="1" fill="#8c6434"/><rect x="12" y="10" width="2" height="1" fill="#7a1a12"/><rect x="14" y="10" width="1" height="1" fill="#1a1612"/><rect x="1" y="11" width="1" height="1" fill="#1a1612"/><rect x="2" y="11" width="1" height="1" fill="#7a1a12"/><rect x="3" y="11" width="2" height="1" fill="#b3261a"/><rect x="5" y="11" width="2" height="1" fill="#8c6434"/><rect x="7" y="11" width="2" height="1" fill="#c9a24a"/><rect x="9" y="11" width="2" height="1" fill="#8c6434"/><rect x="11" y="11" width="3" height="1" fill="#7a1a12"/><rect x="14" y="11" width="1" height="1" fill="#1a1612"/><rect x="1" y="12" width="1" height="1" fill="#1a1612"/><rect x="2" y="12" width="1" height="1" fill="#7a1a12"/><rect x="3" y="12" width="2" height="1" fill="#b3261a"/><rect x="5" y="12" width="9" height="1" fill="#7a1a12"/><rect x="14" y="12" width="1" height="1" fill="#1a1612"/><rect x="1" y="13" width="1" height="1" fill="#1a1612"/><rect x="2" y="13" width="12" height="1" fill="#7a1a12"/><rect x="14" y="13" width="1" height="1" fill="#1a1612"/><rect x="2" y="14" width="12" height="1" fill="#1a1612"/></svg>`,
+        "청홍검": `<svg viewBox="0 0 16 16" class="w-full h-full pixel-art" fill="none" shape-rendering="crispEdges"><rect x="12" y="0" width="2" height="1" fill="#1a1612"/><rect x="11" y="1" width="1" height="1" fill="#1a1612"/><rect x="12" y="1" width="2" height="1" fill="#8d7a9c"/><rect x="14" y="1" width="1" height="1" fill="#1a1612"/><rect x="10" y="2" width="1" height="1" fill="#1a1612"/><rect x="11" y="2" width="2" height="1" fill="#768c98"/><rect x="13" y="2" width="2" height="1" fill="#8d7a9c"/><rect x="15" y="2" width="1" height="1" fill="#1a1612"/><rect x="9" y="3" width="1" height="1" fill="#1a1612"/><rect x="10" y="3" width="4" height="1" fill="#768c98"/><rect x="14" y="3" width="1" height="1" fill="#8d7a9c"/><rect x="15" y="3" width="1" height="1" fill="#1a1612"/><rect x="8" y="4" width="1" height="1" fill="#1a1612"/><rect x="9" y="4" width="5" height="1" fill="#768c98"/><rect x="14" y="4" width="1" height="1" fill="#1a1612"/><rect x="7" y="5" width="1" height="1" fill="#1a1612"/><rect x="8" y="5" width="5" height="1" fill="#768c98"/><rect x="13" y="5" width="1" height="1" fill="#1a1612"/><rect x="6" y="6" width="1" height="1" fill="#1a1612"/><rect x="7" y="6" width="5" height="1" fill="#768c98"/><rect x="12" y="6" width="1" height="1" fill="#1a1612"/><rect x="5" y="7" width="1" height="1" fill="#1a1612"/><rect x="6" y="7" width="5" height="1" fill="#768c98"/><rect x="11" y="7" width="1" height="1" fill="#1a1612"/><rect x="4" y="8" width="1" height="1" fill="#1a1612"/><rect x="5" y="8" width="5" height="1" fill="#768c98"/><rect x="10" y="8" width="1" height="1" fill="#1a1612"/><rect x="3" y="9" width="1" height="1" fill="#1a1612"/><rect x="4" y="9" width="5" height="1" fill="#768c98"/><rect x="9" y="9" width="1" height="1" fill="#1a1612"/><rect x="2" y="10" width="1" height="1" fill="#1a1612"/><rect x="3" y="10" width="5" height="1" fill="#768c98"/><rect x="8" y="10" width="1" height="1" fill="#1a1612"/><rect x="2" y="11" width="1" height="1" fill="#1a1612"/><rect x="3" y="11" width="4" height="1" fill="#768c98"/><rect x="7" y="11" width="1" height="1" fill="#1a1612"/><rect x="1" y="12" width="3" height="1" fill="#1a1612"/><rect x="4" y="12" width="2" height="1" fill="#768c98"/><rect x="6" y="12" width="1" height="1" fill="#1a1612"/><rect x="0" y="13" width="1" height="1" fill="#1a1612"/><rect x="1" y="13" width="2" height="1" fill="#c9a24a"/><rect x="3" y="13" width="3" height="1" fill="#1a1612"/><rect x="0" y="14" width="1" height="1" fill="#1a1612"/><rect x="1" y="14" width="2" height="1" fill="#c9a24a"/><rect x="3" y="14" width="1" height="1" fill="#1a1612"/><rect x="1" y="15" width="2" height="1" fill="#1a1612"/></svg>`,
+        "백년하수오": `<svg viewBox="0 0 16 16" class="w-full h-full pixel-art" fill="none" shape-rendering="crispEdges"><rect x="7" y="0" width="2" height="1" fill="#1a1612"/><rect x="6" y="1" width="1" height="1" fill="#1a1612"/><rect x="7" y="1" width="2" height="1" fill="#86a079"/><rect x="9" y="1" width="1" height="1" fill="#1a1612"/><rect x="6" y="2" width="1" height="1" fill="#1a1612"/><rect x="7" y="2" width="2" height="1" fill="#86a079"/><rect x="9" y="2" width="1" height="1" fill="#1a1612"/><rect x="6" y="3" width="1" height="1" fill="#1a1612"/><rect x="7" y="3" width="2" height="1" fill="#4c6b48"/><rect x="9" y="3" width="1" height="1" fill="#1a1612"/><rect x="6" y="4" width="1" height="1" fill="#1a1612"/><rect x="7" y="4" width="2" height="1" fill="#4c6b48"/><rect x="9" y="4" width="1" height="1" fill="#1a1612"/><rect x="5" y="5" width="1" height="1" fill="#1a1612"/><rect x="6" y="5" width="4" height="1" fill="#4c6b48"/><rect x="10" y="5" width="1" height="1" fill="#1a1612"/><rect x="4" y="6" width="1" height="1" fill="#1a1612"/><rect x="5" y="6" width="6" height="1" fill="#4c6b48"/><rect x="11" y="6" width="1" height="1" fill="#1a1612"/><rect x="3" y="7" width="1" height="1" fill="#1a1612"/><rect x="4" y="7" width="8" height="1" fill="#4c6b48"/><rect x="12" y="7" width="1" height="1" fill="#1a1612"/><rect x="3" y="8" width="1" height="1" fill="#1a1612"/><rect x="4" y="8" width="8" height="1" fill="#4c6b48"/><rect x="12" y="8" width="1" height="1" fill="#1a1612"/><rect x="3" y="9" width="1" height="1" fill="#1a1612"/><rect x="4" y="9" width="8" height="1" fill="#4c6b48"/><rect x="12" y="9" width="1" height="1" fill="#1a1612"/><rect x="3" y="10" width="1" height="1" fill="#1a1612"/><rect x="4" y="10" width="8" height="1" fill="#4c6b48"/><rect x="12" y="10" width="1" height="1" fill="#1a1612"/><rect x="4" y="11" width="1" height="1" fill="#1a1612"/><rect x="5" y="11" width="6" height="1" fill="#4c6b48"/><rect x="11" y="11" width="1" height="1" fill="#1a1612"/><rect x="5" y="12" width="1" height="1" fill="#1a1612"/><rect x="6" y="12" width="4" height="1" fill="#4c6b48"/><rect x="10" y="12" width="1" height="1" fill="#1a1612"/><rect x="6" y="13" width="4" height="1" fill="#1a1612"/></svg>`,
+        "연단환": `<svg viewBox="0 0 16 16" class="w-full h-full pixel-art" fill="none" shape-rendering="crispEdges"><rect x="6" y="2" width="4" height="1" fill="#1a1612"/><rect x="4" y="3" width="2" height="1" fill="#1a1612"/><rect x="6" y="3" width="4" height="1" fill="#8c6434"/><rect x="10" y="3" width="2" height="1" fill="#1a1612"/><rect x="3" y="4" width="1" height="1" fill="#1a1612"/><rect x="4" y="4" width="8" height="1" fill="#8c6434"/><rect x="12" y="4" width="1" height="1" fill="#1a1612"/><rect x="3" y="5" width="1" height="1" fill="#1a1612"/><rect x="4" y="5" width="8" height="1" fill="#8c6434"/><rect x="12" y="5" width="1" height="1" fill="#1a1612"/><rect x="2" y="6" width="1" height="1" fill="#1a1612"/><rect x="3" y="6" width="3" height="1" fill="#8c6434"/><rect x="6" y="6" width="2" height="1" fill="#e6cfaa"/><rect x="8" y="6" width="5" height="1" fill="#8c6434"/><rect x="13" y="6" width="1" height="1" fill="#1a1612"/><rect x="2" y="7" width="1" height="1" fill="#1a1612"/><rect x="3" y="7" width="3" height="1" fill="#8c6434"/><rect x="6" y="7" width="2" height="1" fill="#e6cfaa"/><rect x="8" y="7" width="5" height="1" fill="#8c6434"/><rect x="13" y="7" width="1" height="1" fill="#1a1612"/><rect x="2" y="8" width="1" height="1" fill="#1a1612"/><rect x="3" y="8" width="3" height="1" fill="#8c6434"/><rect x="6" y="8" width="2" height="1" fill="#c39650"/><rect x="8" y="8" width="5" height="1" fill="#8c6434"/><rect x="13" y="8" width="1" height="1" fill="#1a1612"/><rect x="2" y="9" width="1" height="1" fill="#1a1612"/><rect x="3" y="9" width="10" height="1" fill="#8c6434"/><rect x="13" y="9" width="1" height="1" fill="#1a1612"/><rect x="3" y="10" width="1" height="1" fill="#1a1612"/><rect x="4" y="10" width="8" height="1" fill="#8c6434"/><rect x="12" y="10" width="1" height="1" fill="#1a1612"/><rect x="3" y="11" width="1" height="1" fill="#1a1612"/><rect x="4" y="11" width="8" height="1" fill="#8c6434"/><rect x="12" y="11" width="1" height="1" fill="#1a1612"/><rect x="4" y="12" width="2" height="1" fill="#1a1612"/><rect x="6" y="12" width="4" height="1" fill="#8c6434"/><rect x="10" y="12" width="2" height="1" fill="#1a1612"/><rect x="6" y="13" width="4" height="1" fill="#1a1612"/></svg>`,
+        "dust": `<svg viewBox="0 0 16 16" class="w-full h-full pixel-art" fill="none" shape-rendering="crispEdges"><rect x="7" y="4" width="2" height="1" fill="#1a1612"/><rect x="6" y="5" width="1" height="1" fill="#1a1612"/><rect x="7" y="5" width="2" height="1" fill="#a89e90"/><rect x="9" y="5" width="1" height="1" fill="#1a1612"/><rect x="6" y="6" width="1" height="1" fill="#1a1612"/><rect x="7" y="6" width="2" height="1" fill="#a89e90"/><rect x="9" y="6" width="3" height="1" fill="#1a1612"/><rect x="7" y="7" width="3" height="1" fill="#1a1612"/><rect x="10" y="7" width="2" height="1" fill="#3a332c"/><rect x="12" y="7" width="1" height="1" fill="#1a1612"/><rect x="4" y="8" width="2" height="1" fill="#1a1612"/><rect x="8" y="8" width="1" height="1" fill="#1a1612"/><rect x="9" y="8" width="4" height="1" fill="#3a332c"/><rect x="13" y="8" width="1" height="1" fill="#1a1612"/><rect x="3" y="9" width="1" height="1" fill="#1a1612"/><rect x="4" y="9" width="2" height="1" fill="#6e655a"/><rect x="6" y="9" width="1" height="1" fill="#1a1612"/><rect x="8" y="9" width="1" height="1" fill="#1a1612"/><rect x="9" y="9" width="4" height="1" fill="#3a332c"/><rect x="13" y="9" width="1" height="1" fill="#1a1612"/><rect x="3" y="10" width="1" height="1" fill="#1a1612"/><rect x="4" y="10" width="2" height="1" fill="#6e655a"/><rect x="6" y="10" width="1" height="1" fill="#1a1612"/><rect x="9" y="10" width="1" height="1" fill="#1a1612"/><rect x="10" y="10" width="2" height="1" fill="#3a332c"/><rect x="12" y="10" width="1" height="1" fill="#1a1612"/><rect x="4" y="11" width="2" height="1" fill="#1a1612"/><rect x="10" y="11" width="2" height="1" fill="#1a1612"/></svg>`,
+        "chest": `<svg viewBox="0 0 16 16" class="w-full h-full pixel-art" fill="none" shape-rendering="crispEdges"><rect x="2" y="3" width="12" height="1" fill="#1a1612"/><rect x="1" y="4" width="1" height="1" fill="#1a1612"/><rect x="2" y="4" width="12" height="1" fill="#8c6434"/><rect x="14" y="4" width="1" height="1" fill="#1a1612"/><rect x="1" y="5" width="1" height="1" fill="#1a1612"/><rect x="2" y="5" width="12" height="1" fill="#8c6434"/><rect x="14" y="5" width="1" height="1" fill="#1a1612"/><rect x="1" y="6" width="1" height="1" fill="#1a1612"/><rect x="2" y="6" width="12" height="1" fill="#8c6434"/><rect x="14" y="6" width="1" height="1" fill="#1a1612"/><rect x="1" y="7" width="1" height="1" fill="#1a1612"/><rect x="2" y="7" width="12" height="1" fill="#8c6434"/><rect x="14" y="7" width="1" height="1" fill="#1a1612"/><rect x="1" y="8" width="6" height="1" fill="#1a1612"/><rect x="7" y="8" width="2" height="1" fill="#8c6434"/><rect x="9" y="8" width="6" height="1" fill="#1a1612"/><rect x="1" y="9" width="1" height="1" fill="#1a1612"/><rect x="2" y="9" width="12" height="1" fill="#8c6434"/><rect x="14" y="9" width="1" height="1" fill="#1a1612"/><rect x="1" y="10" width="1" height="1" fill="#1a1612"/><rect x="2" y="10" width="12" height="1" fill="#8c6434"/><rect x="14" y="10" width="1" height="1" fill="#1a1612"/><rect x="1" y="11" width="1" height="1" fill="#1a1612"/><rect x="2" y="11" width="12" height="1" fill="#8c6434"/><rect x="14" y="11" width="1" height="1" fill="#1a1612"/><rect x="1" y="12" width="1" height="1" fill="#1a1612"/><rect x="2" y="12" width="12" height="1" fill="#8c6434"/><rect x="14" y="12" width="1" height="1" fill="#1a1612"/><rect x="1" y="13" width="1" height="1" fill="#1a1612"/><rect x="2" y="13" width="12" height="1" fill="#8c6434"/><rect x="14" y="13" width="1" height="1" fill="#1a1612"/><rect x="2" y="14" width="12" height="1" fill="#1a1612"/></svg>`
       },
       enemies: {
-        "쉬움": `<svg viewBox="0 0 16 16" class="w-full h-full pixel-art" fill="none"><rect x="4" y="2" width="8" height="3" fill="#059669"/><rect x="5" y="5" width="6" height="4" fill="#fcd34d"/><rect x="6" y="6" width="1" height="1" fill="#000"/><rect x="9" y="6" width="1" height="1" fill="#000"/><rect x="6" y="8" width="4" height="1" fill="#000"/><rect x="4" y="9" width="8" height="5" fill="#047857"/></svg>`,
-        "호각": `<svg viewBox="0 0 16 16" class="w-full h-full pixel-art" fill="none"><rect x="5" y="1" width="6" height="3" fill="#0369a1"/><rect x="5" y="4" width="6" height="5" fill="#fcd34d"/><rect x="6" y="5" width="1" height="1" fill="#000"/><rect x="9" y="5" width="1" height="1" fill="#000"/><rect x="4" y="9" width="8" height="5" fill="#0284c7"/><rect x="12" y="7" width="1" height="7" fill="#cbd5e1"/></svg>`,
-        "도전": `<svg viewBox="0 0 16 16" class="w-full h-full pixel-art" fill="none"><rect x="4" y="2" width="8" height="4" fill="#450a0a"/><rect x="5" y="5" width="6" height="4" fill="#fcd34d"/><rect x="6" y="6" width="1" height="1" fill="#ef4444"/><rect x="9" y="6" width="1" height="1" fill="#ef4444"/><rect x="6" y="5" width="1" height="3" fill="#b91c1c"/><rect x="4" y="9" width="8" height="5" fill="#18181b"/></svg>`,
-        "무작위": `<svg viewBox="0 0 16 16" class="w-full h-full pixel-art" fill="none"><rect x="4" y="2" width="8" height="7" fill="#1e1b4b"/><rect x="6" y="5" width="1" height="1" fill="#a855f7"/><rect x="9" y="5" width="1" height="1" fill="#a855f7"/><rect x="4" y="9" width="8" height="5" fill="#0f172a"/><text x="8" y="13" font-size="6" font-family="monospace" fill="#c084fc" text-anchor="middle" font-weight="bold">?</text></svg>`,
-        "boss": `<svg viewBox="0 0 16 16" class="w-full h-full pixel-art" fill="none"><polygon points="8,1 4,4 12,4" fill="#eab308"/><rect x="4" y="4" width="8" height="5" fill="#fcd34d"/><rect x="6" y="5" width="1" height="1" fill="#eab308"/><rect x="9" y="5" width="1" height="1" fill="#eab308"/><rect x="4" y="9" width="8" height="5" fill="#ca8a04"/><circle cx="8" cy="8" r="6" stroke="#facc15" stroke-width="0.5" fill="none"/></svg>`
+        "쉬움": `<svg viewBox="0 0 16 16" class="w-full h-full pixel-art" fill="none" shape-rendering="crispEdges"><rect x="4" y="1" width="8" height="1" fill="#1a1612"/><rect x="3" y="2" width="1" height="1" fill="#1a1612"/><rect x="4" y="2" width="8" height="1" fill="#4c6b48"/><rect x="12" y="2" width="1" height="1" fill="#1a1612"/><rect x="3" y="3" width="1" height="1" fill="#1a1612"/><rect x="4" y="3" width="8" height="1" fill="#4c6b48"/><rect x="12" y="3" width="1" height="1" fill="#1a1612"/><rect x="3" y="4" width="1" height="1" fill="#1a1612"/><rect x="4" y="4" width="8" height="1" fill="#4c6b48"/><rect x="12" y="4" width="1" height="1" fill="#1a1612"/><rect x="4" y="5" width="1" height="1" fill="#1a1612"/><rect x="5" y="5" width="6" height="1" fill="#e6cfaa"/><rect x="11" y="5" width="1" height="1" fill="#1a1612"/><rect x="4" y="6" width="1" height="1" fill="#1a1612"/><rect x="5" y="6" width="1" height="1" fill="#e6cfaa"/><rect x="6" y="6" width="1" height="1" fill="#1a1612"/><rect x="7" y="6" width="2" height="1" fill="#e6cfaa"/><rect x="9" y="6" width="1" height="1" fill="#1a1612"/><rect x="10" y="6" width="1" height="1" fill="#e6cfaa"/><rect x="11" y="6" width="1" height="1" fill="#1a1612"/><rect x="4" y="7" width="1" height="1" fill="#1a1612"/><rect x="5" y="7" width="6" height="1" fill="#e6cfaa"/><rect x="11" y="7" width="1" height="1" fill="#1a1612"/><rect x="4" y="8" width="1" height="1" fill="#1a1612"/><rect x="5" y="8" width="1" height="1" fill="#e6cfaa"/><rect x="6" y="8" width="4" height="1" fill="#1a1612"/><rect x="10" y="8" width="1" height="1" fill="#e6cfaa"/><rect x="11" y="8" width="1" height="1" fill="#1a1612"/><rect x="3" y="9" width="1" height="1" fill="#1a1612"/><rect x="4" y="9" width="8" height="1" fill="#4c6b48"/><rect x="12" y="9" width="1" height="1" fill="#1a1612"/><rect x="3" y="10" width="1" height="1" fill="#1a1612"/><rect x="4" y="10" width="8" height="1" fill="#4c6b48"/><rect x="12" y="10" width="1" height="1" fill="#1a1612"/><rect x="3" y="11" width="1" height="1" fill="#1a1612"/><rect x="4" y="11" width="8" height="1" fill="#4c6b48"/><rect x="12" y="11" width="1" height="1" fill="#1a1612"/><rect x="3" y="12" width="1" height="1" fill="#1a1612"/><rect x="4" y="12" width="8" height="1" fill="#4c6b48"/><rect x="12" y="12" width="1" height="1" fill="#1a1612"/><rect x="3" y="13" width="1" height="1" fill="#1a1612"/><rect x="4" y="13" width="8" height="1" fill="#4c6b48"/><rect x="12" y="13" width="1" height="1" fill="#1a1612"/><rect x="4" y="14" width="8" height="1" fill="#1a1612"/></svg>`,
+        "호각": `<svg viewBox="0 0 16 16" class="w-full h-full pixel-art" fill="none" shape-rendering="crispEdges"><rect x="5" y="0" width="6" height="1" fill="#1a1612"/><rect x="4" y="1" width="1" height="1" fill="#1a1612"/><rect x="5" y="1" width="6" height="1" fill="#405260"/><rect x="11" y="1" width="1" height="1" fill="#1a1612"/><rect x="4" y="2" width="1" height="1" fill="#1a1612"/><rect x="5" y="2" width="6" height="1" fill="#405260"/><rect x="11" y="2" width="1" height="1" fill="#1a1612"/><rect x="4" y="3" width="1" height="1" fill="#1a1612"/><rect x="5" y="3" width="6" height="1" fill="#405260"/><rect x="11" y="3" width="1" height="1" fill="#1a1612"/><rect x="4" y="4" width="1" height="1" fill="#1a1612"/><rect x="5" y="4" width="6" height="1" fill="#e6cfaa"/><rect x="11" y="4" width="1" height="1" fill="#1a1612"/><rect x="4" y="5" width="1" height="1" fill="#1a1612"/><rect x="5" y="5" width="1" height="1" fill="#e6cfaa"/><rect x="6" y="5" width="1" height="1" fill="#1a1612"/><rect x="7" y="5" width="2" height="1" fill="#e6cfaa"/><rect x="9" y="5" width="1" height="1" fill="#1a1612"/><rect x="10" y="5" width="1" height="1" fill="#e6cfaa"/><rect x="11" y="5" width="1" height="1" fill="#1a1612"/><rect x="4" y="6" width="1" height="1" fill="#1a1612"/><rect x="5" y="6" width="6" height="1" fill="#e6cfaa"/><rect x="11" y="6" width="2" height="1" fill="#1a1612"/><rect x="4" y="7" width="1" height="1" fill="#1a1612"/><rect x="5" y="7" width="6" height="1" fill="#e6cfaa"/><rect x="11" y="7" width="1" height="1" fill="#1a1612"/><rect x="12" y="7" width="1" height="1" fill="#768c98"/><rect x="13" y="7" width="1" height="1" fill="#1a1612"/><rect x="4" y="8" width="1" height="1" fill="#1a1612"/><rect x="5" y="8" width="6" height="1" fill="#e6cfaa"/><rect x="11" y="8" width="1" height="1" fill="#1a1612"/><rect x="12" y="8" width="1" height="1" fill="#768c98"/><rect x="13" y="8" width="1" height="1" fill="#1a1612"/><rect x="3" y="9" width="1" height="1" fill="#1a1612"/><rect x="4" y="9" width="8" height="1" fill="#405260"/><rect x="12" y="9" width="1" height="1" fill="#768c98"/><rect x="13" y="9" width="1" height="1" fill="#1a1612"/><rect x="3" y="10" width="1" height="1" fill="#1a1612"/><rect x="4" y="10" width="8" height="1" fill="#405260"/><rect x="12" y="10" width="1" height="1" fill="#768c98"/><rect x="13" y="10" width="1" height="1" fill="#1a1612"/><rect x="3" y="11" width="1" height="1" fill="#1a1612"/><rect x="4" y="11" width="8" height="1" fill="#405260"/><rect x="12" y="11" width="1" height="1" fill="#768c98"/><rect x="13" y="11" width="1" height="1" fill="#1a1612"/><rect x="3" y="12" width="1" height="1" fill="#1a1612"/><rect x="4" y="12" width="8" height="1" fill="#405260"/><rect x="12" y="12" width="1" height="1" fill="#768c98"/><rect x="13" y="12" width="1" height="1" fill="#1a1612"/><rect x="3" y="13" width="1" height="1" fill="#1a1612"/><rect x="4" y="13" width="8" height="1" fill="#405260"/><rect x="12" y="13" width="1" height="1" fill="#768c98"/><rect x="13" y="13" width="1" height="1" fill="#1a1612"/><rect x="4" y="14" width="9" height="1" fill="#1a1612"/></svg>`,
+        "도전": `<svg viewBox="0 0 16 16" class="w-full h-full pixel-art" fill="none" shape-rendering="crispEdges"><rect x="4" y="1" width="8" height="1" fill="#1a1612"/><rect x="3" y="2" width="1" height="1" fill="#1a1612"/><rect x="4" y="2" width="8" height="1" fill="#7a1a12"/><rect x="12" y="2" width="1" height="1" fill="#1a1612"/><rect x="3" y="3" width="1" height="1" fill="#1a1612"/><rect x="4" y="3" width="8" height="1" fill="#7a1a12"/><rect x="12" y="3" width="1" height="1" fill="#1a1612"/><rect x="3" y="4" width="1" height="1" fill="#1a1612"/><rect x="4" y="4" width="8" height="1" fill="#7a1a12"/><rect x="12" y="4" width="1" height="1" fill="#1a1612"/><rect x="3" y="5" width="1" height="1" fill="#1a1612"/><rect x="4" y="5" width="1" height="1" fill="#7a1a12"/><rect x="5" y="5" width="1" height="1" fill="#e6cfaa"/><rect x="6" y="5" width="1" height="1" fill="#b3261a"/><rect x="7" y="5" width="4" height="1" fill="#e6cfaa"/><rect x="11" y="5" width="1" height="1" fill="#7a1a12"/><rect x="12" y="5" width="1" height="1" fill="#1a1612"/><rect x="4" y="6" width="1" height="1" fill="#1a1612"/><rect x="5" y="6" width="1" height="1" fill="#e6cfaa"/><rect x="6" y="6" width="1" height="1" fill="#b3261a"/><rect x="7" y="6" width="2" height="1" fill="#e6cfaa"/><rect x="9" y="6" width="1" height="1" fill="#b3261a"/><rect x="10" y="6" width="1" height="1" fill="#e6cfaa"/><rect x="11" y="6" width="1" height="1" fill="#1a1612"/><rect x="4" y="7" width="1" height="1" fill="#1a1612"/><rect x="5" y="7" width="1" height="1" fill="#e6cfaa"/><rect x="6" y="7" width="1" height="1" fill="#b3261a"/><rect x="7" y="7" width="4" height="1" fill="#e6cfaa"/><rect x="11" y="7" width="1" height="1" fill="#1a1612"/><rect x="4" y="8" width="1" height="1" fill="#1a1612"/><rect x="5" y="8" width="6" height="1" fill="#e6cfaa"/><rect x="11" y="8" width="1" height="1" fill="#1a1612"/><rect x="3" y="9" width="10" height="1" fill="#1a1612"/><rect x="3" y="10" width="10" height="1" fill="#1a1612"/><rect x="3" y="11" width="10" height="1" fill="#1a1612"/><rect x="3" y="12" width="10" height="1" fill="#1a1612"/><rect x="3" y="13" width="10" height="1" fill="#1a1612"/><rect x="4" y="14" width="8" height="1" fill="#1a1612"/></svg>`,
+        "무작위": `<svg viewBox="0 0 16 16" class="w-full h-full pixel-art" fill="none" shape-rendering="crispEdges"><rect x="4" y="1" width="8" height="1" fill="#1a1612"/><rect x="3" y="2" width="1" height="1" fill="#1a1612"/><rect x="4" y="2" width="8" height="1" fill="#405260"/><rect x="12" y="2" width="1" height="1" fill="#1a1612"/><rect x="3" y="3" width="1" height="1" fill="#1a1612"/><rect x="4" y="3" width="8" height="1" fill="#405260"/><rect x="12" y="3" width="1" height="1" fill="#1a1612"/><rect x="3" y="4" width="1" height="1" fill="#1a1612"/><rect x="4" y="4" width="8" height="1" fill="#405260"/><rect x="12" y="4" width="1" height="1" fill="#1a1612"/><rect x="3" y="5" width="1" height="1" fill="#1a1612"/><rect x="4" y="5" width="2" height="1" fill="#405260"/><rect x="6" y="5" width="1" height="1" fill="#8d7a9c"/><rect x="7" y="5" width="2" height="1" fill="#405260"/><rect x="9" y="5" width="1" height="1" fill="#8d7a9c"/><rect x="10" y="5" width="2" height="1" fill="#405260"/><rect x="12" y="5" width="1" height="1" fill="#1a1612"/><rect x="3" y="6" width="1" height="1" fill="#1a1612"/><rect x="4" y="6" width="8" height="1" fill="#405260"/><rect x="12" y="6" width="1" height="1" fill="#1a1612"/><rect x="3" y="7" width="1" height="1" fill="#1a1612"/><rect x="4" y="7" width="8" height="1" fill="#405260"/><rect x="12" y="7" width="1" height="1" fill="#1a1612"/><rect x="3" y="8" width="1" height="1" fill="#1a1612"/><rect x="4" y="8" width="3" height="1" fill="#405260"/><rect x="7" y="8" width="2" height="1" fill="#5d4a6e"/><rect x="9" y="8" width="3" height="1" fill="#405260"/><rect x="12" y="8" width="1" height="1" fill="#1a1612"/><rect x="3" y="9" width="3" height="1" fill="#1a1612"/><rect x="6" y="9" width="1" height="1" fill="#405260"/><rect x="7" y="9" width="1" height="1" fill="#5d4a6e"/><rect x="8" y="9" width="1" height="1" fill="#8d7a9c"/><rect x="9" y="9" width="1" height="1" fill="#5d4a6e"/><rect x="10" y="9" width="3" height="1" fill="#1a1612"/><rect x="3" y="10" width="4" height="1" fill="#1a1612"/><rect x="7" y="10" width="1" height="1" fill="#405260"/><rect x="8" y="10" width="1" height="1" fill="#8d7a9c"/><rect x="9" y="10" width="1" height="1" fill="#405260"/><rect x="10" y="10" width="3" height="1" fill="#1a1612"/><rect x="3" y="11" width="4" height="1" fill="#1a1612"/><rect x="7" y="11" width="1" height="1" fill="#5d4a6e"/><rect x="8" y="11" width="1" height="1" fill="#405260"/><rect x="9" y="11" width="4" height="1" fill="#1a1612"/><rect x="3" y="12" width="4" height="1" fill="#1a1612"/><rect x="7" y="12" width="1" height="1" fill="#5d4a6e"/><rect x="8" y="12" width="1" height="1" fill="#405260"/><rect x="9" y="12" width="4" height="1" fill="#1a1612"/><rect x="3" y="13" width="10" height="1" fill="#1a1612"/><rect x="4" y="14" width="8" height="1" fill="#1a1612"/></svg>`,
+        "boss": `<svg viewBox="0 0 16 16" class="w-full h-full pixel-art" fill="none" shape-rendering="crispEdges"><rect x="7" y="0" width="2" height="1" fill="#1a1612"/><rect x="5" y="1" width="2" height="1" fill="#1a1612"/><rect x="7" y="1" width="2" height="1" fill="#c9a24a"/><rect x="9" y="1" width="2" height="1" fill="#1a1612"/><rect x="4" y="2" width="1" height="1" fill="#1a1612"/><rect x="5" y="2" width="6" height="1" fill="#c9a24a"/><rect x="11" y="2" width="1" height="1" fill="#1a1612"/><rect x="3" y="3" width="1" height="1" fill="#1a1612"/><rect x="4" y="3" width="8" height="1" fill="#c9a24a"/><rect x="12" y="3" width="1" height="1" fill="#1a1612"/><rect x="3" y="4" width="1" height="1" fill="#1a1612"/><rect x="4" y="4" width="8" height="1" fill="#e6cfaa"/><rect x="12" y="4" width="1" height="1" fill="#1a1612"/><rect x="3" y="5" width="1" height="1" fill="#1a1612"/><rect x="4" y="5" width="2" height="1" fill="#e6cfaa"/><rect x="6" y="5" width="1" height="1" fill="#c9a24a"/><rect x="7" y="5" width="2" height="1" fill="#e6cfaa"/><rect x="9" y="5" width="1" height="1" fill="#c9a24a"/><rect x="10" y="5" width="2" height="1" fill="#e6cfaa"/><rect x="12" y="5" width="1" height="1" fill="#1a1612"/><rect x="3" y="6" width="1" height="1" fill="#1a1612"/><rect x="4" y="6" width="8" height="1" fill="#e6cfaa"/><rect x="12" y="6" width="1" height="1" fill="#1a1612"/><rect x="3" y="7" width="1" height="1" fill="#1a1612"/><rect x="4" y="7" width="8" height="1" fill="#e6cfaa"/><rect x="12" y="7" width="1" height="1" fill="#1a1612"/><rect x="3" y="8" width="1" height="1" fill="#1a1612"/><rect x="4" y="8" width="8" height="1" fill="#e6cfaa"/><rect x="12" y="8" width="1" height="1" fill="#1a1612"/><rect x="3" y="9" width="1" height="1" fill="#1a1612"/><rect x="4" y="9" width="8" height="1" fill="#8c6434"/><rect x="12" y="9" width="1" height="1" fill="#1a1612"/><rect x="3" y="10" width="1" height="1" fill="#1a1612"/><rect x="4" y="10" width="8" height="1" fill="#8c6434"/><rect x="12" y="10" width="1" height="1" fill="#1a1612"/><rect x="3" y="11" width="1" height="1" fill="#1a1612"/><rect x="4" y="11" width="8" height="1" fill="#8c6434"/><rect x="12" y="11" width="1" height="1" fill="#1a1612"/><rect x="3" y="12" width="1" height="1" fill="#1a1612"/><rect x="4" y="12" width="1" height="1" fill="#c9a24a"/><rect x="5" y="12" width="6" height="1" fill="#8c6434"/><rect x="11" y="12" width="1" height="1" fill="#c9a24a"/><rect x="12" y="12" width="1" height="1" fill="#1a1612"/><rect x="3" y="13" width="1" height="1" fill="#1a1612"/><rect x="4" y="13" width="1" height="1" fill="#8c6434"/><rect x="5" y="13" width="6" height="1" fill="#c9a24a"/><rect x="11" y="13" width="1" height="1" fill="#8c6434"/><rect x="12" y="13" width="1" height="1" fill="#1a1612"/><rect x="4" y="14" width="8" height="1" fill="#1a1612"/></svg>`
       }
     };
 
@@ -1709,7 +1816,7 @@
       const box = document.getElementById("start-setup");
       const open = force !== undefined ? force : box.style.display === "none";
       box.style.display = open ? "block" : "none";
-      document.getElementById("btn-toggle-setup").innerText = open ? "⚙️ 직접 정하기 접기 ▴" : "⚙️ 이름·출신·기질을 직접 정하고 시작하기 ▾";
+      document.getElementById("btn-toggle-setup").innerText = open ? "직접 정하기 접기 ▴" : "직접 정하고 시작하기 ▾";
     }
 
     function quickStart() {
@@ -1776,7 +1883,7 @@
       const b = btn || document.getElementById("btn-copy-link");
       if (ok) {
         const old = b.innerHTML;
-        b.innerHTML = char.rankKey ? "✓ 내 열전 링크를 복사했습니다" : "✓ 게임 링크를 복사했습니다";
+        b.innerHTML = char.rankKey ? "✓ 열전 링크를 복사했습니다" : "✓ 게임 링크를 복사했습니다";
         setTimeout(() => { b.innerHTML = old; }, 2200);
       } else {
         showCustomAlert(`아래 링크를 길게 눌러 복사해 주세요.\n${url}`);
@@ -2050,7 +2157,7 @@
 
       const submitBtn = document.getElementById("btn-submit-rank");
       submitBtn.disabled = true;
-      submitBtn.innerText = "천하 서열록에 기록을 올리는 중...";
+      submitBtn.innerText = "천하 서열록에 이름을 올리는 중…";
 
       const record = char.pendingRecord || buildRankRecord();
       char.recordedAt = record.createdAt;
@@ -2065,7 +2172,7 @@
           fetchDayStanding(record.dailyKey, record.power).then(st => { if (st) char.dayRank = st.rank; });
           hasSubmittedThisLife = true;
           markArchiveSubmitted(char.archiveId);
-          submitBtn.innerText = auto ? "✓ 천하 서열록에 자동으로 올라갔습니다" : "✓ 천하 서열록 등록 완료";
+          submitBtn.innerText = "✓ 천하 서열록에 이름이 올랐습니다";
           submitBtn.className = "w-full py-2.5 bg-stone-800 text-stone-500 font-brush text-xs rounded-xl cursor-not-allowed";
           if (!auto) openLeaderboardModal();
         } else {
@@ -2076,7 +2183,7 @@
         console.error("랭킹 등록 실패:", err);
         if (!auto) showCustomAlert("서열록 등록에 실패했습니다. 다음에 접속할 때 자동으로 다시 시도합니다.");
         submitBtn.disabled = false;
-        submitBtn.innerText = "🏆 서열록 등록 다시 시도 (실패 시 다음 접속 때 자동 재시도)";
+        submitBtn.innerText = "다시 올리기 (다음 접속 때 자동으로 다시 시도)";
       }
     }
 
@@ -2930,7 +3037,7 @@
       } else {
         btnAgain.disabled = false;
         btnAgain.className = "py-3 bg-gradient-to-r from-amber-600 to-amber-500 hover:brightness-110 text-stone-950 font-brush text-sm rounded-xl transition cursor-pointer shadow";
-        btnAgain.innerText = "한 번 더 개봉 (80냥)";
+        btnAgain.innerText = "한 번 더 열기 · 80냥";
       }
 
       modal.style.display = "flex";
@@ -4810,7 +4917,7 @@
 
     function renderArchiveButton() {
       const btn = document.getElementById("btn-archive");
-      if (btn) btn.innerText = `📜 강호 열전 · 지난 인생 ${loadArchive().length}`;
+      if (btn) btn.innerText = `지난 인생을 돌아보다 · ${loadArchive().length}`;
     }
 
     function openArchiveModal() {
@@ -6182,7 +6289,7 @@
       if (yearBusy && !over) pass.className += " text-sm";
       const auto = document.getElementById("btn-auto");
       auto.className = `px-2.5 py-1 rounded-lg border font-bold text-[11px] transition ${autoMode ? "bg-cyan-900/60 border-cyan-400 text-cyan-200" : "bg-stone-900 border-stone-700 text-stone-300 hover:bg-stone-800"} ${over ? "opacity-50" : "cursor-pointer"}`;
-      auto.innerText = autoMode ? "⏸ 멈춤" : "⏩ 운명에 맡기기";
+      auto.innerText = autoMode ? "⏸ 멈춤" : "운명에 맡기기";
       auto.disabled = over;
       document.getElementById("btn-speed").innerText = `${Math.round(1 / timeScale)}x`;
     }
@@ -6210,11 +6317,12 @@
     }
 
     function renderMultiTierBar(val, baseFillClass, tierId, bgId, fillId) {
+      // 먹 획 색: 1단은 능력치 고유색, 2단 금니, 3단 자색, 4단 주홍
       const tierLevels = [
-        { fill: baseFillClass, bg: "bg-transparent", name: "1단" },
-        { fill: "bg-gradient-to-r from-amber-500 to-yellow-300 shadow-[0_0_8px_rgba(250,204,21,0.6)]", bg: baseFillClass, name: "2단" },
-        { fill: "bg-gradient-to-r from-purple-500 to-fuchsia-400 shadow-[0_0_8px_rgba(217,70,239,0.7)]", bg: "bg-amber-500", name: "3단" },
-        { fill: "bg-gradient-to-r from-red-600 via-rose-500 to-white shadow-[0_0_10px_rgba(244,63,94,0.9)]", bg: "bg-purple-600", name: "4단" }
+        { fill: baseFillClass, bg: "transparent", name: "1단" },
+        { fill: "#a8812f", bg: baseFillClass, name: "2단" },
+        { fill: "#5b3a78", bg: "#a8812f", name: "3단" },
+        { fill: "#d0452f", bg: "#5b3a78", name: "4단" }
       ];
 
       const tierIndex = Math.min(tierLevels.length - 1, Math.floor(val / 100));
@@ -6225,10 +6333,12 @@
       document.getElementById(tierId).innerText = currentTier.name;
       
       const bgElem = document.getElementById(bgId);
-      bgElem.className = `absolute inset-0 ${currentTier.bg}`;
+      bgElem.className = "absolute inset-0 ink-stroke";
+      bgElem.style.background = currentTier.bg;
       
       const fillElem = document.getElementById(fillId);
-      fillElem.className = `h-full transition-all duration-300 relative z-10 ${currentTier.fill}`;
+      fillElem.className = "h-full transition-all duration-300 relative z-10 ink-stroke";
+      fillElem.style.background = currentTier.fill;
       fillElem.style.width = Math.max(3, pct) + "%";
     }
 
@@ -6310,10 +6420,10 @@
       renderDelta("delta-evil", alignGains.evil);
       renderDelta("delta-demonic", alignGains.demonic);
 
-      renderMultiTierBar(char.qi, "bg-gradient-to-r from-amber-600 to-amber-400", "tier-qi", "bar-qi-bg", "bar-qi-fill");
-      renderMultiTierBar(char.ext, "bg-gradient-to-r from-red-600 to-red-400", "tier-ext", "bar-ext-bg", "bar-ext-fill");
-      renderMultiTierBar(char.agi, "bg-gradient-to-r from-cyan-600 to-cyan-400", "tier-agi", "bar-agi-bg", "bar-agi-fill");
-      renderMultiTierBar(char.fame, "bg-gradient-to-r from-emerald-600 to-emerald-400", "tier-fame", "bar-fame-bg", "bar-fame-fill");
+      renderMultiTierBar(char.qi, "#16120e", "tier-qi", "bar-qi-bg", "bar-qi-fill");
+      renderMultiTierBar(char.ext, "#b3261a", "tier-ext", "bar-ext-bg", "bar-ext-fill");
+      renderMultiTierBar(char.agi, "#3e5566", "tier-agi", "bar-agi-bg", "bar-agi-fill");
+      renderMultiTierBar(char.fame, "#7b6a4a", "tier-fame", "bar-fame-bg", "bar-fame-fill");
 
       renderFocusUI();
 
@@ -6352,7 +6462,7 @@
         document.getElementById("sect-sum-heir").innerText = heir ? `대제자: ${heir.name} (무력 ${heir.power})` : "대제자가 아직 없습니다";
       } else {
         sumBox.classList.add("hidden");
-        sectBtnLabel.innerText = "🏯 문파 창건";
+        sectBtnLabel.innerText = "문파 창건";
         sectBtnSub.innerText = canFoundSect() ? `창건 가능! (${SECT_FOUND_COST}냥)` : `일류 고수 이상 · ${SECT_FOUND_COST}냥 필요`;
       }
 
@@ -6362,7 +6472,7 @@
         const reqs = ascensionReqs();
         const ready = reqs.every(r => r.ok);
         btnAscension.innerHTML = ready
-          ? `<span>⚡ 우화등선(羽化登仙): 구천현뢰 천겁 돌파 · 약 ${getAscensionProb()}%</span>`
+          ? `<span>우화등선 · 천겁에 맞서다 · 약 ${getAscensionProb()}%</span>`
           : `<span class="text-xs leading-snug">⚡ 우화등선 조건 — ${reqs.map(r => `${r.ok ? "✓" : "✕"} ${r.label}`).join(" · ")}</span>`;
         btnAscension.classList.toggle("opacity-60", !ready);
       } else {
