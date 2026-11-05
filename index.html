@@ -5824,9 +5824,10 @@
       const due = (char.bonds || []).filter(b => !b.done && char.age >= b.due).sort((a, b) => a.due - b.due);
       if (!due.length || Math.random() < 0.25) return;
       const b = due[0];
-      const fn = BOND_PAYOFFS[b.kind];
+      const twist = BOND_TWISTS[b.kind] && Math.random() < 0.25;
+      const fn = twist ? BOND_TWISTS[b.kind] : BOND_PAYOFFS[b.kind];
       if (!fn) { b.done = true; return; }
-      b.done = true;
+      b.done = true; b.twisted = twist;
       await storyHeader(b.header || "다시 만난 사람");
       await fn(b, rec);
     }
@@ -6697,7 +6698,7 @@
           o.stage = 9;
           await storyHeader("천마의 후계");
           await say("늙은 교주가 후계자를 정하겠다고 했다. 남은 것은 나와 혈영당의 늙은 여우, 둘뿐이다. 신교의 법은 하나다. 살아남는 자가 천마다.", "text-stone-200", 320);
-          const peer = bondsOf("cult_peer").find(b => b.done);
+          const peer = bondsOf("cult_peer").find(b => b.done && !b.twisted);
           if (peer) await say(`장로 ${peer.name}${josa(peer.name, "이", "가")} 조용히 내 쪽에 섰다. 혈지의 배수구를 기억하는 사람이었다.`, "text-sky-300 italic", 260);
           const trust = char.flags.cultTrust || 0;
           if (trust >= 3) await say("교주의 눈빛이 나에게 머물렀다. 오랫동안 쌓아 온 신임이었다.", "text-rose-200 italic", 240);
@@ -6781,7 +6782,7 @@
           o.stage = 9;
           await storyHeader("천하제일 표국");
           await say("강북 최대의 표국 금룡표국이 우리 표국을 눈엣가시로 여겼다. 국주끼리의 비무로 강호 표물의 판도를 가리자는 도전장이 왔다.", "text-stone-200", 300);
-          const vice = bondsOf("framed_man").find(b => b.done);
+          const vice = bondsOf("framed_man").find(b => b.done && !b.twisted);
           if (vice) await say(`부국주 ${vice.name}${josa(vice.name, "이", "가")} 내 등 뒤를 지켰다. 누명을 벗겨 준 그날부터 함께해 온 사람이다.`, "text-sky-300 italic", 240);
           const won = await storyFight(char.name, Math.round(getCombatPower() * (1 + (vice ? 0.1 : 0) + o.rep * 0.05)), "금룡표국 국주", Math.round(getBenchmarkPower() * 1.3));
           if (won) { char.flags.topAgency = true; gainFame(20); char.money += scaled(150); addHonor("천하제일표국 국주"); await rec.out(`금룡표국의 깃발이 내려갔다. 천하의 표물이 우리 표국으로 몰려들었다. (명성 +20, 은자 +${scaled(150)})`, "text-yellow-300 font-bold"); addStory("금룡표국을 꺾고 천하제일 표국의 국주가 되었다."); }
@@ -6935,6 +6936,90 @@
         addStory("정마대전의 결전에서 패했다.");
       }
     }
+
+    // ---- 선행의 반전: 착한 선택으로 생긴 인연도 가끔은 칼이 되어 돌아온다 ----
+    const BOND_TWISTS = {
+      first_spared: async (b, rec) => {
+        await say(`${agoText(b)} 살려 보낸 산적이 다시 무리를 모아 마을을 덮쳤다는 소식이 들려왔다. 그날 거둔 칼이 다른 사람의 피를 부른 것이다.`, "text-rose-300", 300);
+        const i = await arcChoose([
+          { label: "내가 살려 보낸 자다. 직접 끝낸다", hint: "생사결 · 이기면 협의 ↑", p: "orthodox" },
+          { label: "관부에 맡기고 모른 척한다", hint: "명성 -6 · 마음의 짐", p: "unorthodox" }
+        ]);
+        if (i === 1) { gainFame(-6); await rec.out("마을이 불탔다는 소식을 뒤늦게 들었다. 그날 밤 잠을 이루지 못했다. (명성 -6)", "text-stone-400 italic"); addStory("살려 보낸 산적이 다시 마을을 덮쳤지만 외면했다."); return; }
+        if (await bondFight("다시 칼을 든 산적 두목", 1.05, rec, 0.05, "살려 보냈던 산적의 칼에 쓰러졌다")) {
+          addAlign(5, 0, 0); gainFame(8);
+          await rec.out("이번에는 칼을 거두지 않았다. 살리는 것도 책임이라는 것을 배웠다. (협의 +5, 명성 +8)", "text-yellow-300");
+          addStory("살려 보낸 산적이 다시 마을을 덮치자, 직접 끝을 냈다.");
+        }
+      },
+      girl_saved: async (b, rec) => {
+        await say(`가문을 재건한 ${b.name}${josa(b.name, "이", "가")} 사람을 보내왔다. 그런데 서신의 말투가 차가웠다.`, "text-stone-200", 300);
+        await say(`"그날 제가 건넨 비급은 가문의 전부였습니다. 이제 가문이 다시 섰으니, 그 비급으로 익힌 무공을 거두어 가겠어요."`, "text-rose-300 italic", 300);
+        const i = await arcChoose([
+          { label: "익힌 구결을 돌려주고 내공 일부를 버린다", hint: "내공 -10 · 협의 +6", p: "orthodox" },
+          { label: "한 번 준 것을 돌려받겠다니, 검으로 답한다", hint: "싸움 · 악명 +3", p: "demonic" }
+        ]);
+        if (i === 0) { char.qi = Math.max(10, char.qi - 10); addAlign(6, 0, 0); await rec.out(`구결을 돌려주고 그 심법의 내력을 흩었다. ${b.name}${josa(b.name, "은", "는")} 고개를 숙이고 돌아갔다. (내공 -10, 협의 +6)`, "text-sky-300"); addStory(`구해 주었던 ${b.name}에게 가문의 비급을 돌려주었다.`); return; }
+        addAlign(0, 3, 0);
+        if (await bondFight(`${b.name} 가문의 호위 무사들`, 1.1, rec, 0.05, `${b.name} 가문의 무사들에게 쓰러졌다`)) await rec.out(`호위들이 물러났다. 구해 준 인연이 원한으로 바뀌었다.`, "text-rose-300");
+        if (!char.dead) addStory(`구해 주었던 ${b.name}${josa(b.name, "과", "와")} 비급 때문에 원수가 되었다.`);
+      },
+      avenger_boy: async (b, rec) => {
+        await say(`고수가 된 ${b.name}${josa(b.name, "이", "가")} 찾아왔다. 큰절 대신, 검을 뽑았다.`, "text-stone-200", 300);
+        await say(`"가르쳐 주신 은혜는 은혜고, 아버지의 원수는 원수입니다. 십여 년을 고민했지만, 이것만은 끝내야겠습니다."`, "text-rose-300 italic", 300);
+        const i = await arcChoose([
+          { label: "검을 뽑아 정면으로 받아 준다", hint: "생사결", p: "neutral" },
+          { label: "검을 내려놓고 한 팔을 내어 준다", hint: "외공 -12 · 협의 +8 · 원한이 끝난다", p: "orthodox" }
+        ]);
+        if (i === 1) { char.ext = Math.max(10, char.ext - 12); addAlign(8, 0, 0); await rec.out(`${b.name}의 검이 어깨를 그었다. 그는 피 묻은 검을 떨어뜨리고 울었다. 원한은 거기서 끝났다. (외공 -12, 협의 +8)`, "text-sky-300"); addStory(`원수의 아들 ${b.name}에게 한 팔을 내어 주며 원한을 끝냈다.`); return; }
+        if (await bondFight(`원수의 아들 ${b.name}`, 1.15, rec, 0.08, `가르쳤던 원수의 아들 ${b.name}의 검에 쓰러졌다`)) { gainStats(4, 4, 4); await rec.out(`${b.name}의 검이 떨어졌다. 차마 목숨은 거두지 못했다. (무력 +12)`, "text-yellow-300"); }
+        if (!char.dead) addStory(`가르쳤던 원수의 아들 ${b.name}${josa(b.name, "이", "가")} 끝내 검을 겨눴다.`);
+      },
+      spared_foe: async (b, rec) => {
+        await say(`${agoText(b)} 쓰러진 자리에서 일으켜 주었던 ${ida(b.name)}. 그런데 그의 눈빛이 이상했다. "그날 받은 동정이 평생의 수치였소."`, "text-rose-300", 300);
+        if (await bondFight(`${b.name}`, 1.1, rec, 0.05, `동정받은 것을 수치로 여긴 ${b.name}의 검에 쓰러졌다`)) { gainStats(3, 4, 3); await rec.out(`다시 이겼다. 이번에는 손을 내밀지 않았다. (무력 +10)`, "text-yellow-300"); }
+        if (!char.dead) addStory(`일으켜 주었던 ${b.name}${josa(b.name, "이", "가")} 그날의 동정을 수치로 여겨 도전해 왔다.`);
+      },
+      merchant: async (b, rec) => {
+        const pay = scaled(150);
+        await say(`${b.name} ${b.org || "상단"}의 주인이 은밀한 부탁을 해 왔다. "은혜를 아는 분이니 말씀드리지요. 경쟁 상단의 창고를 불태워 주십시오. 사례는 ${pay}냥입니다."`, "text-stone-200", 300);
+        const i = await arcChoose([
+          { label: "옛정을 생각해 들어준다", hint: `은자 +${pay} · 악명 +6`, p: "unorthodox" },
+          { label: "은혜는 은혜, 악행은 악행이라며 거절한다", hint: "협의 +4 · 후원이 끊긴다", p: "orthodox" }
+        ]);
+        if (i === 0) { char.money += pay; addAlign(0, 6, 0); await rec.out(`밤하늘이 붉게 물들었다. 은혜가 이런 식으로 갚아질 줄은 몰랐다. (은자 +${pay}, 악명 +6)`, "text-rose-300"); addStory(`은혜를 입은 ${b.name} ${b.org || "상단"}의 부탁으로 경쟁 상단의 창고를 불태웠다.`); }
+        else { addAlign(4, 0, 0); await rec.out("주인은 얼굴을 붉히며 돌아갔다. 후원은 그날로 끊겼다. (협의 +4)", "text-sky-300"); }
+      },
+      framed_man: async (b, rec) => {
+        await say(`관부에서 연쇄 살인범을 잡았다는 방이 붙었다. 초상화 속 얼굴은 ${agoText(b)} 누명을 썼다며 풀어 준 ${ida(b.name)}.`, "text-rose-300", 300);
+        await say("그날 그가 한 말은 모두 거짓이었다. 풀려난 뒤로도 그는 사람을 죽여 왔다.", "text-stone-400 italic", 280);
+        const i = await arcChoose([
+          { label: "관부를 찾아가 그날의 일을 털어놓는다", hint: "협의 +5 · 명성 -8", p: "orthodox" },
+          { label: "남은 일당을 직접 쫓는다", hint: "싸움 · 이기면 명예 회복", p: "neutral" }
+        ]);
+        if (i === 0) { addAlign(5, 0, 0); gainFame(-8); await rec.out("부끄러움을 무릅쓰고 모든 것을 털어놓았다. 사람 보는 눈을 다시 배웠다. (협의 +5, 명성 -8)", "text-sky-300"); addStory(`누명이라 믿고 풀어 준 ${b.name}${josa(b.name, "이", "가")} 진짜 살인범이었다.`); return; }
+        if (await bondFight(`${b.name}의 일당`, 1.05, rec, 0.05, `풀어 주었던 살인범 ${b.name}의 일당에게 쓰러졌다`)) { gainFame(6); await rec.out("남은 일당을 모두 관부에 넘겼다. 그래도 마음은 무거웠다. (명성 +6)", "text-yellow-300"); }
+        if (!char.dead) addStory(`누명이라 믿고 풀어 준 ${b.name}${josa(b.name, "이", "가")} 진짜 살인범이었다.`);
+      },
+      protege: async (b, rec) => {
+        await say(`천하비무대회에서 우승한 젊은 협객 ${b.name}${josa(b.name, "이", "가")} 단상에서 나를 가리켰다. "오늘 저는 스승을 넘어서겠습니다. 강호 앞에서 겨뤄 주십시오!"`, "text-rose-300", 300);
+        const i = await arcChoose([
+          { label: "단상에 올라 받아 준다", hint: "이기면 명성 ↑ · 지면 명성 ↓", p: "neutral" },
+          { label: "웃으며 이미 네가 이겼다고 말한다", hint: "협의 +4 · 명성 -5", p: "orthodox" }
+        ]);
+        if (i === 1) { addAlign(4, 0, 0); gainFame(-5); await rec.out(`${b.name}${josa(b.name, "은", "는")} 한참을 서 있다가 깊이 절을 했다. (협의 +4)`, "text-sky-300"); return; }
+        const won = await storyFight(char.name, Math.round(getCombatPower() * (char.injury ? 0.85 : 1)), `젊은 협객 ${b.name}`, Math.round(getBenchmarkPower() * 1.15));
+        if (won) { gainFame(15); char.insights = (char.insights || 0) + 1; await rec.out("늙은 호랑이의 이빨은 아직 남아 있었다. (명성 +15, 깨달음 +1)", "text-yellow-300 font-bold"); }
+        else { gainFame(-10); await rec.out(`${b.name}의 검이 한 수 위였다. 강호는 새 시대를 맞았다. (명성 -10)`, "text-stone-400"); }
+        addStory(`이끌어 준 젊은 협객 ${b.name}${josa(b.name, "이", "가")} 나를 넘어서겠다며 도전해 왔다.`);
+      },
+      cult_peer: async (b, rec) => {
+        await say(`장로가 된 혈지의 동기 ${b.name}${josa(b.name, "이", "가")} 밤중에 찾아왔다. 그 손에 혈영 독침이 들려 있었다.`, "text-rose-300", 300);
+        await say(`"그날 네가 살려 준 덕에 여기까지 왔다. 그러니 이제 내 길을 막는 너를 치우는 것도, 내 손이어야겠지."`, "text-stone-400 italic", 280);
+        if (await bondFight(`장로 ${b.name}`, 1.15, rec, 0.1, `살려 주었던 혈지의 동기 ${b.name}의 독침에 쓰러졌다`)) { gainStats(5, 5, 5); addAlign(0, 0, 3); await rec.out(`${b.name}${josa(b.name, "이", "가")} 쓰러졌다. 혈지에서 살려 준 목숨을, 내 손으로 거두었다. (무력 +15)`, "text-yellow-300"); }
+        if (!char.dead) addStory(`살려 주었던 혈지의 동기 ${b.name}${josa(b.name, "이", "가")} 장로가 되어 나를 노렸다.`);
+      }
+    };
 
     // ---- 나이대별 새 사건 ----
     RANDOM_EVENTS.push(
