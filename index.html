@@ -1113,7 +1113,7 @@
       ownedItems: [],
       faction: "orthodox",
       align: { righteous: 0, evil: 0, demonic: 0 },
-      flags: {},
+      flags: {}, bonds: [],
       seenEvents: []
     };
 
@@ -2725,17 +2725,17 @@
         choices: [
           {
             path: "orthodox", label: "예를 갖추고 손을 내밀어 일으켜 준다", hint: "협의 +3 · 명성 +2",
-            apply: () => { addAlign(3, 0, 0); char.fame += 2; yearGains.fame += 2;
+            apply: () => { addAlign(3, 0, 0); char.fame += 2; yearGains.fame += 2; if (Math.random() < 0.3) makeBond("spared_foe", 4, 8, { name: personName(false), header: "그날의 패자" });
               return { text: "패자는 고개 숙여 감사를 표했고, 구경꾼들 사이에서 당신의 도량을 칭송하는 말이 퍼졌습니다.", chips: [["협의", "+3"], ["명성", "+2"]] }; }
           },
           {
             path: "unorthodox", label: "판돈은 물론 품속 전낭까지 털어 간다", hint: `악명 +3 · 은자 +${loot}냥`,
-            apply: () => { addAlign(0, 3, 0); char.money += loot;
+            apply: () => { addAlign(0, 3, 0); char.money += loot; if (Math.random() < 0.3) makeBond("humiliated_foe", 3, 7, { name: personName(false), header: "그날의 패자" });
               return { text: "패자의 전낭이 묵직합니다. 뒤에서 수군거리는 소리가 들리지만 개의치 않습니다.", chips: [["악명", "+3"], ["은자", `+${loot}냥`]] }; }
           },
           {
             path: "demonic", label: "패자의 단전에 손을 얹어 내력을 빨아들인다", hint: "마성 +3 · 내공 +2 · 명성 -2",
-            apply: () => { addAlign(0, 0, 3); char.qi += 2; yearGains.qi += 2; char.fame = Math.max(0, char.fame - 2);
+            apply: () => { addAlign(0, 0, 3); char.qi += 2; yearGains.qi += 2; char.fame = Math.max(0, char.fame - 2); if (Math.random() < 0.3) makeBond("humiliated_foe", 3, 7, { name: personName(false), header: "그날의 패자" });
               return { text: "흡성(吸星)의 마공이 패자의 내력을 집어삼킵니다. 구경꾼들이 비명을 지르며 흩어집니다.", chips: [["마성", "+3"], ["내공", "+2년"], ["명성", "-2"]] }; }
           }
         ]
@@ -3229,10 +3229,10 @@
           desc: "길목의 작은 마을에 산적 떼가 들이닥쳤습니다. 산적 두목이 당신을 알아보고는 \"한몫 끼겠나?\" 하고 히죽 웃습니다.",
           choices: [
             { path: "orthodox", label: "마을 사람들 앞을 막아서 산적을 쫓아낸다", hint: "협의 +6 · 명성 +5 · 외공 +2",
-              apply: () => { addAlign(6, 0, 0); gainFame(5); gainStats(0, 2, 0);
+              apply: () => { addAlign(6, 0, 0); gainFame(5); gainStats(0, 2, 0); makeBond("village", 10, 16, { place: pick(PLACES) + " 어귀의 마을", deed: "산적에게서 마을을 지켜 준", header: "그 마을" });
                 return { text: "산적들이 혼비백산 달아났습니다. 마을 사람들이 당신의 이름을 비석에 새기겠다 합니다.", chips: [["협의", "+6"], ["명성", "+5"], ["외공", "+2"]] }; } },
             { path: "unorthodox", label: "두목과 손잡고 약탈 몫을 챙긴다", hint: `악명 +6 · 은자 +${scaled(40)}냥`,
-              apply: () => { const g = scaled(40); addAlign(0, 6, 0); char.money += g;
+              apply: () => { const g = scaled(40); addAlign(0, 6, 0); char.money += g; makeBond("bandit_chief", 5, 9, { name: personName(false), header: "산적 두목" });
                 return { text: "묵직한 은자 꾸러미를 챙겼습니다. 불타는 마을을 뒤로하고 길을 떠납니다.", chips: [["악명", "+6"], ["은자", `+${g}냥`]] }; } },
             { path: "neutral", label: "못 본 체하고 길을 재촉한다", hint: "변화 없음",
               apply: () => ({ text: "등 뒤로 비명이 들려왔지만 돌아보지 않았습니다.", chips: [] }) }
@@ -3246,7 +3246,7 @@
           desc: "어느 표국에서 귀한 표물의 호위를 부탁해 왔습니다. 그런데 흑도의 정보원이 은밀히 다가와 표물을 함께 빼돌리자고 속삭입니다.",
           choices: [
             { path: "orthodox", label: "약속대로 표물을 무사히 호송한다", hint: `협의 +3 · 명성 +3 · 은자 +${scaled(25)}냥`,
-              apply: () => { const g = scaled(25); addAlign(3, 0, 0); gainFame(3); char.money += g;
+              apply: () => { const g = scaled(25); addAlign(3, 0, 0); gainFame(3); char.money += g; makeBond("merchant", 5, 9, { name: pick(PERSON_SUR) + "씨", org: "표국", deed: "흑도의 꾐에도 표물을 지켜 준 날", header: "그 표국" });
                 return { text: "표물을 무사히 전달했습니다. 표국주가 두둑한 사례금을 건넵니다.", chips: [["협의", "+3"], ["명성", "+3"], ["은자", `+${g}냥`]] }; } },
             { path: "unorthodox", label: "흑도와 짜고 표물을 강탈한다", hint: `악명 +7 · 은자 +${scaled(70)}냥`,
               apply: () => { const g = scaled(70); addAlign(0, 7, 0); char.money += g;
@@ -3281,7 +3281,7 @@
             desc: "흉년으로 고향을 잃은 유민들이 길가에 늘어서 있습니다. 한 인신매매꾼이 \"저 애들 몇 데려가면 값을 쳐주지\"라며 다가옵니다.",
             choices: [
               { path: "orthodox", label: "가진 은자를 털어 죽을 쑤어 나눈다", hint: `협의 +7 · 은자 -${give}냥`,
-                apply: () => { addAlign(7, 0, 0); char.money -= give;
+                apply: () => { addAlign(7, 0, 0); char.money -= give; makeBond("refugee_child", 12, 18, { name: personName(Math.random() < 0.5), header: "죽 한 그릇" });
                   return { text: "따뜻한 죽 한 그릇에 아이들이 웃음을 되찾았습니다.", chips: [["협의", "+7"], ["은자", `-${give}냥`]] }; } },
               { path: "unorthodox", label: "매매꾼과 거래해 유민을 넘긴다", hint: `악명 +9 · 은자 +${scaled(35)}냥`,
                 apply: () => { const g = scaled(35); addAlign(0, 9, 0); char.money += g;
@@ -3293,7 +3293,7 @@
         }
       },
       {
-        id: "war_call",
+        id: "war_call", ph: [1, 2],
         build: () => ({
           title: "정사대전의 전운",
           desc: "무림맹과 사파연합의 충돌이 임박했습니다. 양측 모두 당신에게 사람을 보내 합류를 청합니다.",
@@ -3311,13 +3311,13 @@
         })
       },
       {
-        id: "avenger",
+        id: "avenger", ph: [1, 2, 3],
         build: () => ({
           title: "원수의 아들",
           desc: "예전 비무에서 당신에게 패해 몰락한 자의 아들이 복수를 하겠다며 칼을 겨눕니다. 아직 앳된 얼굴입니다.",
           choices: [
             { path: "orthodox", label: "칼을 거두고 사과한 뒤 무공을 가르쳐 준다", hint: "협의 +5 · 신법 +2",
-              apply: () => { addAlign(5, 0, 0); gainStats(0, 0, 2);
+              apply: () => { addAlign(5, 0, 0); gainStats(0, 0, 2); makeBond("avenger_boy", 9, 14, { name: personName(false), header: "원수의 아들" });
                 return { text: "소년은 한참을 울다 당신에게 절을 올렸습니다.", chips: [["협의", "+5"], ["신법", "+2"]] }; } },
             { path: "unorthodox", label: "후환을 남기지 않는다", hint: "악명 +7 · 명성 -3",
               apply: () => { addAlign(0, 7, 0); gainFame(-3);
@@ -3329,7 +3329,7 @@
         })
       },
       {
-        id: "gambling",
+        id: "gambling", ph: [0, 1],
         build: () => {
           const bet = Math.min(char.money, scaled(30));
           return {
@@ -3360,7 +3360,7 @@
             desc: "누군가 마을 우물에 독을 풀어 사람들이 쓰러지고 있습니다. 해독약은 비싸고, 우물에서는 짙은 독기가 피어오릅니다.",
             choices: [
               { path: "orthodox", label: "사비를 들여 해독약을 구해 온다", hint: `협의 +7 · 명성 +5 · 은자 -${cost}냥`,
-                apply: () => { addAlign(7, 0, 0); gainFame(5); char.money -= cost;
+                apply: () => { addAlign(7, 0, 0); gainFame(5); char.money -= cost; makeBond("village", 10, 16, { place: pick(PLACES) + " 어귀의 마을", deed: "독이 풀린 우물에서 마을을 살려 낸", header: "그 마을" });
                   return { text: "마을 사람들이 목숨을 건졌습니다.", chips: [["협의", "+7"], ["명성", "+5"], ["은자", `-${cost}냥`]] }; } },
               { path: "demonic", label: "우물의 독기를 단전에 끌어들여 연공한다", hint: "마성 +6 · 내공 +6",
                 apply: () => { addAlign(0, 0, 6); gainStats(6, 0, 0);
@@ -3379,7 +3379,7 @@
           desc: "깊은 산중에서 백발의 노인이 바둑을 두고 있습니다. 범상치 않은 기운이 느껴집니다. 노인 곁에는 낡은 보물 상자가 놓여 있습니다.",
           choices: [
             { path: "orthodox", label: "무릎 꿇고 가르침을 청한다", hint: "협의 +2 · 무작위 무공 +6",
-              apply: () => { addAlign(2, 0, 0); const k = ["qi", "ext", "agi"][Math.floor(Math.random() * 3)];
+              apply: () => { addAlign(2, 0, 0); makeBond("hermit", 8, 14, { header: "산중의 노인" }); const k = ["qi", "ext", "agi"][Math.floor(Math.random() * 3)];
                 gainStats(k === "qi" ? 6 : 0, k === "ext" ? 6 : 0, k === "agi" ? 6 : 0);
                 const nm = { qi: "내공", ext: "외공", agi: "신법" }[k];
                 return { text: "노인은 껄껄 웃으며 한 수를 전수해 주었습니다.", chips: [["협의", "+2"], [nm, "+6"]] }; } },
@@ -3401,7 +3401,7 @@
           choices: [
             { path: "orthodox", label: "연기가 오르는 곳으로 달려간다", hint: "협의 +6 · 명성 +6 · 승리 시 기연",
               apply: () => { addAlign(6, 0, 0); gainFame(6); const r = autoDuel(1.15);
-                if (r.won) { gainStats(3, 3, 2); return { text: "마두들을 쓰러뜨리고 아이들을 구했습니다. 상단주가 감사의 표시로 가보를 건넵니다.", chips: [["협의", "+6"], ["명성", "+6"], ["무력", "+8"]] }; }
+                if (r.won) { gainStats(3, 3, 2); makeBond("merchant", 4, 8, { name: pick(PERSON_SUR) + "씨", header: "그 상단" }); return { text: "마두들을 쓰러뜨리고 아이들을 구했습니다. 상단주가 감사의 표시로 가보를 건넵니다.", chips: [["협의", "+6"], ["명성", "+6"], ["무력", "+8"]] }; }
                 char.injury = { ...INJURIES[1] }; return { text: "아이들은 구했지만 마두의 칼에 크게 다쳤습니다.", chips: [["협의", "+6"], ["명성", "+6"], ["부상", INJURIES[1].name]] }; } },
             { path: "unorthodox", label: "마두들이 떠난 뒤 남은 짐을 챙긴다", hint: `악명 +5 · 은자 +${scaled(55)}`,
               apply: () => { const g = scaled(55); addAlign(0, 5, 0); char.money += g;
@@ -3418,11 +3418,11 @@
           desc: "비를 피해 들어간 낡은 산사에서 눈먼 노승이 차를 내옵니다. \"그대의 검에는 무엇이 실려 있소?\"",
           choices: [
             { path: "orthodox", label: "\"지켜야 할 사람들입니다.\"", hint: "협의 +3 · 내공 +6",
-              apply: () => { addAlign(3, 0, 0); gainStats(6, 0, 0); return { text: "노승이 고개를 끄덕이며 호흡법 하나를 일러 주었습니다.", chips: [["협의", "+3"], ["내공", "+6년"]] }; } },
+              apply: () => { addAlign(3, 0, 0); gainStats(6, 0, 0); makeBond("monk", 15, 25, { header: "산사의 노승" }); return { text: "노승이 고개를 끄덕이며 호흡법 하나를 일러 주었습니다.", chips: [["협의", "+3"], ["내공", "+6년"]] }; } },
             { path: "demonic", label: "\"이기고 싶다는 마음뿐입니다.\"", hint: "마성 +3 · 외공 +6",
               apply: () => { addAlign(0, 0, 3); gainStats(0, 6, 0); return { text: "노승은 한숨을 쉬더니, 그래도 검을 쥐는 법 하나를 고쳐 주었습니다.", chips: [["마성", "+3"], ["외공", "+6"]] }; } },
             { path: "neutral", label: "\"아직 모르겠습니다.\"", hint: "신법 +4 · 수명 +1",
-              apply: () => { gainStats(0, 0, 4); char.lifeBonus = Math.min(5, char.lifeBonus + 1); return { text: "\"모른다는 것을 아는 것이 시작이오.\" 마음이 한결 가벼워졌습니다.", chips: [["신법", "+4"], ["수명", "+1"]] }; } }
+              apply: () => { gainStats(0, 0, 4); char.lifeBonus = Math.min(7, char.lifeBonus + 1); return { text: "\"모른다는 것을 아는 것이 시작이오.\" 마음이 한결 가벼워졌습니다.", chips: [["신법", "+4"], ["수명", "+1"]] }; } }
           ]
         })
       },
@@ -3447,32 +3447,33 @@
           choices: [
             { path: "orthodox", label: "소녀를 등 뒤로 숨기고 흑의인을 막아선다", hint: "협의 +5 · 승리 시 비급",
               apply: () => { addAlign(5, 0, 0); const r = autoDuel(1.2);
+                makeBond("girl_saved", 8, 13, { name: personName(true), header: "숲길의 소녀" });
                 if (r.won) { gainStats(7, 2, 3); addStory("쫓기던 소녀를 구하고 멸문한 가문의 비급을 받았다."); return { text: "흑의인을 물리치자 소녀가 보따리를 풀었습니다. 멸문한 가문의 비급이었습니다. \"은인께서 익혀 주세요.\"", chips: [["협의", "+5"], ["내공", "+7년"], ["외공", "+2"], ["신법", "+3"]] }; }
                 char.injury = { ...INJURIES[0] }; return { text: "소녀를 데리고 간신히 몸을 피했습니다. 소녀는 감사를 남기고 사라졌습니다.", chips: [["협의", "+5"], ["부상", INJURIES[0].name]] }; } },
             { path: "unorthodox", label: "흑의인에게 소녀를 넘기고 사례를 받는다", hint: `악명 +8 · 은자 +${scaled(60)}`,
-              apply: () => { const g = scaled(60); addAlign(0, 8, 0); char.money += g; return { text: "흑의인이 던진 전낭을 받았습니다. 소녀의 눈빛이 오래 잊히지 않았습니다.", chips: [["악명", "+8"], ["은자", `+${g}냥`]] }; } },
+              apply: () => { const g = scaled(60); addAlign(0, 8, 0); char.money += g; makeBond("girl_sold", 6, 10, { name: personName(true), header: "숲길의 소녀" }); return { text: "흑의인이 던진 전낭을 받았습니다. 소녀의 눈빛이 오래 잊히지 않았습니다.", chips: [["악명", "+8"], ["은자", `+${g}냥`]] }; } },
             { path: "neutral", label: "못 본 척 길을 비켜 준다", hint: "변화 없음",
               apply: () => ({ text: "비명이 숲 너머로 멀어졌습니다.", chips: [] }) }
           ]
         })
       },
       {
-        id: "tang_contract",
+        id: "tang_contract", ph: [1, 2],
         build: () => ({
           title: "당가의 은밀한 의뢰",
           desc: "사천 당가의 사자가 독침이 든 함을 내밀었습니다. \"정파의 장로 하나를 조용히 처리해 주시오. 값은 넉넉히 치르겠소.\"",
           choices: [
             { path: "unorthodox", label: "의뢰를 받아들인다", hint: `악명 +9 · 은자 +${scaled(110)}`,
-              apply: () => { const g = scaled(110); addAlign(0, 9, 0); char.money += g; return { text: "일은 깔끔하게 끝났습니다. 그날 이후 밤길에서 자주 뒤를 돌아보게 되었습니다.", chips: [["악명", "+9"], ["은자", `+${g}냥`]] }; } },
+              apply: () => { const g = scaled(110); addAlign(0, 9, 0); char.money += g; makeBond("tang_blackmail", 4, 7, { header: "빈 독침 함" }); return { text: "일은 깔끔하게 끝났습니다. 그날 이후 밤길에서 자주 뒤를 돌아보게 되었습니다.", chips: [["악명", "+9"], ["은자", `+${g}냥`]] }; } },
             { path: "orthodox", label: "함을 내던지고 장로에게 경고한다", hint: "협의 +6 · 명성 +5",
-              apply: () => { addAlign(6, 0, 0); gainFame(5); return { text: "장로는 목숨을 건졌고, 당가는 당신의 이름을 기억하게 되었습니다.", chips: [["협의", "+6"], ["명성", "+5"]] }; } },
+              apply: () => { addAlign(6, 0, 0); gainFame(5); makeBond("elder_saved", 5, 9, { name: pick(PERSON_SUR) + "씨", header: "목숨을 건진 장로" }); return { text: "장로는 목숨을 건졌고, 당가는 당신의 이름을 기억하게 되었습니다.", chips: [["협의", "+6"], ["명성", "+5"]] }; } },
             { path: "demonic", label: "독침을 내 무공에 쓰겠다며 함만 빼앗는다", hint: "마성 +5 · 외공 +5",
               apply: () => { addAlign(0, 0, 5); gainStats(0, 5, 0); return { text: "독기를 머금은 침을 다루는 법을 홀로 익혔습니다.", chips: [["마성", "+5"], ["외공", "+5"]] }; } }
           ]
         })
       },
       {
-        id: "auction",
+        id: "auction", ph: [1, 2],
         build: () => {
           const price = scaled(70);
           return {
@@ -3492,14 +3493,14 @@
         }
       },
       {
-        id: "challenge_letter",
+        id: "challenge_letter", ph: [1, 2],
         build: () => ({
           title: "도전장",
           desc: "객잔 탁자에 비수가 꽂혀 있고, 비수에 도전장이 매달려 있습니다. '보름 뒤 달 밝은 밤, 낙화대에서 기다리겠다. — 혈검(血劍)'",
           choices: [
             { path: "neutral", label: "낙화대로 간다", hint: "한 수 위 고수와의 생사결 · 이기면 명성·은자·깨달음",
               apply: () => { const r = autoDuel(1.3);
-                if (r.won) { const m = scaled(120); char.money += m; gainFame(25); gainStats(10, 10, 10); char.insights = (char.insights || 0) + 1; addStory("혈검과의 결투에서 이겼다."); return { text: "달빛 아래 혈검의 검이 부러졌습니다. 혈검이 남긴 검결에서 깨달음을 얻었고, 이튿날 강호에 당신의 이름이 퍼졌습니다.", chips: [["명성", "+25"], ["무력", "+30"], ["은자", `+${m}냥`], ["깨달음", "+1"]] }; }
+                if (r.won) { const m = scaled(120); char.money += m; gainFame(25); gainStats(10, 10, 10); char.insights = (char.insights || 0) + 1; addStory("혈검과의 결투에서 이겼다."); makeBond("blood_heir", 6, 10, { name: personName(Math.random() < 0.5), header: "혈검의 제자" }); return { text: "달빛 아래 혈검의 검이 부러졌습니다. 혈검이 남긴 검결에서 깨달음을 얻었고, 이튿날 강호에 당신의 이름이 퍼졌습니다.", chips: [["명성", "+25"], ["무력", "+30"], ["은자", `+${m}냥`], ["깨달음", "+1"]] }; }
                 if (Math.random() < 0.15) { char.dead = true; char.deathCause = "혈검과의 결투에서 쓰러졌다"; return { text: "혈검의 검이 달빛을 갈랐습니다. 그것이 마지막으로 본 풍경이었습니다…", chips: [] }; }
                 char.injury = { ...INJURIES[2] }; gainFame(3); return { text: "혈검의 검이 어깨를 꿰뚫었습니다. 목숨은 건졌지만 오래 누워 있어야 했습니다.", chips: [["명성", "+3"], ["부상", INJURIES[2].name]] }; } },
             { path: "orthodox", label: "무의미한 피는 흘리지 않겠다며 거절한다", hint: "협의 +2 · 명성 -3",
@@ -3508,13 +3509,14 @@
         })
       },
       {
-        id: "orphan_disciple",
+        id: "orphan_disciple", ph: [1, 2, 3],
         build: () => ({
           title: "길 위의 아이",
           desc: "눈 내리는 다리 밑에서 굶주린 아이가 나뭇가지로 검술 흉내를 내고 있습니다. 동작 하나하나가 범상치 않습니다.",
           choices: [
             { path: "orthodox", label: "아이를 데려가 기본기를 가르친다", hint: "협의 +3 · 문파가 있으면 재능 있는 제자 입문",
               apply: () => { addAlign(3, 0, 0);
+                if (!sect()) makeBond("avenger_boy", 10, 15, { name: personName(false), deed: "다리 밑에서 굶던 저를 거두어 검을 쥐여 주신", who: "눈 내리던 다리 밑의 아이", header: "다리 밑의 아이" });
                 if (sect()) { const a = makeApplicant(); a.talent = Math.max(4, a.talent); a.wit = Math.max(4, a.wit); sect().applicants.push(a); return { text: `아이의 이름은 ${a.name}. 문파의 입문 지원자 명단에 이름을 올렸습니다.`, chips: [["협의", "+3"], ["지원자", a.name]] }; }
                 gainStats(2, 2, 2); return { text: "한 해 동안 아이에게 기본기를 가르쳤습니다. 가르치며 오히려 배운 것이 많았습니다.", chips: [["협의", "+3"], ["무력", "+6"]] }; } },
             { path: "neutral", label: "따뜻한 국밥 한 그릇과 은자를 쥐여 준다", hint: "은자 -10 · 협의 +1",
@@ -3561,7 +3563,7 @@
         }
       },
       {
-        id: "bribe",
+        id: "bribe", ph: [1, 2, 3],
         cond: () => char.align.evil >= 30,
         build: () => {
           const cost = Math.max(scaled(70), Math.round(char.money * 0.25));
@@ -3632,7 +3634,8 @@
       if (Math.random() > chance) return;
 
       // 제자가 있으면 제자 사건도 섞임 (최근에 본 사건은 피함)
-      const all = RANDOM_EVENTS.filter(e => !e.cond || e.cond());
+      const ph = lifePhase(char.age);
+      const all = RANDOM_EVENTS.filter(e => (!e.ph || e.ph.includes(ph)) && (!e.cond || e.cond()));
       let pool = all.filter(e => !char.seenEvents.slice(-4).includes(e.id));
       if (pool.length === 0) pool = all;
       const ev = pool[Math.floor(Math.random() * pool.length)];
@@ -4485,6 +4488,7 @@
       char.deathCause = "";
       char.growthRevealed = false;
       char.peers = makePeers();
+      char.bonds = []; char.phaseSeen = null; char.vow = null;
       addStory(char.faction === "neutral"
         ? (/세가|가문|世家/.test(char.sect) ? `${char.sect}의 자손으로 강호에 첫발을 내디뎠다.` : "어디에도 속하지 않은 낭인으로 강호에 첫발을 내디뎠다.")
         : `${FACTIONS[char.faction].label} ${char.sect}에 입문하여 강호에 첫발을 내디뎠다.`);
@@ -5402,8 +5406,11 @@
       if (r < boonP + 0.27) return wanderBrawl(rec, p2);
       if (r < boonP + 0.27 + 0.13) { const pe = (char.peers || []).filter(x => x.alive); if (pe.length) return wanderPeer(rec, pick(pe), p2); }
       if (r < boonP + 0.27 + 0.13 + 0.22) {
-        const all = RANDOM_EVENTS.filter(e => !e.cond || e.cond());
-        let pool = all.filter(e => !char.seenEvents.slice(-4).includes(e.id));
+        const ph = lifePhase(char.age);
+        const all = RANDOM_EVENTS.filter(e => (!e.ph || e.ph.includes(ph)) && (!e.cond || e.cond()));
+        // 그 나이대에만 있는 사건을 조금 더 자주
+        const own = all.filter(e => e.ph && e.ph.length === 1 && !char.seenEvents.includes(e.id));
+        let pool = own.length && Math.random() < 0.5 ? own : all.filter(e => !char.seenEvents.slice(-4).includes(e.id));
         if (!pool.length) pool = all;
         const ev = pick(pool);
         char.seenEvents.push(ev.id);
@@ -5411,11 +5418,13 @@
         await storyEvent(ev.build());
         return;
       }
-      await rec.out(pick([
-        `${p2}의 객잔에서 이야기꾼의 무협담을 들으며 하룻밤을 보냈다.`,
-        `${p2}의 장터에서 이름 모를 노점의 국수 맛에 반했다.`,
-        `${p2}로 가는 길, 해 질 녘 강물이 금빛으로 물들었다.`
-      ]), "text-stone-400 italic");
+      const idle = [
+        [`${p2}의 객잔에서 이야기꾼의 무협담을 들으며, 언젠가 저 이야기 속 주인공이 되리라 생각했다.`, `처음 와 본 ${p2}의 장터에서 이것저것 구경하다 노잣돈을 반이나 써 버렸다.`, `${p2}로 가는 길, 해 질 녘 강물이 금빛으로 물들었다.`],
+        [`${p2}의 객잔에서 누군가 내 이름이 들어간 무협담을 하고 있었다. 모른 척 술잔만 비웠다.`, `${p2}의 장터에서 이름 모를 노점의 국수 맛에 반했다.`, `${p2}로 가는 길, 해 질 녘 강물이 금빛으로 물들었다.`],
+        [`${p2}의 객잔 주인이 나를 알아보고 상석을 내주었다. 예전에는 늘 구석 자리였다.`, `${p2}에서 젊은 무인들이 칼부림하는 것을 보고, 혀를 차면서도 젊은 날이 생각났다.`, `${p2}로 가는 길, 같은 강물인데 예전보다 빨리 흐르는 것 같았다.`],
+        [`젊은 날 걷던 ${p2}의 길을 다시 걸었다. 그때의 객잔은 없어지고 찻집이 들어서 있었다.`, `${p2}의 노점에서 국수를 시키니, 주인 손자가 그 옛날 맛 그대로라며 웃었다.`, `${p2}로 가는 길, 지팡이 대신 검집을 짚고 쉬어 갔다.`]
+      ][lifePhase(char.age)];
+      await rec.out(pick(idle), "text-stone-400 italic");
     }
 
     async function wanderBoon(rec) {
@@ -5523,7 +5532,7 @@
 
     async function epRest(rec) {
       trainNow("rest");
-      char.lifeBonus = Math.min(5, char.lifeBonus + 0.3);
+      char.lifeBonus = Math.min(7, char.lifeBonus + 0.3);
       if (char.injury) {
         await rec.out(`약초를 달여 먹으며 ${char.injury.name}${josa(char.injury.name, "을", "를")} 다스렸다. 몸이 다시 가벼워졌다.`, "text-emerald-300");
         char.injury = null;
@@ -5579,6 +5588,520 @@
         await arcCult(A.cult, rec);
       }
     }
+
+    // ==========================================
+    // [인생 흐름] 나이 구간 (겉으로는 보이지 않음) + [인연] 다시 만나는 사람들
+    // ==========================================
+    const lifePhase = age => age < 26 ? 0 : age < 41 ? 1 : age < 61 ? 2 : 3;
+    const PERSON_SUR = ["연", "설", "단", "위", "진", "한", "백", "소", "하", "유", "모용", "남궁", "제갈", "구양"];
+    const PERSON_F = ["소하", "청아", "월화", "서린", "예린", "하연", "운비", "설아"];
+    const PERSON_M = ["무현", "태산", "진우", "철웅", "운기", "도현", "청운", "검호"];
+    function personName(female) { return pick(PERSON_SUR) + pick(female ? PERSON_F : PERSON_M); }
+    const ida = name => name + josa(name, "이었다", "였다");
+    const agoText = b => { const y = char.age - b.at; return y >= 10 ? `${y}년 전` : `몇 해 전`; };
+
+    // 인연을 남긴다: 몇 해 뒤 다시 찾아온다
+    function makeBond(kind, minY, maxY, data = {}) {
+      char.bonds = char.bonds || [];
+      if (char.bonds.filter(b => !b.done).length >= 6) return null;
+      // 같은 인연은 한 생에 한 번 (비무 패자만 두 번까지)
+      const foeKinds = ["spared_foe", "humiliated_foe"];
+      if (foeKinds.includes(kind) ? char.bonds.filter(b => foeKinds.includes(b.kind)).length >= 2 : char.bonds.some(b => b.kind === kind)) return null;
+      const b = { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 5), kind, at: char.age, due: char.age + ri(minY, maxY), done: false, ...data };
+      char.bonds.push(b);
+      return b;
+    }
+    const bondsOf = kind => (char.bonds || []).filter(b => b.kind === kind);
+
+    function vowLabel() { return { fame: "천하에 이름을 떨치겠다", people: "사람을 구하는 검이 되겠다", power: "누구보다 강해지겠다" }[char.vow] || ""; }
+    function vowKept() {
+      if (char.vow === "fame") return char.fame >= 200;
+      if (char.vow === "people") return char.align.righteous >= 150;
+      if (char.vow === "power") return getCombatPower() >= getBenchmarkPower() * 1.1;
+      return false;
+    }
+
+    // ---- 나이가 바뀌는 길목의 장면 (장 제목 없이 이야기로) ----
+    async function lifeTurn(rec) {
+      const ph = lifePhase(char.age);
+      if (char.phaseSeen == null) { char.phaseSeen = ph; return; }
+      if (ph <= char.phaseSeen) return;
+      char.phaseSeen = ph;
+      const role = arcRole();
+      const sworn = bondsOf("sworn").find(b => !b.dead);
+      const alivePeers = (char.peers || []).filter(p => p.alive).length;
+      const totalPeers = (char.peers || []).length;
+
+      if (ph === 1) {
+        await storyHeader("산을 내려가다");
+        const open = {
+          orthodox: `사부가 나를 불러 앉혔다. "이제 산을 내려가거라. ${char.sect.split(" (")[0]}의 이름은 네 등에 지고 가는 것이다."`,
+          unorthodox: "채주가 술잔을 내밀었다. \"이제 남의 칼 밑에서 크는 건 그만해라. 네 산채는 네가 꾸려 봐.\"",
+          demonic: "혈지(血池)의 시험을 마치자, 장로가 붉은 영패를 던져 주었다. \"오늘부터 너는 신교의 칼이다. 첫 임무는 스스로 찾아라.\"",
+          clan: "가주가 가문의 검 한 자루를 내주었다. \"집안 그늘에서 크는 것은 여기까지다. 바깥에서 네 이름을 세워 오너라.\"",
+          ronin: "처음으로 내 이름 석 자가 적힌 의뢰서를 받았다. 더는 누군가의 뒤를 따라다니는 떠돌이가 아니었다."
+        }[role];
+        await say(open, "text-stone-200", 320);
+        if (sworn) await say(`산문 밖에서는 의형 ${sworn.name}${josa(sworn.name, "이", "가")} 말 두 필을 끌고 기다리고 있었다.`, "text-amber-200", 260);
+        await say("길을 나서며 가슴에 한 가지를 새겼다.", "text-stone-400 italic", 220);
+        const i = await arcChoose([
+          { label: "천하에 이름을 떨치겠다", hint: "명성 +6 · 훗날 명성으로 돌아본다", p: "neutral", chip: "이름" },
+          { label: "사람을 구하는 검이 되겠다", hint: "협의 +5 · 훗날 협의로 돌아본다", p: "orthodox", chip: "협의" },
+          { label: "누구보다 강해지겠다", hint: "무력 +9 · 훗날 무력으로 돌아본다", p: "demonic", chip: "강함" }
+        ]);
+        char.vow = ["fame", "people", "power"][i];
+        if (i === 0) gainFame(6); else if (i === 1) addAlign(5, 0, 0); else gainStats(3, 3, 3);
+        await rec.out(`"${vowLabel()}." ${char.age}세의 다짐이었다.`, "text-amber-200");
+        addStory(`산을 내려가며 '${vowLabel()}'고 다짐했다.`);
+        return;
+      }
+
+      if (ph === 2) {
+        await storyHeader("귀밑머리의 흰 터럭");
+        await say("세숫대야에 비친 귀밑머리에 흰 터럭이 섞여 있었다. 언제부터였는지 기억나지 않았다.", "text-stone-200", 320);
+        if (sect()) await say(`연무장에서 제자들이 "사부님!" 하고 부르는 소리가 들렸다. 이제 내가 누군가의 사부였다.`, "text-stone-300", 260);
+        else await say("객잔에서 젊은 무인들이 일어나 \"선배님\" 하고 고개를 숙였다. 어색하게 술잔을 들어 답했다.", "text-stone-300", 260);
+        const master = char.arcs && char.arcs.master;
+        if (master && master.saved) await say("사부의 부고가 날아들었다. 그날 혈수귀 앞을 막아서지 않았다면 이만큼도 함께하지 못했으리라.", "text-sky-300 italic", 280);
+        else if (role === "orthodox" || role === "clan") await say("멀리서 옛 스승이 세상을 떠났다는 소식이 들려왔다. 산을 내려가던 날의 말이 귓가에 맴돌았다.", "text-stone-400 italic", 280);
+        if (char.spouse) await say(`${char.spouse}${josa(char.spouse, "이", "가")} 말없이 흰 터럭 하나를 뽑아 주며 웃었다.`, "text-rose-200", 250);
+        if (sworn) await say(sworn.betrayed ? `의형 ${sworn.name}의 이름을 들으면 아직도 가슴 한쪽이 서늘했다.` : `의형 ${sworn.name}에게서 오랜만에 서신이 왔다. "우리도 늙는구나, 아우."`, "text-amber-200 italic", 250);
+        await rec.out("이제는 지켜야 할 것이 늘어난 나이였다.", "text-stone-400 italic");
+        return;
+      }
+
+      if (ph === 3) {
+        await storyHeader("노을");
+        await say("젊은 무인과 손을 섞다 처음으로 한 수 밀렸다. 이긴 것은 나였지만, 손목이 오래도록 저렸다.", "text-stone-200", 320);
+        if (totalPeers) await say(`함께 입문한 동기 ${totalPeers}명 가운데 살아 있는 이는 ${alivePeers}명뿐이었다.`, "text-stone-400", 260);
+        if (char.vow) {
+          await say(`문득 산을 내려가던 날의 다짐이 떠올랐다. "${vowLabel()}."`, "text-amber-200 italic", 300);
+          if (vowKept()) {
+            char.insights = (char.insights || 0) + 1;
+            await rec.out("돌아보니 그 다짐을 지키며 살아왔다. 마음 한구석이 고요해졌다. (깨달음 +1)", "text-cyan-300 font-bold");
+            addStory("젊은 날의 다짐을 지키며 살아왔음을 깨달았다.");
+          } else {
+            await rec.out("돌아보니 그 다짐에서 멀리 와 있었다. 쓴웃음이 났다.", "text-stone-400 italic");
+          }
+        }
+        if (char.spouse) await say(`${char.spouse}${josa(char.spouse, "과", "와")} 툇마루에 앉아 지는 해를 오래 바라보았다.`, "text-rose-200", 250);
+        const i = await arcChoose([
+          { label: "이제 검을 내려놓을 준비를 한다", hint: "수명 +2 · 남은 날을 돌보며 산다", p: "orthodox", chip: "내려놓음" },
+          { label: "아직 끝나지 않았다", hint: "무력 +12 · 강호를 떠나지 않는다", p: "demonic", chip: "현역" }
+        ]);
+        if (i === 0) { char.lifeBonus = Math.min(7, (char.lifeBonus || 0) + 2); char.flags.retiring = true; await rec.out("검을 닦아 벽에 걸었다. 숨이 한결 길어졌다. (수명 +2)", "text-emerald-300"); }
+        else { gainStats(4, 4, 4); await rec.out("새벽마다 다시 검을 들었다. 몸은 늙어도 검은 늙지 않는다. (무력 +12)", "text-amber-200"); }
+      }
+    }
+
+    // ---- 인연이 돌아오는 장면 ----
+    async function bondChapter(rec) {
+      const due = (char.bonds || []).filter(b => !b.done && char.age >= b.due).sort((a, b) => a.due - b.due);
+      if (!due.length || Math.random() < 0.25) return;
+      const b = due[0];
+      const fn = BOND_PAYOFFS[b.kind];
+      if (!fn) { b.done = true; return; }
+      b.done = true;
+      await storyHeader(b.header || "다시 만난 사람");
+      await fn(b, rec);
+    }
+
+    async function bondFight(name, ratio, rec, deathP, deathCause) {
+      const won = await storyFight(char.name, Math.round(getCombatPower() * (char.injury ? 0.85 : 1)), name, Math.round(getBenchmarkPower() * ratio));
+      if (won) return true;
+      if (Math.random() < deathP) { await dieNow(deathCause, "그날의 인연이 이렇게 돌아올 줄은 몰랐다…"); return false; }
+      char.injury = { ...INJURIES[1] };
+      await rec.out(`✕ 크게 다쳐 물러났다. (${INJURIES[1].name})`, "text-rose-400 font-bold");
+      return false;
+    }
+
+    const BOND_PAYOFFS = {
+      girl_saved: async (b, rec) => {
+        await say(`문 앞에 화려한 가마가 멈췄다. 내린 여인이 고개를 숙였다. "${agoText(b)}, 숲길에서 저를 구해 주셨지요."`, "text-stone-200", 300);
+        await say(`그날의 피투성이 소녀, ${ida(b.name)}. 멸문했던 가문을 다시 일으켜 가주가 되어 있었다.`, "text-amber-200", 280);
+        const i = await arcChoose([
+          { label: "그날 받은 비급이면 충분하다며 사양한다", hint: "협의 +5 · 명성 +10", p: "orthodox" },
+          { label: "가문의 비전 하나를 청한다", hint: "내공 +10 · 신법 +6", p: "neutral" }
+        ]);
+        if (i === 0) { addAlign(5, 0, 0); gainFame(10); await rec.out(`${b.name}${josa(b.name, "은", "는")} 눈시울을 붉히며, 가문 대대로 은혜를 잊지 않겠다고 했다. (협의 +5, 명성 +10)`, "text-sky-300"); }
+        else { gainStats(10, 0, 6); await rec.out(`${b.name}${josa(b.name, "이", "가")} 가문의 심법을 직접 펼쳐 보였다. (내공 +10, 신법 +6)`, "text-cyan-300"); }
+        addStory(`예전에 구해 준 소녀 ${b.name}${josa(b.name, "이", "가")} 가주가 되어 은혜를 갚으러 왔다.`);
+      },
+      girl_sold: async (b, rec) => {
+        await say("밤길, 지붕 위에서 차가운 목소리가 내려왔다. \"흑의인에게 은자 몇 냥에 나를 넘긴 날을 기억하나요?\"", "text-stone-200", 300);
+        await say(`그날의 소녀, ${ida(b.name)}. 살수(殺手)가 되어 돌아와 있었다.`, "text-rose-300", 280);
+        const i = await arcChoose([
+          { label: "검을 뽑아 맞선다", hint: "생사결", p: "unorthodox" },
+          { label: "무릎을 꿇고 그날의 일을 사죄한다", hint: "협의 +6 · 악명 -6 · 은자 절반", p: "orthodox" }
+        ]);
+        if (i === 1) {
+          const m = Math.floor(char.money / 2); char.money -= m; addAlign(6, -6, 0);
+          await rec.out(`${b.name}${josa(b.name, "은", "는")} 한참을 노려보다 검을 거두었다. "이걸로 갚은 셈 치죠." (은자 -${m}, 협의 +6)`, "text-sky-300");
+          addStory(`예전에 넘겼던 소녀 ${b.name}에게 무릎 꿇고 사죄했다.`);
+          return;
+        }
+        if (await bondFight(`살수 ${b.name}`, 1.15, rec, 0.15, `복수하러 온 살수 ${b.name}의 칼에 쓰러졌다`)) {
+          gainStats(4, 6, 4); addAlign(0, 4, 0);
+          await rec.out(`${b.name}의 비수가 바닥에 떨어졌다. 그녀는 어둠 속으로 사라졌다. (무력 +14, 악명 +4)`, "text-yellow-300 font-bold");
+        }
+        if (!char.dead) addStory(`예전에 넘겼던 소녀 ${b.name}${josa(b.name, "이", "가")} 살수가 되어 찾아왔다.`);
+      },
+      village: async (b, rec) => {
+        await say(`${b.place || "산골 마을"}에서 사람들이 찾아왔다. ${b.deed || "산적에게서 마을을 지켜 준"} 그날의 무인을 아직 기억하고 있었다.`, "text-stone-200", 300);
+        await say("마을 어귀에 내 이름이 새겨진 비석이 섰다고 했다. 그 앞에서 아이들이 목검을 휘두르며 내 흉내를 낸다고 했다.", "text-amber-200", 280);
+        gainFame(12); addAlign(3, 0, 0);
+        if (char.injury) { char.injury = null; await rec.out("마을 의원이 가져온 약초로 묵은 상처가 말끔히 나았다. (명성 +12, 부상 회복)", "text-emerald-300"); }
+        else await rec.out("마을에서 보내온 술과 떡을 이웃과 나누었다. (명성 +12, 협의 +3)", "text-emerald-300");
+        addStory("예전에 지켜 준 마을에 내 이름이 새겨진 비석이 섰다.");
+      },
+      bandit_chief: async (b, rec) => {
+        await say(`예전에 함께 마을을 털었던 산적 두목 ${b.name}${josa(b.name, "이", "가")} 녹림의 총표파자가 되어 사람을 보내왔다.`, "text-stone-200", 300);
+        await say("\"그날 함께 나눈 몫을 잊지 않았네. 이번엔 더 큰 판이야. 관부의 세곡선을 털 거라네.\"", "text-rose-300 italic", 280);
+        const take = scaled(160);
+        const i = await arcChoose([
+          { label: "판에 낀다", hint: `은자 +${take} · 악명 +8`, p: "unorthodox" },
+          { label: "옛정을 끊고 관부에 밀고한다", hint: "협의 +6 · 녹림의 원한", p: "orthodox" },
+          { label: "이번엔 빠지겠다고 한다", hint: "변화 없음", p: "neutral" }
+        ]);
+        if (i === 0) { char.money += take; addAlign(0, 8, 0); await rec.out(`세곡선의 은자가 강물처럼 쏟아졌다. (은자 +${take}, 악명 +8)`, "text-yellow-300"); addStory(`녹림 총표파자 ${b.name}${josa(b.name, "과", "와")} 세곡선을 털었다.`); }
+        else if (i === 1) { addAlign(6, 0, 0); gainFame(6); makeBond("bandit_revenge", 3, 6, { name: b.name, header: "녹림의 원한" }); await rec.out(`관군이 녹림의 배를 덮쳤다. ${b.name}${josa(b.name, "은", "는")} 간신히 도망쳤다고 했다. (협의 +6, 명성 +6)`, "text-sky-300"); }
+        else await rec.out("사자는 혀를 차고 돌아갔다.", "text-stone-400");
+      },
+      bandit_revenge: async (b, rec) => {
+        await say(`녹림의 무리가 길을 막았다. 맨 앞의 ${b.name}${josa(b.name, "이", "가")} 이를 갈았다. "관부의 개가 되어 옛 형제를 팔아넘긴 대가다!"`, "text-rose-300", 300);
+        if (await bondFight(`녹림 총표파자 ${b.name}`, 1.1, rec, 0.1, `녹림 총표파자 ${b.name}의 도끼에 쓰러졌다`)) {
+          gainFame(15); gainStats(3, 6, 3);
+          await rec.out(`${b.name}${josa(b.name, "이", "가")} 쓰러지자 녹림의 무리가 흩어졌다. (명성 +15, 무력 +12)`, "text-yellow-300 font-bold");
+          addStory(`복수하러 온 녹림 총표파자 ${b.name}${josa(b.name, "을", "를")} 꺾었다.`);
+        }
+      },
+      merchant: async (b, rec) => {
+        const m = scaled(120);
+        await say(`${b.name} ${b.org || "상단"}의 깃발을 단 마차가 줄지어 들어왔다. ${b.deed || "마두에게서 아이들을 구해 준 날"}, 주인은 그 은혜를 장부 맨 앞장에 적어 두었다고 했다.`, "text-stone-200", 300);
+        char.money += m;
+        await rec.out(`상단주가 해마다 이익의 한 몫을 떼어 보내겠다고 했다. 첫 몫이 도착했다. (은자 +${m})`, "text-yellow-300");
+        if (sect()) await say("상단은 문파의 후원자가 되었다.", "text-amber-200", 200);
+        addStory(`예전에 구해 준 ${b.name} 상단이 후원자가 되었다.`);
+      },
+      avenger_boy: async (b, rec) => {
+        await say(`훤칠한 청년 무인이 찾아와 큰절을 올렸다. "${b.deed || "칼을 겨눴던 저에게 무공을 가르쳐 주신"} 은혜, 하루도 잊은 적이 없습니다."`, "text-stone-200", 300);
+        await say(`${b.who || "원수의 아들이었던 소년"}, ${ida(b.name)}. 이제는 제법 이름이 알려진 고수가 되어 있었다.`, "text-amber-200", 280);
+        if (sect() && sect().disciples.length < SECT_LEVELS[getSectLevelIdx()].maxDisc) {
+          const a = makeApplicant(); a.name = b.name; a.talent = 5; a.wit = Math.max(4, a.wit); a.power = Math.round(getCombatPower() * 0.45); a.loyalty = 95;
+          sect().disciples.push({ ...a, joinedAge: char.age });
+          await rec.out(`${b.name}${josa(b.name, "이", "가")} 문하에 들기를 청했다. 충성 95의 제자가 생겼다.`, "text-emerald-300 font-bold");
+        } else {
+          gainStats(4, 4, 6); addAlign(4, 0, 0);
+          await rec.out(`${b.name}${josa(b.name, "과", "와")} 사흘 밤낮 검을 나누었다. 가르친 것보다 배운 것이 많았다. (무력 +14, 협의 +4)`, "text-cyan-300");
+        }
+        addStory(`${b.who || "원수의 아들"} ${b.name}${josa(b.name, "이", "가")} 고수가 되어 은혜를 갚으러 왔다.`);
+      },
+      refugee_child: async (b, rec) => {
+        await say(`이름난 의원 하나가 찾아왔다. "흉년에 죽 한 그릇을 얻어먹은 유민의 아이였습니다. 그 죽으로 살아남아 의술을 배웠지요."`, "text-stone-200", 300);
+        char.lifeBonus = Math.min(7, (char.lifeBonus || 0) + 1);
+        if (char.injury) char.injury = null;
+        if (char.crippled) { char.crippled = false; await rec.out(`${b.name}의 침술이 끊어진 혈맥을 다시 이었다. 폐인의 몸에서 벗어났다!`, "text-emerald-300 font-bold"); }
+        else await rec.out(`${b.name}${josa(b.name, "이", "가")} 몸 구석구석의 묵은 병을 다스려 주었다. (수명 +1)`, "text-emerald-300");
+        addStory(`흉년에 살린 유민의 아이 ${b.name}${josa(b.name, "이", "가")} 의원이 되어 찾아왔다.`);
+      },
+      tang_blackmail: async (b, rec) => {
+        const cost = Math.max(scaled(80), Math.round(char.money * 0.3));
+        await say("당가의 사자가 다시 찾아왔다. 품에서 꺼낸 것은 그날 장로를 처리한 독침의 빈 함이었다.", "text-stone-200", 300);
+        await say(`"이 함이 무림맹에 들어가면 어찌 되겠소? 입막음 값으로 ${cost}냥이면 되오."`, "text-rose-300 italic", 280);
+        const i = await arcChoose([
+          { label: `${cost}냥을 건넨다`, hint: char.money >= cost ? "조용히 덮는다" : "은자가 부족하다", p: "unorthodox" },
+          { label: "사자의 입을 영원히 막는다", hint: "악명 +6 · 당가와의 싸움", p: "demonic" }
+        ]);
+        if (i === 0 && char.money >= cost) { char.money -= cost; await rec.out(`빈 함이 화롯불에 던져졌다. (은자 -${cost})`, "text-stone-400"); return; }
+        addAlign(0, 6, 0);
+        if (await bondFight("당가의 독수(毒手)", 1.05, rec, 0.08, "당가의 독침에 쓰러졌다")) await rec.out("사자는 다시 돌아가지 못했다. 당가와의 악연이 깊어졌다. (악명 +6)", "text-rose-300");
+      },
+      elder_saved: async (b, rec) => {
+        await say(`무림맹의 ${b.name} 장로가 직접 찾아왔다. 당가의 독침에서 목숨을 건진 그날 이후, 맹 안에서 줄곧 내 편을 들어 주었다고 했다.`, "text-stone-200", 300);
+        char.insights = (char.insights || 0) + 1; gainFame(10);
+        await rec.out(`장로가 맹의 장경각에서 옮겨 적은 구결 한 장을 건넸다. (깨달음 +1, 명성 +10)`, "text-cyan-300 font-bold");
+        addStory(`목숨을 구해 준 무림맹 ${b.name} 장로가 비전 구결로 은혜를 갚았다.`);
+      },
+      spared_foe: async (b, rec) => {
+        await say(`객잔에서 누군가 술잔을 내밀었다. "그날 쓰러진 나를 일으켜 준 손을 기억하오." ${agoText(b)} 비무에서 이겼던 ${ida(b.name)}.`, "text-stone-200", 300);
+        gainStats(3, 3, 3);
+        await rec.out(`그 뒤로 ${b.name}${josa(b.name, "은", "는")} 나를 이기려고 줄곧 수련했다며 웃었다. 밤새 서로의 검을 풀어 보았다. (무력 +9)`, "text-cyan-300");
+        addStory(`예전 비무에서 일으켜 준 ${b.name}${josa(b.name, "과", "와")} 벗이 되었다.`);
+      },
+      humiliated_foe: async (b, rec) => {
+        await say(`"${agoText(b)} 그 객잔, 기억하나? 모두가 보는 앞에서 망신을 줬지." 얼굴에 칼자국이 난 사내가 검을 뽑았다. ${ida(b.name)}.`, "text-rose-300", 300);
+        if (await bondFight(`${b.name}`, 1.05, rec, 0.06, `원한을 품고 돌아온 ${b.name}의 검에 쓰러졌다`)) {
+          gainStats(2, 4, 2); gainFame(4);
+          await rec.out(`다시 한번 ${b.name}${josa(b.name, "을", "를")} 꺾었다. 이번에는 그냥 보내 주었다. (무력 +8)`, "text-yellow-300");
+        }
+        if (!char.dead) addStory(`예전에 망신을 준 ${b.name}${josa(b.name, "이", "가")} 원한을 품고 돌아왔다.`);
+      },
+      sworn: async (b, rec) => {
+        // 의형제의 두 번째 이야기: 성향이 갈렸으면 배신, 아니면 생사의 위기에서 손을 내밈
+        const myPath = getPath();
+        if (b.path && b.path !== myPath && myPath !== "neutral" && Math.random() < 0.6) {
+          b.betrayed = true;
+          await say(`의형 ${b.name}${josa(b.name, "이", "가")} 낯선 무리를 이끌고 나타났다. "아우, 우리 길은 오래전에 갈라졌네."`, "text-rose-300", 300);
+          await say("함께 맹세하던 복숭아밭의 술잔이 떠올랐다. 그는 이제 다른 깃발 아래 서 있었다.", "text-stone-400 italic", 260);
+          if (await bondFight(`의형 ${b.name}`, 1.15, rec, 0.12, `의형 ${b.name}의 검에 쓰러졌다`)) {
+            char.insights = (char.insights || 0) + 1; gainStats(5, 5, 5);
+            await rec.out(`${b.name}의 검이 부러졌다. 끝내 목숨만은 거두지 못했다. (무력 +15, 깨달음 +1)`, "text-cyan-300 font-bold");
+          }
+          if (!char.dead) addStory(`의형 ${b.name}${josa(b.name, "이", "가")} 다른 깃발 아래 서서 칼을 겨눴다.`);
+          return;
+        }
+        await say(`의형 ${b.name}에게서 피 묻은 서신이 왔다. "아우, 마지막으로 부탁하네. 흑풍채에 붙잡혔네."`, "text-stone-200", 300);
+        const i = await arcChoose([
+          { label: "모든 일을 내려놓고 달려간다", hint: "생사결 · 이기면 평생의 벗", p: "orthodox" },
+          { label: "사람을 사서 대신 보낸다", hint: `은자 -${scaled(60)} · 결과는 운에 맡김`, p: "neutral" }
+        ]);
+        if (i === 1) {
+          char.money = Math.max(0, char.money - scaled(60));
+          if (Math.random() < 0.5) { await rec.out(`용병들이 ${b.name}${josa(b.name, "을", "를")} 구해 왔다. 그는 고맙다는 말만 남기고 떠났다.`, "text-stone-300"); }
+          else { b.dead = true; await rec.out(`용병들은 늦었다. 의형 ${b.name}의 시신만 돌아왔다.`, "text-rose-300"); addStory(`의형 ${b.name}${josa(b.name, "을", "를")} 끝내 구하지 못했다.`); }
+          return;
+        }
+        const saved = await bondFight("흑풍채 채주", 1.1, rec, 0.08, `의형을 구하러 갔다가 흑풍채에서 쓰러졌다`);
+        if (!saved && !char.dead) { b.dead = true; await rec.out(`물러나는 등 뒤로 의형 ${b.name}의 마지막 외침이 들렸다.`, "text-rose-300"); addStory(`흑풍채에 붙잡힌 의형 ${b.name}${josa(b.name, "을", "를")} 끝내 구하지 못했다.`); }
+        if (saved) {
+          gainFame(10); addAlign(4, 0, 0); b.lifelong = true;
+          await rec.out(`포박을 끊어 주자 ${b.name}${josa(b.name, "이", "가")} 웃었다. "역시 내 아우일세." (명성 +10, 협의 +4)`, "text-yellow-300 font-bold");
+          makeBond("sworn_old", 12, 20, { name: b.name, header: "오랜 벗" });
+          addStory(`흑풍채에 붙잡힌 의형 ${b.name}${josa(b.name, "을", "를")} 구해 냈다.`);
+        }
+      },
+      sworn_old: async (b, rec) => {
+        await say(`백발이 된 의형 ${b.name}${josa(b.name, "이", "가")} 지팡이를 짚고 찾아왔다. 복숭아밭에서 맹세하던 날처럼 술 한 동이를 들고서.`, "text-stone-200", 300);
+        await say("\"한날한시에 죽자던 말, 아직 유효한가?\" 두 노인이 한참을 웃었다.", "text-amber-200 italic", 280);
+        char.lifeBonus = Math.min(7, (char.lifeBonus || 0) + 1);
+        await rec.out("밤새 옛이야기를 나누었다. 오래 살아야 할 이유가 하나 늘었다. (수명 +1)", "text-emerald-300");
+        addStory(`백발이 된 의형 ${b.name}${josa(b.name, "과", "와")} 다시 술잔을 나누었다.`);
+      },
+      first_spared: async (b, rec) => {
+        await say(`어느 마을 서당에서 훈장 하나가 뛰어나와 내 손을 잡았다. "${agoText(b)}, 산적질하던 저를 베지 않고 살려 보내 주셨지요."`, "text-stone-200", 300);
+        await say("그날 처음으로 칼을 거두었던 산적이었다. 그 뒤로 글을 배워 아이들을 가르치고 있다고 했다.", "text-amber-200", 280);
+        addAlign(4, 0, 0); char.insights = (char.insights || 0) + 1;
+        await rec.out("베지 않은 한 사람이 수십 명의 아이를 키우고 있었다. 검의 쓰임을 다시 생각했다. (협의 +4, 깨달음 +1)", "text-cyan-300 font-bold");
+        addStory("첫 실전에서 살려 보낸 산적이 훈장이 되어 있었다.");
+      },
+      first_killed: async (b, rec) => {
+        await say(`밤마다 같은 꿈을 꾸었다. ${agoText(b)}, 처음으로 벤 산적의 얼굴이었다.`, "text-stone-300 italic", 300);
+        await say("그의 어린 아들이 자라 관부의 포두가 되었고, 아비를 죽인 자를 쫓고 있다는 소문이 들려왔다.", "text-rose-300", 280);
+        const i = await arcChoose([
+          { label: "포두를 찾아가 사실을 털어놓는다", hint: "협의 +6 · 명성 -5", p: "orthodox" },
+          { label: "모른 척 덮어 둔다", hint: "마음의 짐", p: "unorthodox" }
+        ]);
+        if (i === 0) { addAlign(6, 0, 0); gainFame(-5); await rec.out("포두는 오래 말이 없다가, 아비가 산적이었다는 것을 알고 있었다며 돌아섰다. 짐 하나를 내려놓았다. (협의 +6)", "text-sky-300"); addStory("처음 벤 산적의 아들에게 그날의 일을 털어놓았다."); }
+        else { addAlign(0, 2, 0); await rec.out("꿈은 그 뒤로도 가끔 찾아왔다.", "text-stone-400 italic"); }
+      },
+      protege: async (b, rec) => {
+        await say(`천하비무대회에서 우승한 젊은 협객 ${b.name}${josa(b.name, "이", "가")} 단상에서 내 이름을 불렀다. "오늘의 저를 만들어 주신 분이 저기 계십니다."`, "text-stone-200", 300);
+        gainFame(18); char.insights = (char.insights || 0) + 1;
+        await rec.out("수많은 시선이 나를 향했다. 젊은 날 내가 받았던 것을 이제 돌려준 셈이었다. (명성 +18, 깨달음 +1)", "text-cyan-300 font-bold");
+        addStory(`이끌어 준 젊은 협객 ${b.name}${josa(b.name, "이", "가")} 천하비무대회에서 우승하며 내 이름을 불렀다.`);
+      }
+    };
+
+    Object.assign(BOND_PAYOFFS, {
+      hermit: async (b, rec) => {
+        await say(`${agoText(b)} 산중에서 가르침을 준 노인의 부고가 날아들었다. 심부름 온 동자가 낡은 보따리를 내밀었다. "어르신께서 꼭 전하라 하셨습니다."`, "text-stone-200", 300);
+        await say("보따리 안에는 바둑판 한 장과 쪽지가 있었다. '그날 무릎 꿇던 젊은이에게. 검도 바둑도, 이기려 들면 진다.'", "text-amber-200 italic", 300);
+        char.insights = (char.insights || 0) + 1; gainStats(5, 5, 5);
+        await rec.out("바둑판의 기보를 따라가다 보니 검로가 보였다. (깨달음 +1, 무력 +15)", "text-cyan-300 font-bold");
+        addStory("산중에서 만났던 노인이 세상을 떠나며 기보 한 장을 남겼다.");
+      },
+      monk: async (b, rec) => {
+        await say(`오랜만에 그 낡은 산사를 다시 찾았다. ${agoText(b)} 차를 내주던 눈먼 노승은 이미 입적한 뒤였다.`, "text-stone-200", 300);
+        await say("젊은 스님이 노승이 남긴 글을 건넸다. '검에 무엇을 실었는지, 이제는 답할 수 있겠소?'", "text-amber-200 italic", 300);
+        char.lifeBonus = Math.min(7, (char.lifeBonus || 0) + 1); char.insights = (char.insights || 0) + 1;
+        await rec.out("한참을 앉아 있다가, 처음으로 그 물음에 답할 수 있었다. (깨달음 +1, 수명 +1)", "text-cyan-300 font-bold");
+        addStory("눈먼 노승이 남긴 물음에 비로소 답을 찾았다.");
+      },
+      blood_heir: async (b, rec) => {
+        await say(`객잔 탁자에 다시 비수가 꽂혔다. 비수에 매달린 도전장에는 이렇게 적혀 있었다. '스승 혈검의 원수를 갚겠다. — ${b.name}'`, "text-rose-300", 300);
+        const i = await arcChoose([
+          { label: "낙화대로 다시 간다", hint: "생사결 · 이기면 혈검의 검보", p: "neutral" },
+          { label: "스승의 마지막 초식을 적어 보내 준다", hint: "협의 +5 · 원한을 푼다", p: "orthodox" }
+        ]);
+        if (i === 1) { addAlign(5, 0, 0); await rec.out(`그날 혈검이 마지막으로 펼친 초식을 적어 보냈다. 며칠 뒤 '감사합니다'라는 한 줄과 함께 비수가 돌아왔다. (협의 +5)`, "text-sky-300"); addStory(`혈검의 제자 ${b.name}에게 스승의 마지막 초식을 전해 주었다.`); return; }
+        if (await bondFight(`혈검의 제자 ${b.name}`, 1.2, rec, 0.12, `혈검의 제자 ${b.name}의 검에 쓰러졌다`)) {
+          gainStats(6, 8, 6); gainFame(15);
+          await rec.out(`스승을 빼닮은 검이었다. ${b.name}${josa(b.name, "이", "가")} 남긴 검보에서 혈검의 진짜 검로가 보였다. (무력 +20, 명성 +15)`, "text-yellow-300 font-bold");
+          addStory(`혈검의 제자 ${b.name}의 도전을 꺾었다.`);
+        }
+      }
+    });
+
+    // ---- 나이대별 새 사건 ----
+    RANDOM_EVENTS.push(
+      {
+        id: "sworn_brothers", ph: [0],
+        cond: () => !bondsOf("sworn").length,
+        build: () => {
+          const nm = personName(false);
+          return {
+            title: "복숭아밭의 맹세",
+            desc: `객잔에서 시비가 붙은 또래 무인 ${nm}${josa(nm, "과", "와")} 한나절을 치고받다가, 결국 둘 다 쓰러져 웃음을 터뜨렸습니다. "이것도 인연인데, 형제의 연을 맺는 게 어떤가?"`,
+            choices: [
+              { path: "orthodox", label: "복숭아밭에서 의형제를 맺는다", hint: "평생의 인연 · 훗날 다시 만난다",
+                apply: () => { makeBond("sworn", 7, 12, { name: nm, path: getPath(), header: "의형제" }); addAlign(2, 0, 0); addStory(`또래 무인 ${nm}${josa(nm, "과", "와")} 의형제를 맺었다.`);
+                  return { text: `복숭아꽃 아래서 술잔을 나누었습니다. ${nm}${josa(nm, "이", "가")} 형, 당신이 아우가 되었습니다.`, chips: [["인연", `의형 ${nm}`], ["협의", "+2"]] }; } },
+              { path: "neutral", label: "웃으며 술값만 나눠 내고 헤어진다", hint: "외공 +3",
+                apply: () => { gainStats(0, 3, 0); return { text: "주먹을 섞은 덕에 몸놀림이 한결 매서워졌습니다.", chips: [["외공", "+3"]] }; } }
+            ]
+          };
+        }
+      },
+      {
+        id: "first_blood", ph: [0],
+        cond: () => !char.flags.firstBlood,
+        build: () => ({
+          title: "첫 실전",
+          desc: "마을을 덮친 산적과 처음으로 진검을 맞댔습니다. 쓰러진 산적이 목을 내밀며 떨고 있습니다. \"살려 주시오, 집에 어린 자식이…\"",
+          choices: [
+            { path: "orthodox", label: "칼을 거두고 다시는 이런 짓을 말라며 보낸다", hint: "협의 +4 · 훗날 다시 만난다",
+              apply: () => { char.flags.firstBlood = true; addAlign(4, 0, 0); makeBond("first_spared", 12, 18, { header: "베지 않은 사람" });
+                return { text: "산적은 몇 번이고 절을 하며 숲으로 사라졌습니다. 손이 한참 동안 떨렸습니다.", chips: [["협의", "+4"]] }; } },
+            { path: "unorthodox", label: "후환을 남기지 않는다", hint: "외공 +5 · 악명 +3 · 마음의 짐",
+              apply: () => { char.flags.firstBlood = true; addAlign(0, 3, 0); gainStats(0, 5, 0); makeBond("first_killed", 14, 22, { header: "첫 피" });
+                return { text: "처음으로 사람을 베었습니다. 그날 밤 잠을 이루지 못했습니다.", chips: [["외공", "+5"], ["악명", "+3"]] }; } }
+          ]
+        })
+      },
+      {
+        id: "forbidden_library", ph: [0],
+        build: () => ({
+          title: "장경각의 밤",
+          desc: "잠든 사형들 몰래 장경각에 숨어들었습니다. 금서 서가에 손을 뻗는 순간, 등 뒤에서 기침 소리가 들립니다. 서고지기 노인입니다.",
+          choices: [
+            { path: "orthodox", label: "솔직히 무릎 꿇고 잘못을 고한다", hint: "협의 +3 · 노인의 가르침",
+              apply: () => { addAlign(3, 0, 0); gainStats(5, 0, 0); return { text: "노인은 혀를 차더니 금서 대신 기본 심법의 숨은 뜻을 풀어 주었습니다. (내공 +5)", chips: [["협의", "+3"], ["내공", "+5"]] }; } },
+            { path: "unorthodox", label: "노인을 밀치고 금서를 품에 넣어 달아난다", hint: "악명 +4 · 외공 +4 · 신법 +4",
+              apply: () => { addAlign(0, 4, 0); gainStats(0, 4, 4); return { text: "금서의 초식은 위험했지만 강했습니다. 사문에서는 범인을 끝내 찾지 못했습니다.", chips: [["악명", "+4"], ["외공", "+4"], ["신법", "+4"]] }; } }
+          ]
+        })
+      },
+      {
+        id: "senior_bully", ph: [0],
+        build: () => ({
+          title: "사형의 텃세",
+          desc: "덩치 큰 사형이 매일같이 허드렛일을 떠넘기고, 대련을 핑계로 두들겨 팹니다. 오늘도 목검을 들고 다가옵니다.",
+          choices: [
+            { path: "neutral", label: "이를 악물고 버틴다", hint: "외공 +4 · 수모를 견딘다",
+              apply: () => { gainStats(0, 4, 0); return { text: "맞으면서 배웠습니다. 사형의 목검 궤적이 점점 보이기 시작했습니다.", chips: [["외공", "+4"]] }; } },
+            { path: "unorthodox", label: "한밤중에 사형을 찾아가 결판을 낸다", hint: "이기면 신법 +5 · 지면 부상",
+              apply: () => { if (autoDuel(0.9).won) { gainStats(0, 0, 5); gainFame(3); return { text: "사형이 바닥에 나뒹굴었습니다. 다음 날부터 아무도 일을 떠넘기지 않았습니다.", chips: [["신법", "+5"], ["명성", "+3"]] }; }
+                char.injury = { ...INJURIES[0] }; return { text: "더 두들겨 맞았습니다. 그래도 사형은 그 뒤로 조금 조심스러워졌습니다.", chips: [["부상", INJURIES[0].name]] }; } },
+            { path: "orthodox", label: "사부에게 고한다", hint: "협의 +2",
+              apply: () => { addAlign(2, 0, 0); return { text: "사형은 벌을 받았고, 사부는 '스스로 이겨 내는 법도 배우거라'라고만 했습니다.", chips: [["협의", "+2"]] }; } }
+          ]
+        })
+      },
+      {
+        id: "young_hero", ph: [2],
+        cond: () => !bondsOf("protege").length,
+        build: () => {
+          const nm = personName(Math.random() < 0.4);
+          return {
+            title: "젊은 협객의 청",
+            desc: `이제 막 강호에 나온 젊은 협객 ${nm}${josa(nm, "이", "가")} 한 수 가르침을 청합니다. 눈빛이 젊은 날의 나를 닮았습니다.`,
+            choices: [
+              { path: "orthodox", label: "한 해 동안 곁에 두고 이끌어 준다", hint: "협의 +4 · 수련 일부를 내준다 · 훗날의 인연",
+                apply: () => { addAlign(4, 0, 0); char.ext = Math.max(10, char.ext - 2); makeBond("protege", 6, 12, { name: nm, header: "이끌어 준 사람" });
+                  return { text: `${nm}${josa(nm, "은", "는")} 스펀지처럼 배웠습니다. 가르치며 내 검도 다시 돌아보게 되었습니다.`, chips: [["협의", "+4"], ["인연", nm]] }; } },
+              { path: "neutral", label: "기본 하나만 일러 주고 보낸다", hint: "명성 +2",
+                apply: () => { gainFame(2); return { text: "젊은 협객은 깊이 고개를 숙이고 떠났습니다.", chips: [["명성", "+2"]] }; } }
+            ]
+          };
+        }
+      },
+      {
+        id: "old_wound", ph: [2],
+        build: () => ({
+          title: "묵은 내상",
+          desc: "젊은 날 무리하게 내공을 끌어 쓰던 곳이 비 오는 날마다 저려 옵니다. 의원은 한 해쯤 운기를 멈추고 쉬라고 합니다.",
+          choices: [
+            { path: "neutral", label: "의원의 말대로 한 해를 쉰다", hint: "수명 +1 · 내공 -3",
+              apply: () => { char.lifeBonus = Math.min(7, (char.lifeBonus || 0) + 1); char.qi = Math.max(10, char.qi - 3);
+                return { text: "오랜만에 검을 내려놓고 쉬었습니다. 몸이 한결 가벼워졌습니다.", chips: [["수명", "+1"], ["내공", "-3"]] }; } },
+            { path: "demonic", label: "통증을 무시하고 더 몰아붙인다", hint: "내공 +8 · 부상 위험",
+              apply: () => { gainStats(8, 0, 0); if (Math.random() < 0.4) { char.injury = { ...INJURIES[2] }; return { text: "내공은 늘었지만 결국 내상이 도졌습니다.", chips: [["내공", "+8"], ["부상", INJURIES[2].name]] }; }
+                return { text: "고통 속에서 벽 하나를 넘었습니다.", chips: [["내공", "+8"]] }; } }
+          ]
+        })
+      },
+      {
+        id: "young_genius", ph: [3],
+        build: () => ({
+          title: "젊은 천재의 도전",
+          desc: "열아홉 살 천재가 천하를 돌며 이름난 노고수들을 차례로 꺾고 있습니다. 오늘 그 칼끝이 내게 왔습니다. \"늙은 호랑이의 이빨이 아직 남았는지 봅시다.\"",
+          choices: [
+            { path: "neutral", label: "늙은 호랑이의 이빨을 보여 준다", hint: "이기면 명성 크게 ↑ · 지면 명성 ↓",
+              apply: () => { if (autoDuel(1.15).won) { gainFame(20); char.insights = (char.insights || 0) + 1; addStory("천하를 휩쓸던 젊은 천재를 꺾었다.");
+                  return { text: "천재가 무릎을 꿇었습니다. 강호는 노고수의 이름을 다시 입에 올렸습니다.", chips: [["명성", "+20"], ["깨달음", "+1"]] }; }
+                gainFame(-10); return { text: "끝내 한 초 차이로 밀렸습니다. 천재는 정중히 고개를 숙이고 떠났습니다. 세월은 누구도 비켜 가지 않았습니다.", chips: [["명성", "-10"]] }; } },
+            { path: "orthodox", label: "검 대신 차 한 잔을 내민다", hint: "협의 +3 · 천재와의 인연",
+              apply: () => { addAlign(3, 0, 0); gainStats(0, 0, 3); return { text: "천재는 어리둥절해하다 자리에 앉았습니다. 밤새 무공이 아닌 세상 이야기를 나누었습니다.", chips: [["협의", "+3"], ["신법", "+3"]] }; } }
+          ]
+        })
+      },
+      {
+        id: "memoir", ph: [3],
+        cond: () => !char.flags.memoir,
+        build: () => {
+          const cost = scaled(60);
+          return {
+            title: "남길 것",
+            desc: "밤이 길어졌습니다. 평생 익힌 것을 글로 남겨 둘지, 그대로 품고 갈지 생각합니다.",
+            choices: [
+              { path: "orthodox", label: `필사공을 들여 무공 비급을 남긴다 (은자 ${cost})`, hint: char.money >= cost ? "제자 성장 ↑ · 엔딩에 기록" : "은자가 부족하다",
+                apply: () => { if (char.money < cost) return { text: "먹과 종이를 살 돈조차 넉넉지 않았습니다.", chips: [] };
+                  char.money -= cost; char.flags.memoir = "manual"; if (sect()) sect().disciples.forEach(d => d.power += 15); addStory("평생의 무공을 비급으로 남겼다.");
+                  return { text: "한 자 한 자 평생의 검리를 적어 내려갔습니다. 마지막 장에 이름을 적고 붓을 놓았습니다.", chips: [["은자", `-${cost}냥`], ["비급", "완성"]] }; } },
+              { path: "neutral", label: "무공 대신 살아온 이야기를 적는다", hint: "명성 +8 · 엔딩에 기록",
+                apply: () => { char.flags.memoir = "life"; gainFame(8); addStory("살아온 이야기를 회고록으로 남겼다.");
+                  return { text: "무공보다 사람 이야기가 더 길어졌습니다. 쓰다 보니 웃을 일도, 울 일도 많았습니다.", chips: [["명성", "+8"]] }; } },
+              { path: "demonic", label: "검리는 내 것이다. 아무것도 남기지 않는다", hint: "마성 +3 · 내공 +5",
+                apply: () => { char.flags.memoir = "none"; addAlign(0, 0, 3); gainStats(5, 0, 0); return { text: "모든 것을 단전 깊숙이 갈무리했습니다.", chips: [["마성", "+3"], ["내공", "+5"]] }; } }
+            ]
+          };
+        }
+      },
+      {
+        id: "old_friend_funeral", ph: [3],
+        cond: () => (char.peers || []).some(p => !p.alive),
+        build: () => {
+          const dead = (char.peers || []).filter(p => !p.alive);
+          const p = dead[dead.length - 1];
+          return {
+            title: "옛 동기의 장례",
+            desc: `함께 입문했던 동기 ${p.name}의 장례에 갔습니다. 문상객 가운데 젊은 날의 얼굴은 손에 꼽을 만큼밖에 남지 않았습니다.`,
+            choices: [
+              { path: "orthodox", label: "그의 남은 식솔을 돌봐 주겠다고 약속한다", hint: `협의 +4 · 은자 -${scaled(30)}`,
+                apply: () => { addAlign(4, 0, 0); char.money = Math.max(0, char.money - scaled(30)); return { text: "젊은 날의 경쟁자였지만, 끝은 같은 길 위의 벗이었습니다.", chips: [["협의", "+4"]] }; } },
+              { path: "neutral", label: "홀로 남아 그와의 마지막 비무를 떠올린다", hint: "깨달음 기회",
+                apply: () => { if (Math.random() < 0.4) { char.insights = (char.insights || 0) + 1; return { text: "그가 늘 쓰던 초식의 빈틈과 장점이 처음으로 온전히 보였습니다.", chips: [["깨달음", "+1"]] }; }
+                  return { text: "무덤 앞에 술 한 잔을 붓고 돌아섰습니다.", chips: [] }; } }
+            ]
+          };
+        }
+      },
+      {
+        id: "retire_offer", ph: [3],
+        cond: () => !char.flags.retireAsked,
+        build: () => ({
+          title: "은퇴 권유",
+          desc: "후배들이 찾아와 조심스레 말을 꺼냅니다. \"이제 강호의 일은 저희에게 맡기시고, 편히 쉬시지요.\"",
+          choices: [
+            { path: "orthodox", label: "웃으며 자리를 물려준다", hint: "수명 +2 · 녹봉은 그대로 · 명성 +5",
+              apply: () => { char.flags.retireAsked = true; char.lifeBonus = Math.min(7, (char.lifeBonus || 0) + 2); gainFame(5); addStory("후배들에게 강호의 자리를 물려주었다.");
+                return { text: "짐을 내려놓으니 아침 햇살이 이렇게 따뜻한 줄 처음 알았습니다.", chips: [["수명", "+2"], ["명성", "+5"]] }; } },
+            { path: "demonic", label: "\"내 검이 녹슬었는지 직접 확인해 보거라.\"", hint: "무력 +9 · 현역 유지",
+              apply: () => { char.flags.retireAsked = true; gainStats(3, 3, 3); return { text: "후배 셋이 한꺼번에 덤볐다가 나란히 엉덩방아를 찧었습니다.", chips: [["무력", "+9"]] }; } }
+          ]
+        })
+      }
+    );
 
     // ==========================================
     // [연작] 멸문의 원수 · 마교의 부활 (출신별 역할)
@@ -5887,6 +6410,7 @@
         if (won) {
           if (i === 0) {
             gainStats(25, 18, 14); gainFame(30);
+            st.saved = true;
             await rec.out("혈수귀가 쓰러지자, 사부가 떨리는 손으로 독문절기의 구결을 귀에 속삭였다. \"이제 네 것이다.\" (내공 +25, 외공 +18, 신법 +14, 깨달음 +1)", "text-cyan-300 font-bold");
             addStory("사부를 구하고 혈수귀를 베어 사부의 독문절기를 이어받았다.");
             char.insights = (char.insights || 0) + 1;
@@ -6128,6 +6652,8 @@
       char.lastEventNote = "";
 
       try {
+        await lifeTurn(rec);
+        if (char.dead) { await finishLifeStory(); return; }
         await storyHeader(`${startAge}세`);
         const openers = ["sect", "own"].includes(affiliation()) ? SEASON_OPEN : SEASON_OPEN.filter(t => !/산문|연무장/.test(t));
         await say(pick(openers), "text-stone-400 italic", 250);
@@ -6157,6 +6683,8 @@
         await runArcs(rec);
         if (char.dead) { await finishLifeStory(); return; }
         await discipleChapter();
+        if (char.dead) { await finishLifeStory(); return; }
+        await bondChapter(rec);
         if (char.dead) { await finishLifeStory(); return; }
         await maybeAssassination(rec);
         if (char.dead) { await finishLifeStory(); return; }
