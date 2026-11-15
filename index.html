@@ -1438,6 +1438,7 @@
           const isDefault = ORIGIN_KEYS.some(k => originInfo(k).defaultSect === sectInput.value.trim()) || !sectInput.value.trim();
           selectedFaction = key;
           if (isDefault) sectInput.value = f.defaultSect;
+          if (nameIsAuto()) rollName();
           renderFactionSelector();
         };
         grid.appendChild(div);
@@ -1884,11 +1885,27 @@
       document.getElementById("btn-toggle-setup").innerText = open ? "직접 정하기 접기 ▴" : "직접 정하고 시작하기 ▾";
     }
 
-    function randomWuxiaName() {
-      const female = Math.random() < 0.35;
-      return pick(PERSON_SUR) + pick(female ? PERSON_F.concat(["소운", "비연", "월향"]) : PERSON_M.concat(["천혁", "태호", "서진", "검우", "율"]));
+    const COMMON_SUR = ["연", "설", "단", "위", "진", "한", "백", "소", "하", "유", "강", "서", "윤", "임"];
+    const ORIGIN_SUR = { orthodox: COMMON_SUR, ronin: COMMON_SUR, unorthodox: COMMON_SUR.concat(["마", "곽", "독고"]), demonic: ["혈", "음", "사", "적", "야율", "혁련"] };
+    const ORIGIN_GIVEN = {
+      demonic: { m: ["천혁", "무영", "혈광", "명우", "흑린", "사혼"], f: ["월향", "비연", "요화", "설영", "흑란"] },
+      unorthodox: { m: ["태호", "패산", "독수", "광우", "철호"], f: ["비연", "야화", "홍련", "소운"] },
+    };
+    function clanSurname(sect) {
+      const m = (sect || "").trim().match(/^([가-힣]{1,2})세가/);
+      return m ? m[1] : pick(["남궁", "모용", "제갈", "구양"]);
     }
-    function rollName() { document.getElementById("input-name").value = randomWuxiaName(); }
+    function randomWuxiaName(key = selectedFaction, sect) {
+      const female = Math.random() < 0.35;
+      if (sect === undefined) { const el = document.getElementById("input-sect"); sect = el ? el.value : ""; }
+      const sur = key === "clan" ? clanSurname(sect) : pick(ORIGIN_SUR[key] || COMMON_SUR);
+      const extra = ORIGIN_GIVEN[key];
+      const pool = female ? PERSON_F.concat(["소운", "비연", "월향"], extra ? extra.f : []) : PERSON_M.concat(["천혁", "태호", "서진", "검우", "율"], extra ? extra.m : []);
+      return sur + pick(pool);
+    }
+    let lastAutoName = "";
+    function rollName() { lastAutoName = randomWuxiaName(); document.getElementById("input-name").value = lastAutoName; }
+    function nameIsAuto() { const v = document.getElementById("input-name").value.trim(); return !v || v === lastAutoName; }
 
     function quickStart() {
       selectedFaction = pick(ORIGIN_KEYS);
@@ -1896,7 +1913,7 @@
       selectedTemper = tk[Math.floor(Math.random() * tk.length)];
       selectedAvatarId = PIXEL_ASSETS.avatars[Math.floor(Math.random() * PIXEL_ASSETS.avatars.length)].id;
       const sect = selectedFaction === "clan" ? pick(["남궁세가 (南宮世家)", "모용세가 (慕容世家)", "제갈세가 (諸葛世家)"]) : originInfo(selectedFaction).defaultSect;
-      document.getElementById("input-name").value = randomWuxiaName();
+      document.getElementById("input-name").value = randomWuxiaName(selectedFaction, sect);
       document.getElementById("input-sect").value = sect;
       rollInitialStats();
       startGame();
@@ -8269,6 +8286,7 @@
       renderTemperSelector();
       renderArchiveButton();
       rollName();
+      document.getElementById("input-sect").addEventListener("change", () => { if (selectedFaction === "clan" && nameIsAuto()) rollName(); });
       showFriendChronicle();
       setTimeout(syncPendingRecords, 1500);
       updateUI();
