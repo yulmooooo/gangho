@@ -263,7 +263,7 @@
       <div class="space-y-3 text-xs font-bold">
         <div>
           <label class="block text-stone-300 mb-1">무협명 (이름)</label>
-          <input id="input-name" type="text" maxlength="12" value="풍천혁" placeholder="이름을 입력하십시오" class="w-full bg-stone-900 border border-stone-700 rounded-xl px-3 py-2 text-white font-bold focus:outline-none focus:border-amber-500">
+          <div class="flex gap-1.5"><input id="input-name" type="text" maxlength="12" value="" placeholder="이름을 입력하십시오" class="flex-1 min-w-0 bg-stone-900 border border-stone-700 rounded-xl px-3 py-2 text-white font-bold focus:outline-none focus:border-amber-500"><button type="button" onclick="rollName()" title="다른 이름" class="shrink-0 px-3 rounded-xl bg-stone-900 border border-stone-700 text-stone-300 font-bold text-sm cursor-pointer">다른 이름</button></div>
         </div>
 
         <div>
@@ -1594,7 +1594,7 @@
 
         addLog(char.age, `✕ [주화입마] 사경 돌파 중 기운이 역류하여 심각한 내상을 입었습니다. (내공 -${lostQi})`, "text-red-400 font-bold");
         const devRoll = Math.random();
-        if (devRoll < 0.04) { char.dead = true; char.deathCause = "폐관 중 주화입마로 끝내 숨을 거두었다"; }
+        if (devRoll < 0.04 * deathScale()) { char.dead = true; char.deathCause = "폐관 중 주화입마로 끝내 숨을 거두었다"; }
         else if (devRoll < 0.09 && !char.crippled) { char.crippled = { since: char.age }; char.qi = Math.max(10, Math.round(char.qi * 0.2)); addLog(char.age, "✕✕ [단전 파괴] 역류한 내력이 단전을 부숴 폐인이 되었습니다. (대환단·공청석유로 되살릴 수 있음)", "text-rose-400 font-bold"); addStory("주화입마로 단전이 부서져 폐인이 되었다."); }
         showBreakthroughResultPopup("DEVIATION", nextRank, -lostQi, 0, 0);
       }
@@ -1660,7 +1660,7 @@
     }
 
     function getAscensionProb() {
-      return Math.max(5, Math.min(80, 45 + Math.floor((getCombatPower() - 1600) / 15)) - ascensionAgePenalty());
+      return Math.max(5, Math.min(75, 35 + Math.floor((getCombatPower() - 1600) / 15)) - ascensionAgePenalty());
     }
 
     function executeAscensionTrial() {
@@ -1884,13 +1884,19 @@
       document.getElementById("btn-toggle-setup").innerText = open ? "직접 정하기 접기 ▴" : "직접 정하고 시작하기 ▾";
     }
 
+    function randomWuxiaName() {
+      const female = Math.random() < 0.35;
+      return pick(PERSON_SUR) + pick(female ? PERSON_F.concat(["소운", "비연", "월향"]) : PERSON_M.concat(["천혁", "태호", "서진", "검우", "율"]));
+    }
+    function rollName() { document.getElementById("input-name").value = randomWuxiaName(); }
+
     function quickStart() {
       selectedFaction = pick(ORIGIN_KEYS);
       const tk = Object.keys(TEMPERS);
       selectedTemper = tk[Math.floor(Math.random() * tk.length)];
       selectedAvatarId = PIXEL_ASSETS.avatars[Math.floor(Math.random() * PIXEL_ASSETS.avatars.length)].id;
       const sect = selectedFaction === "clan" ? pick(["남궁세가 (南宮世家)", "모용세가 (慕容世家)", "제갈세가 (諸葛世家)"]) : originInfo(selectedFaction).defaultSect;
-      document.getElementById("input-name").value = pick(QUICK_NAMES_A) + pick(QUICK_NAMES_B);
+      document.getElementById("input-name").value = randomWuxiaName();
       document.getElementById("input-sect").value = sect;
       rollInitialStats();
       startGame();
@@ -3588,7 +3594,7 @@
             { path: "neutral", label: "낙화대로 간다", hint: "한 수 위 고수와의 생사결 · 이기면 명성·은자·깨달음",
               apply: () => { const r = autoDuel(1.3);
                 if (r.won) { const m = scaled(120); char.money += m; gainFame(25); gainStats(10, 10, 10); char.insights = (char.insights || 0) + 1; addStory("혈검과의 결투에서 이겼다."); makeBond("blood_heir", 6, 10, { name: personName(Math.random() < 0.5), header: "혈검의 제자" }); return { text: "달빛 아래 혈검의 검이 부러졌습니다. 혈검이 남긴 검결에서 깨달음을 얻었고, 이튿날 강호에 당신의 이름이 퍼졌습니다.", chips: [["명성", "+25"], ["무력", "+30"], ["은자", `+${m}냥`], ["깨달음", "+1"]] }; }
-                if (Math.random() < 0.15) { char.dead = true; char.deathCause = "혈검과의 결투에서 쓰러졌다"; return { text: "혈검의 검이 달빛을 갈랐습니다. 그것이 마지막으로 본 풍경이었습니다…", chips: [] }; }
+                if (Math.random() < 0.15 * deathScale()) { char.dead = true; char.deathCause = "혈검과의 결투에서 쓰러졌다"; return { text: "혈검의 검이 달빛을 갈랐습니다. 그것이 마지막으로 본 풍경이었습니다…", chips: [] }; }
                 char.injury = { ...INJURIES[2] }; gainFame(3); return { text: "혈검의 검이 어깨를 꿰뚫었습니다. 목숨은 건졌지만 오래 누워 있어야 했습니다.", chips: [["명성", "+3"], ["부상", INJURIES[2].name]] }; } },
             { path: "orthodox", label: "무의미한 피는 흘리지 않겠다며 거절한다", hint: "협의 +2 · 명성 -3",
               apply: () => { addAlign(2, 0, 0); gainFame(-3); return { text: "겁쟁이라는 소문이 돌았지만 개의치 않았습니다.", chips: [["협의", "+2"], ["명성", "-3"]] }; } }
@@ -5548,7 +5554,7 @@
         { label: "웃으며 피해 간다", hint: "아무 일도 없다", chip: "회피" }
       ], autoIdx);
       if (i === 1) { await rec.out("상대의 기세를 흘려보내고 조용히 자리를 떴다.", "text-stone-400"); return; }
-      const won = await storyFight(char.name, Math.round(getCombatPower() * (char.injury ? 0.85 : 1)), foe.n, oppPower, { minor: true, lethal: 0.025 });
+      const won = await storyFight(char.name, Math.round(getCombatPower() * (char.injury ? 0.85 : 1)), foe.n, oppPower, { minor: true, lethal: 0.015 });
       if (char.dead) return;
       if (won) {
         const m = Math.round(25 * ratio * getPrizeMult() * (t.prizeBonus || 1));
@@ -5835,7 +5841,7 @@
     async function bondFight(name, ratio, rec, deathP, deathCause) {
       const won = await storyFight(char.name, Math.round(getCombatPower() * (char.injury ? 0.85 : 1)), name, Math.round(getBenchmarkPower() * ratio));
       if (won) return true;
-      if (Math.random() < deathP) { await dieNow(deathCause, "그날의 인연이 이렇게 돌아올 줄은 몰랐다…"); return false; }
+      if (Math.random() < deathP * deathScale()) { await dieNow(deathCause, "그날의 인연이 이렇게 돌아올 줄은 몰랐다…"); return false; }
       char.injury = { ...INJURIES[1] };
       await rec.out(`✕ 크게 다쳐 물러났다. (${INJURIES[1].name})`, "text-rose-400 font-bold");
       return false;
@@ -6304,7 +6310,7 @@
             { path: "demonic", label: "서열전에 나선다", hint: "이기면 장로 · 깨달음 · 지면 목숨이 위험",
               apply: () => { if (autoDuel(1.25).won) { char.flags.cultElder = true; gainFame(20); gainStats(8, 8, 8); char.insights = (char.insights || 0) + 1; addStory("서열전에서 이겨 신교의 장로가 되었다.");
                   return { text: "혈영당주가 무릎을 꿇었습니다. 장로의 붉은 장포가 어깨에 걸쳐졌습니다.", chips: [["장로", "등극"], ["무력", "+24"], ["깨달음", "+1"]] }; }
-                if (char.age >= 20 && Math.random() < 0.1) { char.dead = true; char.deathCause = "신교의 장로 서열전에서 쓰러졌다"; return { text: "혈영당주의 장력이 심맥을 끊었습니다.", chips: [] }; }
+                if (char.age >= 20 && Math.random() < 0.1 * deathScale()) { char.dead = true; char.deathCause = "신교의 장로 서열전에서 쓰러졌다"; return { text: "혈영당주의 장력이 심맥을 끊었습니다.", chips: [] }; }
                 char.injury = { ...INJURIES[2] }; return { text: "패했지만 목숨은 건졌습니다.", chips: [["부상", INJURIES[2].name]] }; } },
             { path: "neutral", label: "아직 때가 아니라며 물러난다", hint: "변화 없음",
               apply: () => ({ text: "혈영당주가 장로가 되었습니다. 그의 눈빛이 나를 오래 기억할 것 같았습니다.", chips: [] }) }
@@ -7209,7 +7215,7 @@
     }
 
     async function arcLoss(cause, scene, deathP, rec) {
-      if (Math.random() < deathP) { await dieNow(cause, scene); return true; }
+      if (Math.random() < deathP * deathScale()) { await dieNow(cause, scene); return true; }
       char.injury = { ...INJURIES[2] };
       await rec.out(`✕ 간신히 목숨만 건져 물러났다. (${INJURIES[2].name})`, "text-rose-400 font-bold");
       return false;
@@ -7508,7 +7514,7 @@
             await rec.out("사제가 함께 혈수귀를 물리쳤다. 사부는 껄껄 웃으며 고향으로 돌아갔다. (내공 +7, 외공 +5, 신법 +4)", "text-cyan-300 font-bold");
             addStory("사부와 함께 혈수귀를 물리쳤다.");
           }
-        } else if (Math.random() < 0.08) {
+        } else if (Math.random() < 0.08 * deathScale()) {
           await dieNow("혈수귀의 손에 사부와 함께 쓰러졌다", "혈수귀의 손이 가슴을 꿰뚫었다. 쓰러지는 사부의 모습이 마지막으로 눈에 담겼다…");
         } else {
           char.injury = { ...INJURIES[2] };
@@ -7538,7 +7544,7 @@
         await rec.out(`생사를 건 승부 끝에 벽 하나를 넘었다. (내공 +18, 외공 +15, 신법 +15, 깨달음 +1)`, "text-cyan-300 font-bold");
         if (j === 0) { addAlign(0, 6, 0); gainFame(25); foe.alive = false; foe.deathAge = char.age; foe.deathCause = "숙명의 맞수에게 패해"; await rec.out(`${fn}${josa(fn, "은", "는")} 웃으며 쓰러졌다. "역시… 너였구나."`, "text-rose-300 font-bold"); addStory(`숙명의 맞수 동기 ${fn}${josa(fn, "을", "를")} 생사결에서 베었다.`); }
         else { addAlign(6, 0, 0); gainFame(20); foe.path = "neutral"; await rec.out(`${fn}${josa(fn, "은", "는")} 한참을 말없이 서 있다가 검을 꺾고 산을 내려갔다.`, "text-sky-300 font-bold"); addStory(`숙명의 맞수 동기 ${fn}${josa(fn, "을", "를")} 꺾고 살려 보냈다.`); }
-      } else if (Math.random() < 0.25) {
+      } else if (Math.random() < 0.25 * deathScale()) {
         await dieNow(`숙명의 맞수 동기 ${fn}의 검에 쓰러졌다`, `${fn}의 검이 심장을 꿰뚫었다. "미안하다… 이것이 강호다." 그의 목소리가 아득해진다…`);
       } else {
         char.injury = { ...INJURIES[3] };
@@ -7622,8 +7628,37 @@
         { label: "생사경", ok: char.rankIdx === 7 },
         { label: `무력 1600 (${getCombatPower()})`, ok: getCombatPower() >= 1600 },
         { label: `깨달음·기연 ${Math.min(3, char.insights || 0)}/3`, ok: (char.insights || 0) >= 3 },
-        { label: "천하제일 우승", ok: (char.championships || 0) >= 1 }
+        { label: "천하제일 우승 또는 칭호", ok: (char.championships || 0) >= 1 || (char.honors || []).length >= 1 }
       ];
+    }
+
+    // 조건을 갖추면 이야기 속에서 천겁이 찾아온다
+    async function ascensionCall(rec) {
+      if (char.hasAscended || char.dead || char.rankIdx !== 7 || !ascensionReqs().every(r => r.ok)) return;
+      if (char.flags.ascAskAge != null && char.age - char.flags.ascAskAge < 3) return;
+      char.flags.ascAskAge = char.age;
+      const p = getAscensionProb();
+      await storyHeader("천겁의 기운");
+      await say("하늘 저편에서 우레가 울렸다. 구름이 소용돌이치며 머리 위로 모여들었다. 오랫동안 기다려 온 천겁(天劫)의 기운이었다.", "text-cyan-200", 350);
+      const i = await choose([
+        { label: "천겁에 맞선다", hint: `성공하면 우화등선 · 약 ${p}% · 실패하면 내공 -45`, chip: "등선", chipClass: "bg-cyan-950 text-cyan-300 border-cyan-500/60" },
+        { label: "아직 때가 아니다", hint: "3년 뒤 다시 찾아온다", chip: "기다림" }
+      ], p >= 50 || char.age >= 80 ? 0 : 1);
+      if (i === 1) { await rec.out("천겁의 기운이 흩어졌다. 언젠가 다시 찾아오리라.", "text-stone-400 italic"); return; }
+      if (Math.random() * 100 < p) {
+        await say("아홉 줄기의 벼락이 내리꽂혔다. 그리고, 몸이 가벼워졌다.", "text-cyan-300 font-bold", 600);
+        char.hasAscended = true;
+        char.title = "천상선인(天上仙人)";
+        addLog(char.age, `★★★★★ [우화등선] 천겁을 뚫고 신선의 반열에 올랐습니다!`, "text-cyan-300 font-brush text-base");
+        addStory("구천현뢰를 뚫고 우화등선하였다.");
+        autoMode = false;
+        storyChips([["우화등선", "성공"]]);
+        setTimeout(() => { yearBusy = false; showFinalEnding("ASCENSION"); saveLifeToArchive(); submitToLeaderboard(true); updateUI(); }, 600);
+        return;
+      }
+      char.qi = Math.max(10, char.qi - 45);
+      await rec.out("✕ 구천현뢰의 위력에 밀려 땅으로 떨어졌다. 다음을 기약할 수밖에. (내공 -45)", "text-rose-400 font-bold");
+      addStory("천겁에 맞섰으나 실패했다.");
     }
 
     function ascensionAgePenalty() {
@@ -7633,6 +7668,12 @@
     // ==========================================
     // [강호의 죽음] 비무 중 사망 · 단전 파괴 · 폐인 · 암살
     // ==========================================
+    // 젊을수록 싸움에 져도 목숨만은 건지는 일이 많다 (중반에 허무하게 끝나지 않도록)
+    function deathScale() {
+      const a = char.age;
+      return a < 30 ? 0.25 : a < 45 ? 0.35 : a < 60 ? 0.7 : 1;
+    }
+
     async function dieNow(cause, scene) {
       if (scene) await say(scene, "text-rose-300 font-bold", 700);
       char.dead = true;
@@ -7644,8 +7685,7 @@
       if (!lethal || char.dead) return;
       const ratio = Math.min(2, Math.max(0.8, oppPower / Math.max(1, myPower)));
       if (char.age < 20) return;
-      const youth = char.age < 30 ? 0.5 : 1;
-      if (Math.random() >= lethal * ratio * youth) return;
+      if (Math.random() >= lethal * ratio * deathScale()) return;
       await dieNow(`${oppName}${josa(oppName, "과", "와")}의 싸움에서 쓰러졌다`, pick([
         `${oppName}의 검이 가슴을 꿰뚫었다. 시야가 붉게 물들며 무릎이 꺾인다…`,
         `마지막 일격을 피하지 못했다. 차가운 흙바닥이 뺨에 닿는다…`,
@@ -7657,7 +7697,7 @@
     async function dantianCheck(rec, chance) {
       if (char.dead || char.crippled || Math.random() >= chance) return;
       await say("✕✕ 단전(丹田)에서 무언가가 깨지는 소리가 났다.", "text-rose-400 font-brush text-base", 400);
-      if (Math.random() < 0.35) {
+      if (Math.random() < 0.35 * deathScale()) {
         await dieNow("단전이 파괴되어 기혈이 역류해 숨을 거두었다", "모아 온 내력이 한꺼번에 역류했다. 온몸의 혈맥이 터져 나간다…");
         return;
       }
@@ -7697,7 +7737,7 @@
         addStory(`${who.n}의 암습에서 살아남았다.`);
         return;
       }
-      if (Math.random() < 0.35) {
+      if (Math.random() < 0.35 * deathScale()) {
         await dieNow(`${who.n}의 손에 암살당했다`, pick([
           "비수가 등을 파고들었다. 돌아볼 틈도 없었다…",
           "목구멍이 타들어 간다. 독이었다…",
@@ -7785,6 +7825,8 @@
         if (char.dead) { await finishLifeStory(); return; }
         await bondChapter(rec);
         if (char.dead) { await finishLifeStory(); return; }
+        await ascensionCall(rec);
+        if (char.hasAscended) { yearBusy = false; updateUI(); return; }
         await maybeAssassination(rec);
         if (char.dead) { await finishLifeStory(); return; }
 
@@ -8094,13 +8136,13 @@
       }
 
       const btnAscension = document.getElementById("btn-ascension");
-      if (char.rankIdx === 7 && !char.hasAscended && !char.dead) {
+      if (char.rankIdx >= 6 && !char.hasAscended && !char.dead) {
         btnAscension.classList.remove("hidden");
-        const reqs = ascensionReqs();
+        const reqs = char.rankIdx === 7 ? ascensionReqs() : [{ label: "생사경", ok: false }, ...ascensionReqs().slice(1)];
         const ready = reqs.every(r => r.ok);
         btnAscension.innerHTML = ready
           ? `<span>우화등선 · 천겁에 맞서다 · 약 ${getAscensionProb()}%</span>`
-          : `<span class="text-xs leading-snug">⚡ 우화등선 조건 — ${reqs.map(r => `${r.ok ? "✓" : "✕"} ${r.label}`).join(" · ")}</span>`;
+          : `<span class="text-xs leading-snug">우화등선까지 — ${reqs.map(r => `${r.ok ? "✓" : "○"} ${r.label}`).join(" · ")}</span>`;
         btnAscension.classList.toggle("opacity-60", !ready);
       } else {
         btnAscension.classList.add("hidden");
@@ -8149,6 +8191,7 @@
       renderFactionSelector();
       renderTemperSelector();
       renderArchiveButton();
+      rollName();
       showFriendChronicle();
       setTimeout(syncPendingRecords, 1500);
       updateUI();
