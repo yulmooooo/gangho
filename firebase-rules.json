@@ -2,7 +2,7 @@
   "rules": {
     "rankings": {
       ".read": true,
-      ".indexOn": ["power", "dailyKey", "weeklyKey", "monthlyKey"],
+      ".indexOn": ["power", "dailyKey", "weeklyKey", "monthlyKey", "createdAt"],
       "$recordId": {
         ".write": "!data.exists() && newData.exists()",
         ".validate": "newData.hasChildren(['name', 'sect', 'power', 'rankName', 'age', 'avatarId', 'dailyKey', 'weeklyKey', 'monthlyKey', 'createdAt'])",
@@ -20,6 +20,9 @@
         "sectLevel": { ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 4" },
         "discipleCount": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 5" },
         "heirName":  { ".validate": "newData.isString() && newData.val().length <= 12" },
+        "origin":    { ".validate": "newData.isString() && (newData.val() === 'orthodox' || newData.val() === 'unorthodox' || newData.val() === 'demonic' || newData.val() === 'clan' || newData.val() === 'ronin')" },
+        "end":       { ".validate": "newData.isString() && (newData.val() === 'ascend' || newData.val() === 'old' || newData.val() === 'fall')" },
+        "title":     { ".validate": "newData.isString() && newData.val().length <= 16 && !newData.val().matches(/[<>]/)" },
         "createdAt": { ".validate": "newData.isNumber()" },
         "$other":    { ".validate": false }
       }
