@@ -1660,7 +1660,7 @@
     }
 
     function getAscensionProb() {
-      return Math.max(5, Math.min(75, 35 + Math.floor((getCombatPower() - 1600) / 15)) - ascensionAgePenalty());
+      return Math.max(5, Math.min(65, 25 + Math.floor((getCombatPower() - 2000) / 25)) - ascensionAgePenalty());
     }
 
     function executeAscensionTrial() {
@@ -2101,19 +2101,64 @@
       ctx.textAlign = "left";
     }
 
+    // 별호(別號): 성향 · 가장 높은 능력 · 무공 결로 사람마다 다르게 짓는다
+    function epithet() {
+      let h = 2166136261; for (const c of (char.name || "") + "|" + (char.originFaction || "") + "|" + (char.avatarId || "")) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619) >>> 0; }
+      let k = 0;
+      const at = arr => arr[(((h >>> (k++ * 7)) ^ (h >>> 3)) >>> 0) % arr.length];
+      const PATH = {
+        orthodox: [["청", "淸"], ["백", "白"], ["의", "義"], ["정", "正"]],
+        unorthodox: [["흑", "黑"], ["광", "狂"], ["야", "野"], ["독", "毒"]],
+        demonic: [["혈", "血"], ["마", "魔"], ["명", "冥"], ["귀", "鬼"]],
+        neutral: [["고", "孤"], ["낭", "浪"], ["무", "無"], ["한", "閑"]]
+      }[getPath()];
+      // 내공은 누구나 크게 자라므로, 외공·신법과 견줄 때는 조금 낮춰 본다
+      const sc = { qi: char.qi * 0.7, ext: char.ext, agi: char.agi };
+      const order = Object.keys(sc).sort((x, y) => sc[y] - sc[x]);
+      const top = order[0], second = order[1];
+      const MID = { qi: [["뢰", "雷"], ["운", "雲"], ["해", "海"], ["월", "月"]], ext: [["철", "鐵"], ["산", "山"], ["호", "虎"], ["염", "炎"]], agi: [["풍", "風"], ["영", "影"], ["연", "燕"], ["류", "流"]] }[top];
+      const END = { qi: [["장", "掌"], ["선", "仙"], ["존", "尊"], ["공", "功"]], ext: [["도", "刀"], ["권", "拳"], ["패", "覇"], ["창", "槍"]], agi: [["검", "劍"], ["객", "客"], ["협", "俠"], ["비", "飛"]] }[second];
+      let a = at(PATH), b = at(MID), c = at(END);
+      if (b[0] === a[0]) b = at(MID);
+      return `${a[0]}${b[0]}${c[0]}(${a[1]}${b[1]}${c[1]})`;
+    }
+
     function cardTitles() {
-      const t = [];
-      if (char.hasAscended) t.push("우화등선한 신선");
-      (char.honors || []).slice().reverse().forEach(h => t.push(h));
-      if ((char.championships || 0) >= 2) t.push(`천하제일 ${char.championships}회`);
-      else if ((char.championships || 0) === 1) t.push("천하제일 우승");
+      const big = [], traits = [];
+      if (char.hasAscended) big.push("우화등선한 신선");
+      (char.honors || []).slice().reverse().forEach(h => big.push(h));
+      if ((char.championships || 0) >= 2) big.push(`천하제일 ${char.championships}회`);
+      else if ((char.championships || 0) === 1) big.push("천하제일 우승");
+      // 한 생의 흔적 (사람마다 다르게 걸리는 것들)
+      const A = char.align || {}, F = char.flags || {};
+      const myth = (F.mythics || []).map(id => (MYTHIC_ITEMS.find(m => m.id === id) || {}).name).filter(Boolean);
+      const sworn = (char.bonds || []).find(b => b.kind === "sworn");
+      const twisted = (char.bonds || []).filter(b => b.twisted).length;
       const s = sect();
-      if (s) t.push(`${s.name.split(" (")[0]} 개파조사`);
-      const m = (char.flags && char.flags.mythics || []).length;
-      if (m >= 2) t.push(`전설 보물 ${m}종`);
-      if (char.age >= 95 && !char.hasAscended) t.push("백세 노고수");
-      if (!t.length && (char.insights || 0) >= 3) t.push("깨달음을 얻은 자");
-      return [...new Set(t)].slice(0, 3);
+      [
+        [myth.length >= 1, myth.length >= 2 ? `전설 보물 ${myth.length}종` : `${myth[0]}의 주인`],
+        [char.age <= 35 && !char.hasAscended, "요절한 기재"],
+        [char.age >= 100, "백세 노고수"],
+        [char.spouse, `${char.spouse}의 정인`],
+        [sworn && sworn.lifelong, `${sworn && sworn.name}의 아우`],
+        [sworn && sworn.betrayed, "의형에게 버림받은 자"],
+        [twisted >= 2, "은혜를 원수로 돌려받은 자"],
+        [F.memoir === "manual", "비급을 남긴 자"],
+        [F.memoir === "life", "회고록을 쓴 노인"],
+        [char.vow && typeof vowKept === "function" && vowKept() && char.age >= 61, "젊은 날의 다짐을 지킨 자"],
+        [s && s.disciples.length >= 6, `제자 ${s && s.disciples.length}명의 스승`],
+        [s, `${s && s.name.split(" (")[0]} 개파조사`],
+        [(A.righteous || 0) >= 250, "만인의 협객"],
+        [(A.evil || 0) >= 250, "강호의 공포"],
+        [(A.demonic || 0) >= 250, "마도의 화신"],
+        [char.money >= 5000, "강호의 큰손"],
+        [(char.insights || 0) >= 7, "깨달음의 구도자"],
+        [char.fame >= 400, "천하에 이름 높은 자"],
+        [F.retiring || F.retireAsked, "검을 내려놓은 자"],
+        [F.settled, "산골 마을의 은인"]
+      ].forEach(([ok, t]) => { if (ok && t) traits.push(t); });
+      const list = [epithet(), ...big, ...traits];
+      return [...new Set(list)].slice(0, 3);
     }
 
     function myCardData() {
@@ -7658,8 +7703,8 @@
     function ascensionReqs() {
       return [
         { label: "생사경", ok: char.rankIdx === 7 },
-        { label: `무력 1600 (${getCombatPower()})`, ok: getCombatPower() >= 1600 },
-        { label: `깨달음·기연 ${Math.min(3, char.insights || 0)}/3`, ok: (char.insights || 0) >= 3 },
+        { label: `무력 2000 (${getCombatPower()})`, ok: getCombatPower() >= 2000 },
+        { label: `깨달음·기연 ${Math.min(5, char.insights || 0)}/5`, ok: (char.insights || 0) >= 5 },
         { label: "천하제일 우승 또는 칭호", ok: (char.championships || 0) >= 1 || (char.honors || []).length >= 1 }
       ];
     }
@@ -7675,7 +7720,7 @@
       const i = await choose([
         { label: "천겁에 맞선다", hint: `성공하면 우화등선 · 약 ${p}% · 실패하면 내공 -45`, chip: "등선", chipClass: "bg-cyan-950 text-cyan-300 border-cyan-500/60" },
         { label: "아직 때가 아니다", hint: "3년 뒤 다시 찾아온다", chip: "기다림" }
-      ], p >= 50 || char.age >= 80 ? 0 : 1);
+      ], p >= 45 || char.age >= 82 ? 0 : 1);
       if (i === 1) { await rec.out("천겁의 기운이 흩어졌다. 언젠가 다시 찾아오리라.", "text-stone-400 italic"); return; }
       if (Math.random() * 100 < p) {
         await say("아홉 줄기의 벼락이 내리꽂혔다. 그리고, 몸이 가벼워졌다.", "text-cyan-300 font-bold", 600);
@@ -7694,7 +7739,7 @@
     }
 
     function ascensionAgePenalty() {
-      return Math.max(0, char.age - 70) * 4;
+      return Math.max(0, char.age - 75) * 3;
     }
 
     // ==========================================
