@@ -1926,7 +1926,8 @@
 
     function myShareUrl() {
       if (!char.rankKey) return SITE_URL;
-      return `${SITE_URL}?r=${encodeURIComponent(char.rankKey)}&e=${encodeURIComponent(shortEndingTitle())}`;
+      const t = cardTitles().slice(0, 2).join("·");
+      return `${SITE_URL}?r=${encodeURIComponent(char.rankKey)}&e=${encodeURIComponent(shortEndingTitle())}${t ? `&t=${encodeURIComponent(t)}` : ""}`;
     }
 
     async function waitForRankKey(ms = 4000) {
@@ -2042,23 +2043,37 @@
       ctx.fillStyle = "#f6e7d0"; ctx.font = "900 40px 'Noto Serif KR', serif"; ctx.textAlign = "center";
       ctx.fillText("風", sx + 31, sy + 50); ctx.fillText("雲", sx + 31, sy + 98); ctx.textAlign = "left";
 
+      // 칭호 띠 (주홍 테두리 패)
+      const titles = d.titles || [];
+      let tx = L, ty = 492;
+      titles.forEach((t, i) => {
+        ctx.font = `${i === 0 ? 900 : 800} 28px 'Noto Serif KR', serif`;
+        const w = ctx.measureText(t).width + 36;
+        if (tx + w > R) return;
+        if (i === 0) { ctx.fillStyle = "#b3261a"; ctx.beginPath(); ctx.roundRect(tx, ty, w, 48, 4); ctx.fill(); ctx.fillStyle = "#f8ece0"; }
+        else { ctx.strokeStyle = "#8e2418"; ctx.lineWidth = 2; ctx.beginPath(); ctx.roundRect(tx + 1, ty + 1, w - 2, 46, 4); ctx.stroke(); ctx.fillStyle = "#8e2418"; }
+        ctx.textBaseline = "middle"; ctx.fillText(t, tx + 18, ty + 25); ctx.textBaseline = "alphabetic";
+        tx += w + 12;
+      });
+      const off = titles.length ? 56 : 0;
+
       // 16세 → 향년
       ctx.font = "900 56px 'Noto Serif KR', serif"; ctx.fillStyle = INK;
-      const a1 = `${d.startAge}세 `; ctx.fillText(a1, L, 560);
-      let x = L + ctx.measureText(a1).width; ctx.fillStyle = RED; ctx.fillText("→", x, 560);
-      x += ctx.measureText("→ ").width; ctx.fillStyle = INK; ctx.fillText(`${d.age}세`, x, 560);
+      const a1 = `${d.startAge}세 `; ctx.fillText(a1, L, 560 + off);
+      let x = L + ctx.measureText(a1).width; ctx.fillStyle = RED; ctx.fillText("→", x, 560 + off);
+      x += ctx.measureText("→ ").width; ctx.fillStyle = INK; ctx.fillText(`${d.age}세`, x, 560 + off);
       ctx.font = "600 30px 'Noto Serif KR', serif"; ctx.fillStyle = SUB;
-      ctx.fillText(clipText(ctx, `최종 경지 ${d.rankName} · ${d.sect} · ${d.pathLabel}`, R - L), L, 612);
+      ctx.fillText(clipText(ctx, `최종 경지 ${d.rankName} · ${d.sect} · ${d.pathLabel}`, R - L), L, 612 + off);
 
       const rg = ctx.createLinearGradient(L, 0, R, 0); rg.addColorStop(0, INK); rg.addColorStop(1, "rgba(22,18,14,.1)");
-      ctx.fillStyle = rg; ctx.fillRect(L, 676, R - L, 2);
+      ctx.fillStyle = rg; ctx.fillRect(L, 668 + off * 0.6, R - L, 2);
 
       // 사건 3줄
-      let y = 748;
+      let y = 740 + off * 0.6;
       d.events.forEach(ev => {
         ctx.font = "900 31px 'Noto Serif KR', serif"; ctx.fillStyle = RED; ctx.fillText(`${ev.age}세`, L, y);
         ctx.font = "600 31px 'Noto Serif KR', serif"; ctx.fillStyle = INK; ctx.fillText(clipText(ctx, ev.text, R - L - 120), L + 120, y);
-        y += 66;
+        y += off ? 58 : 66;
       });
       // 결말
       const ey = d.events.length ? y - 16 : 740;
@@ -2086,12 +2101,27 @@
       ctx.textAlign = "left";
     }
 
+    function cardTitles() {
+      const t = [];
+      if (char.hasAscended) t.push("우화등선한 신선");
+      (char.honors || []).slice().reverse().forEach(h => t.push(h));
+      if ((char.championships || 0) >= 2) t.push(`천하제일 ${char.championships}회`);
+      else if ((char.championships || 0) === 1) t.push("천하제일 우승");
+      const s = sect();
+      if (s) t.push(`${s.name.split(" (")[0]} 개파조사`);
+      const m = (char.flags && char.flags.mythics || []).length;
+      if (m >= 2) t.push(`전설 보물 ${m}종`);
+      if (char.age >= 95 && !char.hasAscended) t.push("백세 노고수");
+      if (!t.length && (char.insights || 0) >= 3) t.push("깨달음을 얻은 자");
+      return [...new Set(t)].slice(0, 3);
+    }
+
     function myCardData() {
       const info = getEndingInfo();
       return {
         name: char.name, startAge: 16, age: char.age,
         rankName: (info.rankLabel || ranks[char.rankIdx].name).split(" / ")[0].split(" (")[0],
-        sect: (char.honors && char.honors.length ? char.honors[char.honors.length - 1] : char.sect.split(" (")[0]), pathLabel: CARD_ROAD[info.path] || CARD_ROAD.neutral,
+        sect: char.sect.split(" (")[0], titles: cardTitles(), pathLabel: CARD_ROAD[info.path] || CARD_ROAD.neutral,
         events: lifeHighlights(), ending: shortEndingTitle() || "무림의 전설",
         power: getCombatPower(), dayRank: char.dayRank || null, insights: char.insights || 0,
         date: formatRecordDate(char.recordedAt)
@@ -2110,6 +2140,7 @@
         const r = await res.json();
         if (!r || !r.name) return;
         const ending = (q.get("e") || "").slice(0, 30);
+        const titlesQ = (q.get("t") || "").slice(0, 40).split("·").filter(Boolean).slice(0, 2);
         const path = PATH_INFO[r.path] ? r.path : "neutral";
         const INK = "#16120e", RED = "#8e2418", SUB = "#4a4036";
         box.innerHTML = `
@@ -2119,6 +2150,7 @@
               <span style="font-size:32px;font-weight:900;line-height:1">${escapeHtml(r.name)}</span>
               <span style="background:#b3261a;color:#f6e7d0;font-weight:900;font-size:11px;line-height:1.15;border-radius:3px;padding:3px 4px;text-align:center">風<br>雲</span>
             </div>
+            ${titlesQ.length ? `<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:5px">${titlesQ.map((t, i) => `<span style="font-size:11px;font-weight:900;padding:3px 8px;border-radius:3px;${i === 0 ? "background:#b3261a;color:#f8ece0" : "border:1.5px solid #8e2418;color:#8e2418"}">${escapeHtml(t)}</span>`).join("")}</div>` : ""}
             <div style="margin-top:8px;font-size:17px;font-weight:900">16세 <span style="color:${RED}">→</span> ${Number(r.age) || "?"}세 · ${escapeHtml(r.rankName || "")}</div>
             <div style="margin-top:3px;font-size:11.5px;font-weight:600;color:${SUB}">${escapeHtml(String(r.sect || "").split(" (")[0])} · ${CARD_ROAD[path]} · ${formatRecordDate(r.createdAt)} 기록</div>
             <div style="margin-top:10px;display:grid;grid-template-columns:repeat(3,1fr);text-align:center;border-top:1.5px solid ${INK};border-bottom:1.5px solid ${INK}">
@@ -4931,7 +4963,7 @@
       const box = document.getElementById("ending-extra");
       const story = char.story.slice(-14).map(s => `<div class="flex gap-2"><span class="shrink-0 text-amber-400 font-bold">${s.age}세</span><span>${escapeHtml(s.text)}</span></div>`).join("");
       const peers = getPeerFates().map(t => `<div>· ${escapeHtml(t)}</div>`).join("");
-      const honors = (char.honors || []).map(h => `<span class="inline-block px-2 py-0.5 mr-1 mb-1 rounded border border-amber-500/60 bg-amber-950/40 text-amber-200 text-[11px] font-bold">${escapeHtml(h)}</span>`).join("");
+      const honors = cardTitles().map(h => `<span class="inline-block px-2 py-0.5 mr-1 mb-1 rounded border border-amber-500/60 bg-amber-950/40 text-amber-200 text-[11px] font-bold">${escapeHtml(h)}</span>`).join("");
       box.innerHTML = (honors ? `<div class="space-y-1"><div class="text-[11px] font-brush text-amber-300">칭호</div><div>${honors}</div></div>` : "") + `
         <div class="space-y-1"><div class="text-[11px] font-brush text-amber-300">인생 이야기</div><div class="space-y-0.5 text-[11px] text-stone-300">${story}</div></div>
         <div class="space-y-1 pt-2 border-t border-stone-800"><div class="text-[11px] font-brush text-amber-300">동기들의 결말</div><div class="space-y-0.5 text-[11px] text-stone-400">${peers}</div></div>`;
