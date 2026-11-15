@@ -449,8 +449,9 @@
         </button>
         <div class="grid grid-cols-2 gap-1.5">
           <button onclick="openLeaderboardModal()" class="py-2 bg-stone-900 border border-stone-700 hover:bg-stone-800 text-stone-200 font-brush text-xs rounded-xl cursor-pointer">천하 서열록 보기</button>
-          <button onclick="location.href = location.pathname" class="py-2 bg-stone-900 border border-stone-700 hover:bg-stone-800 text-stone-200 font-brush text-xs rounded-xl cursor-pointer">새 생을 시작하다</button>
+          <button onclick="location.href = location.pathname" class="py-2 bg-stone-900 border border-stone-700 hover:bg-stone-800 text-stone-200 font-brush text-xs rounded-xl cursor-pointer">처음 화면으로</button>
         </div>
+        <button id="btn-next-life" onclick="location.href = location.pathname + '?go=1'" class="w-full py-2.5 font-brush text-sm rounded-xl cursor-pointer" style="background:#f3ede2;color:#16120e;border:1.5px solid #16120e">다음 생으로 (바로 시작)</button>
       </div>
     </div>
   </div>
@@ -2282,6 +2283,9 @@
         age: char.age,
         avatarId: char.avatarId,
         path: getPath(),
+        origin: ORIGIN_KEYS.includes(selectedFaction) ? selectedFaction : "orthodox",
+        end: char.hasAscended ? "ascend" : char.deathKind === "old" ? "old" : "fall",
+        title: epithet(),
         ...(char.sectData ? {
           sectPower: getSectTotalPower(),
           sectLevel: getSectLevelIdx() + 1,
@@ -2295,12 +2299,15 @@
       };
     }
 
+    const RANK_EXTRA_FIELDS = ["origin", "end", "title"];
     async function postRankRecord(record) {
-      const res = await fetch(rankingUrl(), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(record)
-      });
+      const send = body => fetch(rankingUrl(), { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+      let res = await send(record);
+      // 서버 규칙이 아직 새 칸을 모르면 예전 형식으로 다시 올린다
+      if (!res.ok && res.status >= 400 && res.status < 500 && RANK_EXTRA_FIELDS.some(k => k in record)) {
+        const legacy = { ...record }; RANK_EXTRA_FIELDS.forEach(k => delete legacy[k]);
+        res = await send(legacy);
+      }
       if (!res.ok) return false;
       try { const j = await res.json(); return j && j.name ? j.name : true; } catch (e) { return true; }
     }
@@ -2482,7 +2489,7 @@
               </div>
               <div class="min-w-0">
                 <div class="font-bold text-stone-100 truncate flex items-center gap-1.5">
-                  <span>${escapeHtml(entry.name)}</span>
+                  ${entry.title ? `<span class="text-[10px] font-black shrink-0" style="color:#f87171">${escapeHtml(String(entry.title).split("(")[0])}</span>` : ""}<span>${escapeHtml(entry.name)}</span>
                   <span class="text-[9px] px-1 py-0.2 rounded bg-stone-900 text-amber-300 border border-stone-800 shrink-0 font-normal">
                     ${escapeHtml(entry.sect)}
                   </span>
@@ -4673,6 +4680,7 @@
       char.spouse = "";
       char.dead = false;
       char.deathCause = "";
+      char.deathKind = "";
       char.growthRevealed = false;
       char.peers = makePeers();
       char.bonds = []; char.phaseSeen = null; char.vow = null; char.honors = []; char.oarc = null;
@@ -4895,7 +4903,7 @@
         sect() && sect().disciples.length ? "제자들이 지켜보는 가운데 조용히 숨을 거두었다" : "홀로 오른 산정에서 노을을 바라보며 눈을 감았다",
         char.spouse ? `반려 ${char.spouse}의 손을 잡은 채 잠들듯 떠났다` : "단골 주막에서 마지막 술잔을 비우고 잠들었다"
       ]);
-      if (deathCause) { char.dead = true; char.deathCause = deathCause; }
+      if (deathCause) { char.dead = true; char.deathCause = deathCause; char.deathKind = "old"; }
       else crippledYear(rec);
     }
 
@@ -8281,6 +8289,8 @@
 
     window.onload = function() {
       rollInitialStats();
+      selectedFaction = pick(ORIGIN_KEYS);
+      document.getElementById("input-sect").value = selectedFaction === "clan" ? pick(["남궁세가 (南宮世家)", "모용세가 (慕容世家)", "제갈세가 (諸葛世家)"]) : originInfo(selectedFaction).defaultSect;
       renderAvatarSelector();
       renderFactionSelector();
       renderTemperSelector();
@@ -8290,6 +8300,7 @@
       showFriendChronicle();
       setTimeout(syncPendingRecords, 1500);
       updateUI();
+      if (new URLSearchParams(location.search).get("go") === "1") { history.replaceState(null, "", location.pathname); quickStart(); }
     };
   </script>
 </body>
